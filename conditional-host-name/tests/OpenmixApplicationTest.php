@@ -1,7 +1,7 @@
 <?php
 
 require_once 'TestHelper.php';
-require_once(APP_DIR . '/ConditionalHostname.php');
+require_once(APP_DIR . '/OpenmixApplication.php');
 
 class OpenmixTest extends PHPUnit_Framework_TestCase
 {
@@ -57,53 +57,83 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
     public function service()
     {
         $testData = array(
-        // both meet availability threshold and cdn1 is fastest
-        // country 'de' means append '123.' to the provider CNAME
+            // both meet availability threshold and cdn1 is fastest
+            // country 'de' means append '123.' to the provider CNAME
             array(
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'hostname' => 'de',
-                'expectedAlias' => 'cdn1',
-                'expectedServer' => '123.example.com.cdn1.net',
-                'expectedTTL' => 30,
-                'expectedReasonCode' => 'A'
+                'alias' => 'cdn1',
+                'cname' => '123.example.com.cdn1.net',
+                'reason' => 'A'
             ),
-        // cdn1 fails the  availability threshold so we choose cdn2 even though cdn1 is fastest
-        // country 'de' means append '123.' to the provider CNAME
+            // country 'uk' means append '456.' to the provider CNAME
+            array(
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202),
+                'avail' => array('cdn1' => 74, 'cdn2' => 100),
+                'hostname' => 'uk',
+                'alias' => 'cdn2',
+                'cname' => '456.example.com.cdn2.net',
+                'reason' => 'A'
+            ),
+            // country 'es' means append '789.' to the provider CNAME
+            array(
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202),
+                'avail' => array('cdn1' => 74, 'cdn2' => 100),
+                'hostname' => 'es',
+                'alias' => 'cdn2',
+                'cname' => '789.example.com.cdn2.net',
+                'reason' => 'A'
+            ),
+            // cdn1 fails the  availability threshold so we choose cdn2 even though cdn1 is fastest
+            // country 'de' means append '123.' to the provider CNAME
             array(
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 74, 'cdn2' => 100),
                 'hostname' => 'de',
-                'expectedAlias' => 'cdn2',
-                'expectedServer' => '123.example.com.cdn2.net',
-                'expectedTTL' => 30,
-                'expectedReasonCode' => 'A'
+                'alias' => 'cdn2',
+                'cname' => '123.example.com.cdn2.net',
+                'reason' => 'A'
+            ),
+            // All servers below availability threshold.  Expect random selection.
+            array(
+                'rtt' => array('cdn1' => 200, 'cdn2' => 200),
+                'avail' => array('cdn1' => 89, 'cdn2' => 89),
+                'hostname' => 'de',
+                'reason' => 'C'
+            ),
+            // Data problems
+            array(
+                'rtt' => null,
+                'hostname' => 'de',
+                'reason' => 'B'
+            ),
+            array(
+                'rtt' => array(),
+                'hostname' => 'de',
+                'reason' => 'B'
             ),
         );
-
-
-        $test=1;
-
+        
+        $test=0;
         foreach ($testData as $i)
         {
-            print("\n##############Test: " . $test++ . "\n");
+            //print("\nTest: " . $test++);
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
-
-            print("avail in test:\n");
-            print_r($i['avail']);
-
+            
             $reqCallIndex = 0;
-
-            if (array_key_exists('rtt', $i))
-            {
-                $request->expects($this->at($reqCallIndex++))
-                    ->method('radar')
-                    ->with(RadarProbeTypes::HTTP_RTT)
-                    ->will($this->returnValue($i['rtt']));
-            }
-
+            $request->expects($this->at($reqCallIndex++))
+                ->method('radar')
+                ->with(RadarProbeTypes::HTTP_RTT)
+                ->will($this->returnValue($i['rtt']));
+            
+            $request->expects($this->at($reqCallIndex++))
+                ->method('request')
+                ->with(RequestProperties::HOSTNAME)
+                ->will($this->returnValue($i['hostname']));
+                
             if (array_key_exists('avail', $i))
             {
                 $request->expects($this->at($reqCallIndex++))
@@ -111,19 +141,13 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
                     ->with(RadarProbeTypes::AVAILABILITY)
                     ->will($this->returnValue($i['avail']));
             }
-                
-
-             $request->expects($this->at($reqCallIndex++))
-                ->method('geo')
-                ->with(RequestProperties::HOSTNAME)
-                ->will($this->returnValue($i['hostname']));
-
-            if (array_key_exists('expectedAlias', $i))
+            
+            if (array_key_exists('alias', $i))
             {
                 $response->expects($this->once())
                     ->method('selectProvider')
-                    ->with($i['expectedAlias']);
-
+                    ->with($i['alias']);
+                    
                 $utilities->expects($this->never())
                     ->method('selectRandom');
             }
@@ -135,26 +159,26 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
                 $response->expects($this->never())
                     ->method('selectProvider');
             }
-
-            if (array_key_exists('expectedServer', $i))
+            
+            if (array_key_exists('cname', $i))
             {
                 $response->expects($this->once())
-                ->method('setCName')
-                ->with($i['expectedServer']);
+                    ->method('setCName')
+                    ->with($i['cname']);
             }
             else
             {
                 $response->expects($this->never())
                     ->method('setCName');
             }
-
+            
             $response->expects($this->once())
                 ->method('setReasonCode')
-                ->with($i['expectedReasonCode']);
-
-
+                ->with($i['reason']);
+                
             $app = new OpenmixApplication();
             $app->service($request, $response, $utilities);
+            $this->verifyMockObjects();
         }
     }
 }
