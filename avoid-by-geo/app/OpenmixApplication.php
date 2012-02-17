@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Demonstrates incorporating client source country into provider choice
+ * Demonstrates incorporating client source country into provider choice.
  * Use Performance data for most decsisions, but override for certain countries.
  */
 
@@ -12,7 +12,8 @@ class OpenmixApplication implements Lifecycle
      */
     public $servers = array(
         'cdn1' => 'orig.example.cdn1.net',
-        'cdn2' => 'www.example.com.cdn2.net');
+        'cdn2' => 'www.example.com.cdn2.net',
+        'cdn3' => 'www.someotherprovider.net');
     
     private $reasons = array(
         'Best performing server selected' => 'A',
@@ -36,7 +37,7 @@ class OpenmixApplication implements Lifecycle
             RadarProbeTypes::AVAILABILITY,
             implode(',', array_keys($this->servers)));
 
-    $config->declareInput(GeoProperties::COUNTRY);
+        $config->declareInput(GeoProperties::COUNTRY);
         
         foreach ($this->servers as $alias => $cname)
         {
@@ -58,13 +59,14 @@ class OpenmixApplication implements Lifecycle
     {
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
         $country = $request->geo(GeoProperties::COUNTRY);
-
+        
+        // Only consider cdn2 for requests originating from China
         if ( $country != 'CN' )
         {
-            unset ($rtt["cdn2"]);
+            unset($rtt["cdn2"]);
         }
-
-        if (is_array($rtt)) {
+        
+        if (is_array($rtt) && (0 < count($rtt))) {
             $candidates = array_intersect_key($rtt, $this->servers);
             if (0 < count($candidates))
             {
