@@ -124,6 +124,7 @@ class Geo_Market extends PHPUnit_Framework_TestCase
 
             $app = new OpenmixApplication();
             $app->service($request, $response, $utilities);
+            $this->verifyMockObjects();
         }
     }
 }

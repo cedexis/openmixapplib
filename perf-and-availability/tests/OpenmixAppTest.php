@@ -1,7 +1,7 @@
 <?php
 
 require_once 'TestHelper.php';
-require_once(APP_DIR . '/PerformancesAndAvailabilityThreshold.php');
+require_once(APP_DIR . '/OpenmixApplication.php');
 
 class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
 {
@@ -10,39 +10,36 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
      */
     public function init()
     {
-
         $providers = array(
             'origin' => 'origin.customer.net',
             'thiscdn' => 'www.customer.net.thiscdn.net');
-
+        
         $reasons = array('A', 'B', 'C');
-
+        
         $config = $this->getMock('Configuration');
-
         $callIndex = 0;
-
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
             ->with(RadarProbeTypes::HTTP_RTT, 'origin,thiscdn');
-
+            
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
             ->with(RadarProbeTypes::AVAILABILITY, 'origin,thiscdn');
-
+            
         foreach ($providers as $alias => $cname)
         {
             $config->expects($this->at($callIndex++))
                 ->method('declareResponseOption')
                 ->with($alias, $cname, 20);
         }
-
+        
         foreach ($reasons as $code)
         {
             $config->expects($this->at($callIndex++))
                 ->method('declareReasonCode')
                 ->with($code);
         }
-
+        
         $app = new OpenmixApplication();
         $app->init($config);
     }
@@ -123,14 +120,12 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
         $test=0;
         foreach ($testData as $i)
         {
-            print("\nTest: " . $test++ . "\n");
-
+            //print("\nTest: " . $test++ . "\n");
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
             
             $reqCallIndex = 0;
-
             if (array_key_exists('rtt', $i))
             {
                 $request->expects($this->at($reqCallIndex++))
@@ -138,7 +133,6 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                     ->with(RadarProbeTypes::HTTP_RTT)
                     ->will($this->returnValue($i['rtt']));
             }
-
             
             if (array_key_exists('avail', $i))
             {
@@ -147,7 +141,7 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                     ->with(RadarProbeTypes::AVAILABILITY)
                     ->will($this->returnValue($i['avail']));
             }
-                
+            
             if (array_key_exists('expectedAlias', $i))
             {
                 $response->expects($this->once())
@@ -174,8 +168,6 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
             $app->service($request, $response, $utilities);
             $this->verifyMockObjects();
         }
-
-     }
+    }
 }
-
 ?>
