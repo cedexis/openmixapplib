@@ -1,7 +1,7 @@
 <?php
 
 require_once 'TestHelper.php';
-require_once(APP_DIR . '/Geo_Market_with_overrides.php');
+require_once(APP_DIR . '/OpenmixApplication.php');
 
 class Geo_Market extends PHPUnit_Framework_TestCase
 {
@@ -10,7 +10,6 @@ class Geo_Market extends PHPUnit_Framework_TestCase
      */
     public function init()
     {
-
         $servers = array(
             'server_us' => 'us.example.com',
             'server_gb' => 'gb.example.com',
@@ -81,7 +80,7 @@ class Geo_Market extends PHPUnit_Framework_TestCase
         $test = 1;
         foreach ($testData as $i)
         {
-            print("\nTest: " . $test++ ."\n");
+            //print("\nTest: " . $test++ ."\n");
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');

@@ -6,7 +6,7 @@
  */
 class OpenmixApplication implements Lifecycle
 {
-    private $servers = array(
+    private $providers = array(
         'server_us' => 'us.example.com',
         'server_gb' => 'gb.example.com',
         'server_bf' => 'bf.example.com',
@@ -44,7 +44,7 @@ class OpenmixApplication implements Lifecycle
             $config->declareReasonCode($code);
         }
 
-        foreach ($this->servers as $alias => $cname)
+        foreach ($this->providers as $alias => $cname)
         {
             $config->declareResponseOption($alias, $cname, $this->ttl);
         }
