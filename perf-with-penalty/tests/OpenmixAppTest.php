@@ -1,7 +1,7 @@
 <?php
 
 require_once 'TestHelper.php';
-require_once(APP_DIR . '/perf-with-penalty.php');
+require_once(APP_DIR . '/OpenmixApplication.php');
 
 class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
 {
@@ -10,104 +10,105 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
      */
     public function init()
     {
-
         $servers = array(
-            'origin' => 'origin.customer.net',
-            'thiscdn' => 'www.customer.net.thiscdn.net');
-
+            'cdn1' => 'www.example.com.cdn1.net',
+            'cdn2' => 'cdn.example.com.cdn2.net',
+            'cdn3' => 'origin.example.com');
+        
         $reasons = array('A', 'B', 'C');
-
+        
         $config = $this->getMock('Configuration');
-
+        
         $callIndex = 0;
-
+        
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
-            ->with(RadarProbeTypes::HTTP_RTT, 'origin,thiscdn');
-
+            ->with(RadarProbeTypes::HTTP_RTT, 'cdn1,cdn2,cdn3');
+            
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
-            ->with(RadarProbeTypes::AVAILABILITY, 'origin,thiscdn');
-
+            ->with(RadarProbeTypes::AVAILABILITY, 'cdn1,cdn2,cdn3');
+            
         foreach ($servers as $alias => $cname)
         {
             $config->expects($this->at($callIndex++))
                 ->method('declareResponseOption')
-                ->with($alias, $cname, 20);
+                ->with($alias, $cname, 30);
         }
-
+        
         foreach ($reasons as $code)
         {
             $config->expects($this->at($callIndex++))
                 ->method('declareReasonCode')
                 ->with($code);
         }
-
+        
         $app = new OpenmixApplication();
         $app->init($config);
     }
 
     /**
      * @test
-     * @runInSeparateProcess
      */
     public function service()
     {
         $testData = array(
-            //both are above avail threshold and origin is fastest
+            // all are available and cdn1 is fastest
             array(
-                'rtt' => array('origin' => 201, 'thiscdn' => 202),
-                'avail' => array('origin' => 100, 'thiscdn' => 100),
-                'expectedAlias' => 'origin',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'A'
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202, 'cdn3' => 202),
+                'avail' => array('cdn1' => 100, 'cdn2' => 100, 'cdn3' => 100),
+                'alias' => 'cdn1',
+                'reason' => 'A'
             ),
-            // both are available and thiscdn is fastest
+            // all are available and cdn2 is fastest
             array(
-                'rtt' => array('origin' => 202, 'thiscdn' => 201),
-                'avail' => array('origin' => 100, 'thiscdn' => 100),
-                'expectedAlias' => 'thiscdn',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'A'
+                'rtt' => array('cdn1' => 202, 'cdn2' => 201, 'cdn3' => 202),
+                'avail' => array('cdn1' => 100, 'cdn2' => 100, 'cdn3' => 100),
+                'alias' => 'cdn2',
+                'reason' => 'A'
             ),
-            // thiscdn excluded due to availability so we choose origin even though thiscdn is faster
+            // all are available and cdn3 is fastest
             array(
-                'rtt' => array('origin' => 208, 'thiscdn' => 200),
-                'avail' => array('origin' => 100, 'thiscdn' => 88),
-                'expectedAlias' => 'origin',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'A'
+                'rtt' => array('cdn1' => 202, 'cdn2' => 202, 'cdn3' => 171),
+                'avail' => array('cdn1' => 100, 'cdn2' => 100, 'cdn3' => 100),
+                'alias' => 'cdn3',
+                'reason' => 'A'
             ),
-            // both are below the availability threshold so choose the most available even if slower
+            // cdn1 excluded due to availability, cdn2 next fastest despite penalty
             array(
-                'rtt' => array('origin' => 208, 'thiscdn' => 299),
-                'avail' => array('origin' => 55, 'thiscdn' => 61),
-                'expectedAlias' => 'thiscdn',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'C'
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202, 'cdn3' => 203),
+                'avail' => array('cdn1' => 89, 'cdn2' => 100, 'cdn3' => 100),
+                'alias' => 'cdn2',
+                'reason' => 'A'
+            ),
+            // none available, choose randomly
+            array(
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202, 'cdn3' => 202),
+                'avail' => array('cdn1' => 89, 'cdn2' => 89, 'cdn3' => 89),
+                'reason' => 'C'
             ),
             // Data problems
             array(
                 'rtt' => array(),
-                'expectedReasonCode' => 'B'
+                'reason' => 'B'
             ),
             array(
                 'rtt' => 'something not an array',
-                'expectedReasonCode' => 'B'
+                'reason' => 'B'
             )
         );
 
         $test=0;
         foreach ($testData as $i)
         {
-            print("\nTest: " . $test++ . "\n");
-
+            //print("\nTest: " . $test++ . "\n");
+            
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
             
             $reqCallIndex = 0;
-
+            
             if (array_key_exists('rtt', $i))
             {
                 $request->expects($this->at($reqCallIndex++))
@@ -115,7 +116,6 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                     ->with(RadarProbeTypes::HTTP_RTT)
                     ->will($this->returnValue($i['rtt']));
             }
-
             
             if (array_key_exists('avail', $i))
             {
@@ -125,11 +125,11 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                     ->will($this->returnValue($i['avail']));
             }
                 
-            if (array_key_exists('expectedAlias', $i))
+            if (array_key_exists('alias', $i))
             {
                 $response->expects($this->once())
                     ->method('selectProvider')
-                    ->with($i['expectedAlias']);
+                    ->with($i['alias']);
             }
             else
             {
@@ -139,7 +139,7 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
 
             $response->expects($this->once())
                 ->method('setReasonCode')
-                ->with($i['expectedReasonCode']);
+                ->with($i['reason']);
             
             $app = new OpenmixApplication();
             $app->service($request, $response, $utilities);

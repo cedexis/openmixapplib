@@ -50,8 +50,11 @@ class OpenmixApplication implements Lifecycle
     public function service($request, $response, $utilities)
     {
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
-        if (is_array($rtt)) {
+        //print("\nRTT: " . print_r($rtt, true));
+        if (is_array($rtt) && (0 < count($rtt)))
+        {
             $candidates = array_intersect_key($rtt, $this->servers);
+            //print("\nCandidates: " . print_r($candidates, true));
             if (0 < count($candidates))
             {
                 // Select the best performing server that meets its minimum
@@ -61,6 +64,7 @@ class OpenmixApplication implements Lifecycle
                     $candidates[$i] += $this->servers[$i]['padding'];
                 }
                 asort($candidates);
+                //print("\nCandidates with penalty (sorted): " . print_r($candidates, true));
                 $avail = $request->radar(RadarProbeTypes::AVAILABILITY);
                 foreach (array_keys($candidates) as $alias)
                 {
