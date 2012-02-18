@@ -56,7 +56,8 @@ class OpenmixApplication implements Lifecycle
         $rttData = $request->radar(RadarProbeTypes::HTTP_RTT);
         //print("\nRTT data:\n" . print_r($rttData, true));
         
-        if (!is_array($pulseData) || !is_array($rttData))
+        if (!is_array($pulseData) || (1 > count($pulseData))
+            || !is_array($rttData) || (1 > count($rttData)))
         {
             $utilities->selectRandom();
             $response->setReasonCode($this->reasons['Data problem']);

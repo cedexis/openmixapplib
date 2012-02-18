@@ -66,7 +66,8 @@ class OpenmixApplication implements Lifecycle
             unset($rtt["cdn2"]);
         }
         
-        if (is_array($rtt) && (0 < count($rtt))) {
+        if (is_array($rtt) && (0 < count($rtt)))
+        {
             $candidates = array_intersect_key($rtt, $this->servers);
             if (0 < count($candidates))
             {

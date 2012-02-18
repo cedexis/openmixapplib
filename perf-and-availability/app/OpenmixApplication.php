@@ -51,7 +51,8 @@ class OpenmixApplication implements Lifecycle
     public function service($request, $response, $utilities)
     {
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
-        if (is_array($rtt)) {
+        if (is_array($rtt) && (0 < count($rtt)))
+        {
             $candidates = array_intersect_key($rtt, $this->providers);
             if (0 < count($candidates))
             {
