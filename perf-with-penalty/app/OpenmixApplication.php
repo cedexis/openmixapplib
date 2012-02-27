@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Performance with penalty
+ */
 class OpenmixApplication implements Lifecycle
 {
 
