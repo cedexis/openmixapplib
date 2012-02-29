@@ -4,6 +4,7 @@ categories: [Category 1](http://path/to/category1/info/), [Category 2](http://pa
 description: |
   Description of the app here
   Markdown is fine
+  Blah
   
   Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/perf-and-avail/app/PerformancesAndAvailabilityThreshold.php**.
   
