@@ -1,9 +1,7 @@
-name: Some Application Name
-last_updated: 01/01/0000
-categories: [Category 1](http://path/to/category1/info/), [Category 2](http://path/to/category2/info/)
+name: Throughput with RTT Tie Breaker 
+last_updated: 03/26/2012
+categories: Performance
 description: |
-  Description of the app here
-  Markdown is fine
-  
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/perf-and-avail/app/PerformancesAndAvailabilityThreshold.php**.
-  
+  Choose the best provider based on HTTP Throughput. If the top 2 are with 5% of each other, use HTTP Response time to break the tie.
+
+  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/thruput-with-rtt/app/OpenmixApplication.php**.

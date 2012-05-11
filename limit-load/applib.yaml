@@ -1,9 +1,7 @@
-name: Some Application Name
-last_updated: 01/01/0000
-categories: [Category 1](http://path/to/category1/info/), [Category 2](http://path/to/category2/info/)
+name: Avoid Platforms that are Overloaded 
+last_updated: 01/31/2012
+categories: Fusion, Load
 description: |
-  Description of the app here
-  Markdown is fine
-  
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/perf-and-avail/app/PerformancesAndAvailabilityThreshold.php**.
-  
+  This app demonstrates using Pulse Load to obtain current load data for each provider.  It uses this information to filter out providers that are currently overloaded.  Of the remaining providers, it selects the best-performing one.  If all providers are overloaded, it selects the best-performing overall.
+    
+  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/limit-load/app/OpenmixApplication.php**. 
