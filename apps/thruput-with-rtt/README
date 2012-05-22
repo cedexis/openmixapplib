@@ -1,0 +1,37 @@
+README
+
+This directory and its subdirectories contain an Openmix application and its
+unit test suite.  Please refer to the Openmix SDK documentation and the
+Community App Library for detailed information on writing apps for Openmix.
+
+Contents:
+
+app/
+app/OpenmixApplication.php
+tests/
+tests/TestHelper.php
+tests/OpenmixApplicationTests.php
+api/
+api/RequestProperties.php
+api/Request.php
+api/BgpProperties.php
+api/FusionProperties.php
+api/GeoProperties.php
+api/PulseProperties.php
+api/AnkeenaProperties.php
+api/Lifecycle.php
+api/Configuration.php
+api/Response.php
+api/RadarProbeTypes.php
+api/Utilities.php
+
+app/OpenmixApplication.php is the file containing your Openmix app.  This is the
+file that is uploaded to the Portal.
+
+Unit Tests
+
+To run the unit test suite, you'll need to have PHPUnit installed (the Openmix
+SDK documentation contains setup information).  From the tests directory,
+execute the following command to run the unit test suite:
+
+$ phpunit --verbose OpenmixApplicationTests.php

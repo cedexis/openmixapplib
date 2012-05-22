@@ -1,0 +1,5 @@
+name: Basic Performance Application
+last_updated: 01/31/2012
+categories: Performance
+description: |
+  This application is ideal for getting started with Openmix application development. It uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance.

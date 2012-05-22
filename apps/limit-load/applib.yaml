@@ -1,0 +1,5 @@
+name: Avoid Platforms that are Overloaded 
+last_updated: 01/31/2012
+categories: Fusion, Load
+description: |
+  This app demonstrates using Pulse Load to obtain current load data for each provider.  It uses this information to filter out providers that are currently overloaded.  Of the remaining providers, it selects the best-performing one.  If all providers are overloaded, it selects the best-performing overall.
