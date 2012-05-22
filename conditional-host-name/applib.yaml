@@ -5,6 +5,3 @@ description: |
   Some platforms use virtual-host specific hostnames, often for content localization, but you often want to centralize these into your Openmix script rather than creating many Openmix platforms. For example, imagine your website has the URLs http://<country>.example.com/ where <country> is replaced with ISO codes.  
 
   The solution is to dynamically construct the resulting hostname in the application as in this example application which routes traffic to the available platform with the lowest response time.
-
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **conditional-host-name/app/OpenmixApplication.php**.
-  

@@ -3,5 +3,3 @@ last_updated: 01/31/2012
 categories: Performance
 description: |
   This application is ideal for getting started with Openmix application development. It uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance.
-
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/perf-and-avail/app/OpenmixApplication.php**. 

@@ -3,5 +3,3 @@ last_updated: 01/31/2012
 categories: Geography, Performance
 description: |
   You can choose to remove certain platforms from consideration based on geography. This example application shows you how to do that, wrapped in logic that chooses the available platform with the lowest response time.
-
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **avoid-by-geo/app/OpenmixApplication.php**.

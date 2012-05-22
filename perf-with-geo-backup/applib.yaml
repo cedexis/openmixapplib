@@ -3,5 +3,3 @@ last_updated: 05/11/2012
 categories: Radar, Geography
 description: |
   This application demonstrates using Cedexis Radar as the primary way to select platforms, but where Geolocation data is used if there is inadequate radar data available.
-
-  Download the [Openmix application library](http://download.cedexis.com/docs/openmix-library.zip) to get the code and unit test suite for this application, then check out [this tutorial about Openmix application development and testing](/blog/openmix-application-library-upgrades-and-plans/). You'll find this application in **openmix_library/perf-with-geo-backup/app/OpenmixApplication.php**.
