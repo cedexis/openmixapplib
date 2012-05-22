@@ -1,10 +1,11 @@
 #!/bin/sh
 
-rsync -a --delete template/api limit-money-spent
-rsync -a --delete template/api conditional-host-name
-rsync -a --delete template/api perf-and-availability
-rsync -a --delete template/api geo-with-overides
-rsync -a --delete template/api perf-with-geo-backup
-rsync -a --delete template/api thruput-with-rtt
-rsync -a --delete template/api limit-load
-rsync -a --delete template/api perf-with-penalty
+# Figure out where this script file is so that the `apps` directory can be
+# conclusively found. Thanks to
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# Update all of the apps using `template/api` as the source of truth
+ls $DIR/../apps/ | xargs -t -I \{\} rsync -a --delete $DIR/../template/api $DIR/../apps/\{\}
