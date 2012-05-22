@@ -43,6 +43,10 @@ class RequestProperties
     
     /**
      * (string) The IP address of the user's nameserver
+     *
+     * Example::
+     *
+     *      $value = $request->request(RequestProperties::IP);
      */
     const IP = 'string:request:ip';
 }

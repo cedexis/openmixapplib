@@ -5,13 +5,21 @@
 class FusionProperties
 {
     /**
-     * (real) Amount of content delivered by this provider since the beginning
-     * of the month
+     * (real) The mount of content delivered by this provider since the beginning
+     * of the month.
+     *
+     * Example::
+     *
+     *      $value = $request->fusion(FusionProperties::GB);
      */
     const GB  ='real:fusion:gb';
     
     /**
-     * (real) Rate of content being delivered by this provider right now
+     * (real) The rate of content being delivered by this provider right now.
+     *
+     * Example::
+     *
+     *      $value = $request->fusion(FusionProperties::MBPS);
      */
     const MBPS='real:fusion:mbps';
 }

@@ -6,29 +6,47 @@
 interface Response
 {
     /**
-     * called when you have a fixed response profile for
-     * a given provider
+     * Called when you have a fixed response profile for a given provider.
+     *
+     * Example::
+     *
+     *      $response->selectProvider('provider_a');
      */
     public function selectProvider($provider);
 
     /**
-     * called when you want to respond with the provider and
-     * hostname - equivalent to return "host.name,provider"
+     * Called when you want to respond with the provider and hostname - equivalent to return "host.name,provider"
+     *
+     * Example::
+     *
+     *      $response->respond('provider_a', 'a.example.com');
      */
     public function respond($provider,$cname);
 
     /**
-     * just sets the cname to return
+     * Override the CNAME to return.
+     *
+     * Example::
+     *
+     *      $response->setCName('other.example.com');
      */
     public function setCName($cname);
 
     /**
-     * just sets the ttl
+     * Override the TTL to return.
+     *
+     * Example::
+     *
+     *      $response->setTTL(100);
      */
     public function setTTL($ttl);
 
     /**
-     * Sets the reason code to one of the values defined by $config->declareReasonCode()
+     * Sets the reason code to one of the values defined by $config->declareReasonCode().
+     *
+     * Example::
+     *
+     *      $response->setReasonCode('A');
      */
     public function setReasonCode($code);
 
