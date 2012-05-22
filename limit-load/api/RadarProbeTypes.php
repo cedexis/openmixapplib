@@ -21,15 +21,6 @@ class RadarProbeTypes
     const HTTP_RTT    = 'real:score:http_rtt';
     
     /**
-     * (real) Connect time
-     *
-     * Example::
-     *
-     *      $value = $request->radar(RadarProbeTypes::HTTP_COLD);
-     */
-    const HTTP_COLD   = 'real:score:http_cold';
-    
-    /**
      * (real) Time to load a custom probe
      *
      * Example::
@@ -87,15 +78,6 @@ class RadarProbeTypes
      *      $value = $request->radar(RadarProbeTypes::SSL_RTT);
      */
     const SSL_RTT     = 'real:score:ssl_rtt';
-    
-    /**
-     * (real) Connect time for secure requests
-     *
-     * Example::
-     *
-     *      $value = $request->radar(RadarProbeTypes::SSL_COLD);
-     */
-    const SSL_COLD    = 'real:score:ssl_cold';
     
     /**
      * (real) Time to load a custom probe over a secure connection.
