@@ -1,7 +1,0 @@
-name: Performance Routing with Platform Penalty
-last_updated: 01/31/2012
-categories: Cost, Performance
-description: |
-  The routing provided by the basic performance application is great for certain cases, but there are times when you know that you only want to use a specific platform when others are considerably worse. For example, you might only want to send traffic to your origin when it is significantly better than any other choice.  
-
-  This application shows how this can work by using the concept of ‘padding’ to increase the value of the performance measure being used to decide where to send traffic.

@@ -1,5 +1,0 @@
-name: Performance with Geo Based Backup 
-last_updated: 05/11/2012
-categories: Radar, Geography
-description: |
-  This application demonstrates using Cedexis Radar as the primary way to select platforms, but where Geolocation data is used if there is inadequate radar data available.

@@ -1,5 +1,0 @@
-name: Avoid Platforms based on Geography
-last_updated: 01/31/2012
-categories: Geography, Performance
-description: |
-  You can choose to remove certain platforms from consideration based on geography. This example application shows you how to do that, wrapped in logic that chooses the available platform with the lowest response time.

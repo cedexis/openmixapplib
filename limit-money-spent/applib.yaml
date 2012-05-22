@@ -1,5 +1,0 @@
-name: Avoid Platforms that have reached a cost threshold
-last_updated: 01/31/2012
-categories: Fusion, Cost
-description: |
-  This application demonstrates using Pulse Load to obtain cloud provider "cost", routing traffic away from a provider once it reaches a certain threshold.  Any servers below the cost threshold will be load-balanced with origin based on round-trip time performance.
