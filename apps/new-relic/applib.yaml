@@ -1,0 +1,5 @@
+name: New Relic Data Example
+last_updated: 06/14/2012
+categories: Fusion
+description: |
+  This application demonstrates the use of New Relic data in an Openmix application.

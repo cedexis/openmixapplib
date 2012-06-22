@@ -70,7 +70,13 @@ interface Request
      *      $dataArray = $request->ankeena(AnkeenaProperties::TOTAL_ACTIVE_CONNS);
      */
     public function ankeena($ankeenaProperty);
-
+    
+    /**
+     * @param string $newrelicProperty One of the constants defined in NewrelicProperties
+     *
+     */
+    public function newrelic($newrelicProperty);
+    
     /**
      * @param string $costFunction one of the cost functions declared by $config->declareAltoCostFunction
      *
