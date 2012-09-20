@@ -24,7 +24,8 @@ interface Response
     public function respond($provider,$cname);
 
     /**
-     * Override the CNAME to return.
+     * Override the CNAME to return. This method is only effective if called **after**
+     * `$utilities->selectRandom()` or `$response->selectProvider()` are called.
      *
      * Example::
      *
