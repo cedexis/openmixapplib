@@ -12,14 +12,15 @@ class OpenmixApplication implements Lifecycle
     private $reasons = array(
         'Best performing provider = previous' => 'A',
         'Either no previous or previous < availThreshold' => 'B',
-        'Choosing previous. Best performing within 25%' => 'C',
-        'New provider > 25% faster, setting new provider' => 'D',
+        'Choosing previous. Best performing within varianceThreshold' => 'C',
+        'New provider > varianceThreshold, setting new provider' => 'D',
         'All providers eliminated' => 'E',
         'Data problem' => 'F');
     
     private $ttl = 20;
     
     private $availabilityThreshold = 90;
+    private $varianceThreshold = 0.75;
     
     public $saved = array();
     private $startmem = 0;
@@ -101,6 +102,9 @@ class OpenmixApplication implements Lifecycle
                     $avail = array_intersect_key($avail, $this->providers);
                     if (!empty($avail)) {
                         foreach (array_keys($candidates) as $alias) {
+                            if (isset($candidates[$previous])) {
+                                $testval = $this->varianceThreshold*$candidates[$previous];
+                            }                            
                             if ($avail[$alias] >= $this->availabilityThreshold) {
                                 if ($previous == $alias) {
                                     $response->selectProvider($alias);
@@ -114,14 +118,14 @@ class OpenmixApplication implements Lifecycle
                                     $this->saved[$key] = $alias;
                                     return;
                                 }
-                                elseif ($candidates[$alias] < .75*$candidates[$previous]) {
+                                elseif ($candidates[$alias] < $testval) {
                                     $response->selectProvider($alias);
-                                    $response->setReasonCode($this->reasons['New provider > 25% faster, setting new provider']);
+                                    $response->setReasonCode($this->reasons['New provider > varianceThreshold, setting new provider']);
                                     $this->saved[$key] = $alias;
                                     return;
                                 }
                                 $response->selectProvider($previous);
-                                $response->setReasonCode($this->reasons['Choosing previous. Best performing within 25%']);
+                                $response->setReasonCode($this->reasons['Choosing previous. Best performing within varianceThreshold']);
                                 return;
                             }
                         }
