@@ -174,6 +174,57 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                     'some other key' => 'some other alias'
                 )
             )
+            // Data problems
+            ,array(
+                'description' => 'RTT not an array',
+                'get_key' => 'some key',
+                'rtt' => 'not an array',
+                'reason' => 'F',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'saved_after' => array( 'some other key' => 'some other alias' )
+            )
+            ,array(
+                'description' => 'RTT contains invalid data',
+                'get_key' => 'some key',
+                'rtt' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
+                'reason' => 'F',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'saved_after' => array( 'some other key' => 'some other alias' )
+            )
+            ,array(
+                'description' => 'Invalid previous alias',
+                'get_key' => 'some key',
+                'reason' => 'G',
+                'saved_before' => array( 'some key' => 'bogus alias' ),
+                'saved_after' => array( 'some key' => 'bogus alias' )
+            )
+            ,array(
+                'description' => 'avail not an array',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
+                'avail' => 'not an array',
+                'reason' => 'F',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'saved_after' => array( 'some other key' => 'some other alias' )
+            )
+            ,array(
+                'description' => 'avail array empty',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
+                'avail' => array(),
+                'reason' => 'F',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'saved_after' => array( 'some other key' => 'some other alias' )
+            )
+            ,array(
+                'description' => 'avail array contains invalid data',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
+                'avail' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
+                'reason' => 'F',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'saved_after' => array( 'some other key' => 'some other alias' )
+            )
         );
         
         //print("\nTesting service");
@@ -198,10 +249,12 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 ->method('update_sticky_data')
                 ->with($i['get_key']);
             
-            $request->expects($this->at($call_index++))
-                ->method('radar')
-                ->with(RadarProbeTypes::HTTP_RTT)
-                ->will($this->returnValue($i['rtt']));
+            if (array_key_exists('rtt', $i)) {
+                $request->expects($this->at($call_index++))
+                    ->method('radar')
+                    ->with(RadarProbeTypes::HTTP_RTT)
+                    ->will($this->returnValue($i['rtt']));
+            }
                 
             if (array_key_exists('avail', $i)) {
                 $request->expects($this->at($call_index++))
@@ -211,19 +264,12 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             }
             
             if (array_key_exists('alias', $i)) {
-                $response->expects($this->once())
-                    ->method('selectProvider')
-                    ->with($i['alias']);
-                    
-                $utilities->expects($this->never())
-                    ->method('selectRandom');
+                $response->expects($this->once())->method('selectProvider')->with($i['alias']);
+                $utilities->expects($this->never())->method('selectRandom');
             }
             else {
-                $response->expects($this->never())
-                    ->method('selectProvider');
-                    
-                $utilities->expects($this->once())
-                    ->method('selectRandom');
+                $response->expects($this->never())->method('selectProvider');
+                $utilities->expects($this->once())->method('selectRandom');
             }
             
             $response->expects($this->once())
