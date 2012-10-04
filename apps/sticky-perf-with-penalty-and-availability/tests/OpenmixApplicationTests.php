@@ -162,14 +162,11 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
         print("\nTesting update_sticky_data");
         $test_data = array(
             array(
-                'description' => 'temp',
+                'description' => 'new key; not maxed',
                 'key' => 'some key',
-                'freqtable_before' => array(
-                    'some other key' => 'some other microtime'
-                ),
-                'saved_before' => array(
-                    'some other key' => 'some other alias'
-                ),
+                'microtime' => 1000,
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'saved_before' => array( 'some other key' => 'some other alias' ),
                 'entries_before' => 0,
                 'entries_after' => 1,
                 'saved_after' => array(
@@ -177,9 +174,43 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                     'some other key' => 'some other alias'
                 ),
                 'freqtable_after' => array(
-                    'some key' => 'some microtime',
-                    'some other key' => 'some other microtime'
+                    'some key' => 1000,
+                    'some other key' => 100
+                )
+            ),
+            array(
+                'description' => 'new key; maxed',
+                'key' => 'some key',
+                'microtime' => 1000,
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'entries_before' => 800,
+                'entries_after' => 800,
+                'saved_after' => array( 'some key' => null ),
+                'freqtable_after' => array( 'some key' => 1000 )
+            ),
+            array(
+                'description' => 'existing key',
+                'key' => 'some key',
+                'microtime' => 1000,
+                'freqtable_before' => array(
+                    'some key' => 100,
+                    'some other key' => 101
                 ),
+                'saved_before' => array(
+                    'some key' => 'some old alias',
+                    'some other key' => 'some other alias'
+                ),
+                'entries_before' => 0,
+                'entries_after' => 0,
+                'saved_after' => array(
+                    'some key' => 'some old alias',
+                    'some other key' => 'some other alias'
+                ),
+                'freqtable_after' => array(
+                    'some key' => 1000,
+                    'some other key' => 101
+                )
             )
         );
         
@@ -194,7 +225,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             
             $application->expects($this->once())
                 ->method('get_microtime')
-                ->will($this->returnValue('some microtime'));
+                ->will($this->returnValue($i['microtime']));
             
             $application->update_sticky_data($i['key']);
             
