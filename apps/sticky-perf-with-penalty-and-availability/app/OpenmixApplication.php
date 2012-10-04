@@ -31,7 +31,9 @@ class OpenmixApplication implements Lifecycle {
     public $freqtable = array();
     public $entries = 0;
     
-    // Do not adjust above 800
+    // Do not adjust above 800; it's been determined that 800 is an appropriate
+    // maximum number of entries to keep the application below the imposed limit
+    // of 2M.
     private $max = 800;
     
     /**
