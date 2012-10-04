@@ -127,12 +127,44 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 )
             )
             ,array(
-                'description' => 'previous provider1; provider1 not available; provider2 fastest',
+                'description' => 'previous provider1; provider1 available; provider2 fastest but not fast enough',
                 'get_key' => 'some key',
-                'rtt' => array( 'provider1' => 200, 'provider2' => 189, 'provider3' => 200 ),
-                'avail' => array( 'provider1' => 79, 'provider2' => 80, 'provider3' => 80 ),
+                'rtt' => array( 'provider1' => 200, 'provider2' => 120, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
+                'alias' => 'provider1',
+                'reason' => 'C',
+                'saved_before' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                )
+            )
+            ,array(
+                'description' => 'previous provider1; provider1 available; provider2 fast enough to replace it',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 119, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider2',
-                'reason' => 'B',
+                'reason' => 'D',
+                'saved_before' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'provider2',
+                    'some other key' => 'some other alias'
+                )
+            )
+            ,array(
+                'description' => 'previous provider1; no providers available; provider2 most available',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 78, 'provider2' => 79, 'provider3' => 78 ),
+                'alias' => 'provider2',
+                'reason' => 'E',
                 'saved_before' => array(
                     'some key' => 'provider1',
                     'some other key' => 'some other alias'

@@ -77,7 +77,6 @@ class OpenmixApplication implements Lifecycle {
         $previous = null;
         if (array_key_exists($key, $this->saved)) {
             $previous = $this->saved[$key];
-            
             if (!is_null($previous) && !array_key_exists($previous, $this->providers)) {
                 $utilities->selectRandom();
                 $response->setReasonCode($this->reasons['Unexpected previous alias']);
@@ -103,9 +102,14 @@ class OpenmixApplication implements Lifecycle {
                 if (is_array($avail)) {
                     $avail = array_intersect_key($avail, $this->providers);
                     if (!empty($avail)) {
+                        if (array_key_exists($previous, $candidates)) {
+                            $testval = $this->varianceThreshold * $candidates[$previous];
+                            //print("\nTest value: $testval");
+                        }
                         foreach (array_keys($candidates) as $alias) {
                             if ($avail[$alias] >= $this->availabilityThreshold) {
                                 //print("\n$alias is available");
+                                //print("\n$alias perf: " . $candidates[$alias]);
                                 if ($previous == $alias) {
                                     $response->selectProvider($alias);
                                     $response->setReasonCode($this->reasons['Best performing provider = previous']);
@@ -120,14 +124,11 @@ class OpenmixApplication implements Lifecycle {
                                     $this->saved[$key] = $alias;
                                     return;
                                 }
-                                else {
-                                    $testval = $this->varianceThreshold * $candidates[$previous];
-                                    if ($candidates[$alias] < $testval) {
-                                        $response->selectProvider($alias);
-                                        $response->setReasonCode($this->reasons['New provider > varianceThreshold, setting new provider']);
-                                        $this->saved[$key] = $alias;
-                                        return;
-                                    }
+                                else if ($candidates[$alias] < $testval) {
+                                    $response->selectProvider($alias);
+                                    $response->setReasonCode($this->reasons['New provider > varianceThreshold, setting new provider']);
+                                    $this->saved[$key] = $alias;
+                                    return;
                                 }
                                 $response->selectProvider($previous);
                                 $response->setReasonCode($this->reasons['Choosing previous. Best performing within varianceThreshold']);
@@ -136,6 +137,7 @@ class OpenmixApplication implements Lifecycle {
                         }
                         // No provider passed the availability threshold. Select the most available.
                         arsort($avail);
+                        //print("\nAvail data sorted: " . print_r($avail, true));
                         $alias = key($avail);
                         $response->selectProvider($alias);
                         $this->saved[$key] = $alias;
