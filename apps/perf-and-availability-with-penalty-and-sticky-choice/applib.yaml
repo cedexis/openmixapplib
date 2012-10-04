@@ -1,6 +1,6 @@
 name: Template
 author: Cedexis
-last_updated: 05/21/2012
+last_updated: 10/4/2012
 categories: 
 description: |
-  The most basic template for an Openmix application.
+  An sticky app using performance with penalty and availability.
