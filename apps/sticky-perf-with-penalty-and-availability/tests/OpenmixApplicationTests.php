@@ -64,6 +64,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ->method('declareResponseOption')
             ->with('provider3', 'cname3.foo.com', 30);
             
+        $config->expects($this->exactly(8))->method('declareReasonCode');
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('A');
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('B');
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('C');
@@ -71,9 +72,33 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('E');
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('F');
         $config->expects($this->at($call_index++))->method('declareReasonCode')->with('G');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('H');
         
         $application = new OpenmixApplication();
         $application->init($config);
+    }
+    
+    /**
+     * @test
+     */
+    public function service_handles_exception() {
+        $request = $this->getMock('Request');
+        $response = $this->getMock('Response');
+        $utilities = $this->getMock('Utilities');
+        $application = $this->getMock('OpenmixApplication', array('get_key'));
+        
+        $application->expects($this->once())
+            ->method('get_key')
+            ->will($this->throwException(new Exception("I'm a hard-coded exception!!!")));
+            
+        $utilities->expects($this->once())
+            ->method('selectRandom');
+            
+        $response->expects($this->once())
+            ->method('setReasonCode')
+            ->with('H');
+        
+        $application->service($request, $response, $utilities);
     }
     
     /**
