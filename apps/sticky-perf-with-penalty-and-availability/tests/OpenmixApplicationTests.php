@@ -8,7 +8,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
      * @test
      */
     public function init() {
-        print("\nTesting init");
+        //print("\nTesting init");
         $config = $this->getMock('Configuration');
         
         $call_index = 0;
@@ -51,6 +51,26 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
         $config->expects($this->at($call_index++))
             ->method('declareInput')
             ->with(EDNSProperties::MARKET);
+            
+        $config->expects($this->at($call_index++))
+            ->method('declareResponseOption')
+            ->with('provider1', 'cname1.foo.com', 30);
+            
+        $config->expects($this->at($call_index++))
+            ->method('declareResponseOption')
+            ->with('provider2', 'cname2.foo.com', 30);
+            
+        $config->expects($this->at($call_index++))
+            ->method('declareResponseOption')
+            ->with('provider3', 'cname3.foo.com', 30);
+            
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('A');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('B');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('C');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('D');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('E');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('F');
+        $config->expects($this->at($call_index++))->method('declareReasonCode')->with('G');
         
         $application = new OpenmixApplication();
         $application->init($config);
@@ -60,40 +80,75 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
      * @test
      */
     public function service() {
-        print("\nTesting service");
         $test_data = array(
             array(
-                'description' => 'no EDNS; no previous; all available; provider3 fastest',
+                'description' => 'no previous; all available; provider3 fastest',
                 'get_key' => 'some key',
-                'update_sticky_data_key' => 'some key',
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 199 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider3',
                 'reason' => 'B',
-                'saved_after' => array(
-                    'some key' => 'provider3',
-                    'some other key' => 'some other alias'
-                )
-            ),
-            array(
-                'description' => 'EDNS; no previous; all available; provider3 fastest',
-                'get_key' => 'some key',
-                'update_sticky_data_key' => 'some key',
-                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 199 ),
-                'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
-                'alias' => 'provider3',
-                'reason' => 'B',
+                'saved_before' => array( 'some other key' => 'some other alias' ),
                 'saved_after' => array(
                     'some key' => 'provider3',
                     'some other key' => 'some other alias'
                 )
             )
+            ,array(
+                'description' => 'previous provider1; all available; provider1 selected; no other providers fast enough',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
+                'alias' => 'provider1',
+                'reason' => 'A',
+                'saved_before' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                )
+            )
+            ,array(
+                'description' => 'previous provider1; provider1 not available; provider2 fastest',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 189, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 79, 'provider2' => 80, 'provider3' => 80 ),
+                'alias' => 'provider2',
+                'reason' => 'B',
+                'saved_before' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'provider2',
+                    'some other key' => 'some other alias'
+                )
+            )
+            ,array(
+                'description' => 'previous provider1; provider1 not available; provider2 fastest',
+                'get_key' => 'some key',
+                'rtt' => array( 'provider1' => 200, 'provider2' => 189, 'provider3' => 200 ),
+                'avail' => array( 'provider1' => 79, 'provider2' => 80, 'provider3' => 80 ),
+                'alias' => 'provider2',
+                'reason' => 'B',
+                'saved_before' => array(
+                    'some key' => 'provider1',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'provider2',
+                    'some other key' => 'some other alias'
+                )
+            )
         );
         
-        $test_index = 0;
+        //print("\nTesting service");
+        //$test_index = 0;
         foreach ($test_data as $i) {
-            print("\nTest: " . $test_index++);
-            print("\nDescription: " . $i['description']);
+            //print("\nTest: " . $test_index++);
+            //print("\nDescription: " . $i['description']);
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
@@ -109,7 +164,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             
             $application->expects($this->at($application_call_index++))
                 ->method('update_sticky_data')
-                ->with($i['update_sticky_data_key']);
+                ->with($i['get_key']);
             
             $request->expects($this->at($call_index++))
                 ->method('radar')
@@ -144,8 +199,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 ->with($i['reason']);
             
             // Pre-seed the application with sticky data
-            $application->saved = array( 'some other key' => 'some other alias' );
-            $application->freqtable = array( 'some other key' => 'some other microtime' );
+            $application->saved = $i['saved_before'];
             
             $application->service($request, $response, $utilities);
             $this->verifyMockObjects();
@@ -159,7 +213,6 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
      * @test
      */
     public function update_sticky_data() {
-        print("\nTesting update_sticky_data");
         $test_data = array(
             array(
                 'description' => 'new key; not maxed',
@@ -214,10 +267,11 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
         );
         
-        $test_index = 0;
+        //print("\nTesting update_sticky_data");
+        //$test_index = 0;
         foreach ($test_data as $i) {
-            print("\nTest: " . $test_index++);
-            print("\nDescription: " . $i['description']);
+            //print("\nTest: " . $test_index++);
+            //print("\nDescription: " . $i['description']);
             $application = $this->getMock('OpenmixApplication', array('get_microtime'));
             $application->freqtable = $i['freqtable_before'];
             $application->saved = $i['saved_before'];
@@ -239,7 +293,6 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
      * @test
      */
     public function get_key() {
-        print("\nTesting get_key");
         $test_data = array(
             array(
                 'description' => 'EDNS enabled',
@@ -264,10 +317,11 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
         );
         
-        $test_index = 0;
+        //print("\nTesting get_key");
+        //$test_index = 0;
         foreach ($test_data as $i) {
-            print("\nTest: " . $test_index++);
-            print("\nDescription: " . $i['description']);
+            //print("\nTest: " . $test_index++);
+            //print("\nDescription: " . $i['description']);
             $request = $this->getMock('Request');
             $call_index = 0;
                 
