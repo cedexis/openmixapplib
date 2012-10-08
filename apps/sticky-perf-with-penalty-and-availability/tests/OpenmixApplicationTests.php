@@ -356,6 +356,25 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 )
             )
             ,array(
+                'description' => 'new key; not maxed; request country sticky; mixed case',
+                'sticky_countries' => array( 'US', 'UK', 'FR' ),
+                'key' => 'some key',
+                'country' => 'us',
+                'microtime' => 1000,
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'entries_before' => 0,
+                'entries_after' => 1,
+                'saved_after' => array(
+                    'some key' => null,
+                    'some other key' => 'some other alias'
+                ),
+                'freqtable_after' => array(
+                    'some key' => 1000,
+                    'some other key' => 100
+                )
+            )
+            ,array(
                 'description' => 'new key; not maxed; request country not sticky',
                 'sticky_countries' => array( 'some other country' ),
                 'key' => 'some key',

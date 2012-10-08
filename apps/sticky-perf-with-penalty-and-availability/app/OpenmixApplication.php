@@ -196,7 +196,10 @@ class OpenmixApplication implements Lifecycle {
     }
     
     public function update_sticky_data($key, $country) {
-        if (empty($this->sticky_countries) || in_array($country, $this->sticky_countries)) {
+        //print("\nupdate_stick_data for country: $country");
+        $filtered = preg_grep("/$country/i", $this->sticky_countries);
+        //print("\npreg_grep results:\n" . print_r($filtered, true));
+        if (empty($this->sticky_countries) || !empty($filtered)) {
             if (!array_key_exists($key, $this->saved)) {
                 // when at max, evict the last one added
                 if ($this->entries >= $this->max) {
