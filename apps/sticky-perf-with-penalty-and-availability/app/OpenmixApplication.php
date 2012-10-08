@@ -22,6 +22,10 @@ class OpenmixApplication implements Lifecycle {
         'Caught exception' => 'H'
     );
     
+    // If you want to restrict stickiness to certain countries, list their ISO 3166-1 alpha-2
+    // codes in this array (see http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
+    public $sticky_countries = array();
+    
     private $ttl = 30;
     
     private $availabilityThreshold = 80;
@@ -75,9 +79,11 @@ class OpenmixApplication implements Lifecycle {
      */
     public function service($request, $response, $utilities) {
         try {
-            $key = $this->get_key($request);
+            list($key, $country) = $this->get_key($request);
+            //print("\nkey: $key");
+            //print("\ncountry: $country");
             //print("\nKey: $key");
-            $this->update_sticky_data($key);
+            $this->update_sticky_data($key, $country);
             $previous = null;
             if (array_key_exists($key, $this->saved)) {
                 $previous = $this->saved[$key];
@@ -167,6 +173,7 @@ class OpenmixApplication implements Lifecycle {
             $utilities->selectRandom();
         }
         catch (Exception $e) {
+            //print("\nEncountered exception:\n$e");
             $utilities->selectRandom();
             $response->setReasonCode($this->reasons['Caught exception']);
         }
@@ -185,27 +192,29 @@ class OpenmixApplication implements Lifecycle {
             $country = $request->geo(EDNSProperties::COUNTRY);
             $asn = $request->geo(EDNSProperties::ASN);
         }
-        return "$market-$country-$asn";
+        return array("$market-$country-$asn", $country);
     }
     
-    public function update_sticky_data($key) {
-        if (!array_key_exists($key, $this->saved)) {
-            // when at max, evict the last one added
-            if ($this->entries >= $this->max) {
-                asort($this->freqtable);
-                $last_added = key($this->freqtable);
-                unset($this->saved[$last_added]);
-                unset($this->freqtable[$last_added]);
-                gc_collect_cycles();
+    public function update_sticky_data($key, $country) {
+        if (empty($this->sticky_countries) || in_array($country, $this->sticky_countries)) {
+            if (!array_key_exists($key, $this->saved)) {
+                // when at max, evict the last one added
+                if ($this->entries >= $this->max) {
+                    asort($this->freqtable);
+                    $last_added = key($this->freqtable);
+                    unset($this->saved[$last_added]);
+                    unset($this->freqtable[$last_added]);
+                    gc_collect_cycles();
+                }
+                else {
+                    $this->entries += 1;
+                }
+                $this->saved[$key] = null;
             }
-            else {
-                $this->entries += 1;
-            }
-            $this->saved[$key] = null;
+            
+            // Update the frequency table
+            $this->freqtable[$key] = $this->get_microtime();
         }
-        
-        // Update the frequency table
-        $this->freqtable[$key] = $this->get_microtime();
     }
 }
 ?>

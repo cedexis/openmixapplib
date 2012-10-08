@@ -108,7 +108,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
         $test_data = array(
             array(
                 'description' => 'no previous; all available; provider3 fastest',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 199 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider3',
@@ -121,7 +121,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'previous provider1; all available; provider1 selected; no other providers fast enough',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider1',
@@ -137,7 +137,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'previous provider1; provider1 not available; provider2 fastest',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 189, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 79, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider2',
@@ -153,7 +153,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'previous provider1; provider1 available; provider2 fastest but not fast enough',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 120, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider1',
@@ -169,7 +169,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'previous provider1; provider1 available; provider2 fast enough to replace it',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 119, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider2',
@@ -185,7 +185,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'previous provider1; no providers available; provider2 most available',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 78, 'provider2' => 79, 'provider3' => 78 ),
                 'alias' => 'provider2',
@@ -202,7 +202,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             // Data problems
             ,array(
                 'description' => 'RTT not an array',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => 'not an array',
                 'reason' => 'F',
                 'saved_before' => array( 'some other key' => 'some other alias' ),
@@ -210,7 +210,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'RTT contains invalid data',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
                 'reason' => 'F',
                 'saved_before' => array( 'some other key' => 'some other alias' ),
@@ -218,14 +218,14 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'Invalid previous alias',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'reason' => 'G',
                 'saved_before' => array( 'some key' => 'bogus alias' ),
                 'saved_after' => array( 'some key' => 'bogus alias' )
             )
             ,array(
                 'description' => 'avail not an array',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => 'not an array',
                 'reason' => 'F',
@@ -234,7 +234,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'avail array empty',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array(),
                 'reason' => 'F',
@@ -243,7 +243,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             )
             ,array(
                 'description' => 'avail array contains invalid data',
-                'get_key' => 'some key',
+                'get_key' => array('some key', 'some country'),
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
                 'reason' => 'F',
@@ -272,7 +272,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             
             $application->expects($this->at($application_call_index++))
                 ->method('update_sticky_data')
-                ->with($i['get_key']);
+                ->with($i['get_key'][0], $i['get_key'][1]);
             
             if (array_key_exists('rtt', $i)) {
                 $request->expects($this->at($call_index++))
@@ -318,8 +318,10 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
     public function update_sticky_data() {
         $test_data = array(
             array(
-                'description' => 'new key; not maxed',
+                'description' => 'new key; not maxed; all countries sticky',
+                'sticky_countries' => array(),
                 'key' => 'some key',
+                'country' => 'some country',
                 'microtime' => 1000,
                 'freqtable_before' => array( 'some other key' => 100 ),
                 'saved_before' => array( 'some other key' => 'some other alias' ),
@@ -333,10 +335,43 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                     'some key' => 1000,
                     'some other key' => 100
                 )
-            ),
-            array(
-                'description' => 'new key; maxed',
+            )
+            ,array(
+                'description' => 'new key; not maxed; request country sticky',
+                'sticky_countries' => array( 'some country' ),
                 'key' => 'some key',
+                'country' => 'some country',
+                'microtime' => 1000,
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'entries_before' => 0,
+                'entries_after' => 1,
+                'saved_after' => array(
+                    'some key' => null,
+                    'some other key' => 'some other alias'
+                ),
+                'freqtable_after' => array(
+                    'some key' => 1000,
+                    'some other key' => 100
+                )
+            )
+            ,array(
+                'description' => 'new key; not maxed; request country not sticky',
+                'sticky_countries' => array( 'some other country' ),
+                'key' => 'some key',
+                'country' => 'some country',
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'saved_before' => array( 'some other key' => 'some other alias' ),
+                'entries_before' => 0,
+                'entries_after' => 0,
+                'saved_after' => array( 'some other key' => 'some other alias' ),
+                'freqtable_after' => array( 'some other key' => 100 )
+            )
+            ,array(
+                'description' => 'new key; maxed; all countries sticky',
+                'sticky_countries' => array(),
+                'key' => 'some key',
+                'country' => 'some country',
                 'microtime' => 1000,
                 'freqtable_before' => array( 'some other key' => 100 ),
                 'saved_before' => array( 'some other key' => 'some other alias' ),
@@ -344,10 +379,12 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 'entries_after' => 800,
                 'saved_after' => array( 'some key' => null ),
                 'freqtable_after' => array( 'some key' => 1000 )
-            ),
-            array(
-                'description' => 'existing key',
+            )
+            ,array(
+                'description' => 'existing key; all countries sticky',
+                'sticky_countries' => array(),
                 'key' => 'some key',
+                'country' => 'some country',
                 'microtime' => 1000,
                 'freqtable_before' => array(
                     'some key' => 100,
@@ -376,16 +413,25 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             //print("\nTest: " . $test_index++);
             //print("\nDescription: " . $i['description']);
             $application = $this->getMock('OpenmixApplication', array('get_microtime'));
+            $application->sticky_countries = $i['sticky_countries'];
             $application->freqtable = $i['freqtable_before'];
             $application->saved = $i['saved_before'];
             $application->entries = $i['entries_before'];
             
-            $application->expects($this->once())
-                ->method('get_microtime')
-                ->will($this->returnValue($i['microtime']));
+            if (array_key_exists('microtime', $i)) {
+                $application->expects($this->once())
+                    ->method('get_microtime')
+                    ->will($this->returnValue($i['microtime']));
+            }
+            else {
+                $application->expects($this->never())
+                    ->method('get_microtime');
+            }
             
-            $application->update_sticky_data($i['key']);
+            // Code under test
+            $application->update_sticky_data($i['key'], $i['country']);
             
+            // Assertions
             $this->assertEquals($i['entries_after'], $application->entries);
             $this->assertEquals($i['saved_after'], $application->saved);
             $this->assertEquals($i['freqtable_after'], $application->freqtable);
@@ -408,7 +454,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                     'country' => 'some edns country',
                     'asn' => 'some edns asn',
                 ),
-                'result' => 'some edns market-some edns country-some edns asn'
+                'result' => array('some edns market-some edns country-some edns asn', 'some edns country')
             ),
             array(
                 'description' => 'EDNS not enabled',
@@ -416,7 +462,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
                 'market' => 'some market',
                 'country' => 'some country',
                 'asn' => 'some asn',
-                'result' => 'some market-some country-some asn'
+                'result' => array('some market-some country-some asn', 'some country')
             )
         );
         
