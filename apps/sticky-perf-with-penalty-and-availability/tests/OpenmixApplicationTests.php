@@ -320,122 +320,147 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             array(
                 'description' => 'new key; not maxed; all countries sticky',
                 'sticky_countries' => array(),
-                'key' => 'some key',
-                'country' => 'some country',
                 'microtime' => 1000,
-                'freqtable_before' => array( 'some other key' => 100 ),
+                'max' => 2,
                 'saved_before' => array( 'some other key' => 'some other alias' ),
-                'entries_before' => 0,
-                'entries_after' => 1,
-                'saved_after' => array(
-                    'some key' => null,
-                    'some other key' => 'some other alias'
-                ),
-                'freqtable_after' => array(
-                    'some key' => 1000,
-                    'some other key' => 100
-                )
+                'saved_after' => array( 'some key' => null, 'some other key' => 'some other alias' ),
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'freqtable_after' => array( 'some key' => 1000, 'some other key' => 100 )
             )
             ,array(
                 'description' => 'new key; not maxed; request country sticky',
                 'sticky_countries' => array( 'some country' ),
-                'key' => 'some key',
-                'country' => 'some country',
                 'microtime' => 1000,
-                'freqtable_before' => array( 'some other key' => 100 ),
+                'max' => 2,
                 'saved_before' => array( 'some other key' => 'some other alias' ),
-                'entries_before' => 0,
-                'entries_after' => 1,
-                'saved_after' => array(
-                    'some key' => null,
-                    'some other key' => 'some other alias'
-                ),
-                'freqtable_after' => array(
-                    'some key' => 1000,
-                    'some other key' => 100
-                )
+                'saved_after' => array( 'some key' => null, 'some other key' => 'some other alias' ),
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'freqtable_after' => array( 'some key' => 1000, 'some other key' => 100 )
             )
             ,array(
                 'description' => 'new key; not maxed; request country sticky; mixed case',
                 'sticky_countries' => array( 'US', 'UK', 'FR' ),
-                'key' => 'some key',
                 'country' => 'us',
                 'microtime' => 1000,
-                'freqtable_before' => array( 'some other key' => 100 ),
+                'max' => 2,
                 'saved_before' => array( 'some other key' => 'some other alias' ),
-                'entries_before' => 0,
-                'entries_after' => 1,
-                'saved_after' => array(
-                    'some key' => null,
-                    'some other key' => 'some other alias'
-                ),
-                'freqtable_after' => array(
-                    'some key' => 1000,
-                    'some other key' => 100
-                )
+                'saved_after' => array( 'some key' => null, 'some other key' => 'some other alias' ),
+                'freqtable_before' => array( 'some other key' => 100 ),
+                'freqtable_after' => array( 'some key' => 1000, 'some other key' => 100 )
             )
             ,array(
                 'description' => 'new key; not maxed; request country not sticky',
                 'sticky_countries' => array( 'some other country' ),
-                'key' => 'some key',
-                'country' => 'some country',
-                'freqtable_before' => array( 'some other key' => 100 ),
+                'max' => 2,
                 'saved_before' => array( 'some other key' => 'some other alias' ),
-                'entries_before' => 0,
-                'entries_after' => 0,
                 'saved_after' => array( 'some other key' => 'some other alias' ),
+                'freqtable_before' => array( 'some other key' => 100 ),
                 'freqtable_after' => array( 'some other key' => 100 )
             )
             ,array(
                 'description' => 'new key; maxed; all countries sticky',
                 'sticky_countries' => array(),
-                'key' => 'some key',
-                'country' => 'some country',
                 'microtime' => 1000,
-                'freqtable_before' => array( 'some other key' => 100 ),
-                'saved_before' => array( 'some other key' => 'some other alias' ),
-                'entries_before' => 800,
-                'entries_after' => 800,
-                'saved_after' => array( 'some key' => null ),
-                'freqtable_after' => array( 'some key' => 1000 )
+                'max' => 3,
+                'saved_before' => array(
+                    'some key 1' => 'some provider 1',
+                    'some key 2' => 'some provider 2',
+                    'some key 3' => 'some provider 3',
+                ),
+                'saved_after' => array(
+                    'some key' => null,
+                    'some key 2' => 'some provider 2',
+                    'some key 3' => 'some provider 3',
+                ),
+                'freqtable_before' => array(
+                    'some key 1' => 99,
+                    'some key 2' => 100,
+                    'some key 3' => 100,
+                ),
+                'freqtable_after' => array(
+                    'some key' => 1000,
+                    'some key 2' => 100,
+                    'some key 3' => 100,
+                ),
             )
             ,array(
                 'description' => 'existing key; all countries sticky',
                 'sticky_countries' => array(),
-                'key' => 'some key',
-                'country' => 'some country',
                 'microtime' => 1000,
-                'freqtable_before' => array(
-                    'some key' => 100,
-                    'some other key' => 101
-                ),
+                'max' => 2,
                 'saved_before' => array(
                     'some key' => 'some old alias',
                     'some other key' => 'some other alias'
                 ),
-                'entries_before' => 0,
-                'entries_after' => 0,
                 'saved_after' => array(
                     'some key' => 'some old alias',
                     'some other key' => 'some other alias'
+                ),
+                'freqtable_before' => array(
+                    'some key' => 100,
+                    'some other key' => 101
                 ),
                 'freqtable_after' => array(
                     'some key' => 1000,
                     'some other key' => 101
                 )
             )
+            ,array(
+                'description' => 'existing key; request country sticky',
+                'sticky_countries' => array( 'US' ),
+                'country' => 'us',
+                'microtime' => 1000,
+                'max' => 2,
+                'saved_before' => array(
+                    'some key' => 'some old alias',
+                    'some other key' => 'some other alias'
+                ),
+                'saved_after' => array(
+                    'some key' => 'some old alias',
+                    'some other key' => 'some other alias'
+                ),
+                'freqtable_before' => array(
+                    'some key' => 100,
+                    'some other key' => 101
+                ),
+                'freqtable_after' => array(
+                    'some key' => 1000,
+                    'some other key' => 101
+                )
+            )
+            ,array(
+                'description' => 'existing key; request country not sticky',
+                'sticky_countries' => array( 'US' ),
+                'max' => 2,
+                'saved_before' => array(
+                    'some key 1' => 'some provider 1',
+                    'some key 2' => 'some provider 2'
+                ),
+                'saved_after' => array(
+                    'some key 1' => 'some provider 1',
+                    'some key 2' => 'some provider 2'
+                ),
+                'freqtable_before' => array(
+                    'some key 1' => 100,
+                    'some key 2' => 101
+                ),
+                'freqtable_after' => array(
+                    'some key 1' => 100,
+                    'some key 2' => 101
+                )
+            )
         );
         
-        //print("\nTesting update_sticky_data");
-        //$test_index = 0;
+        print("\nTesting update_sticky_data");
+        $test_index = 0;
         foreach ($test_data as $i) {
-            //print("\nTest: " . $test_index++);
-            //print("\nDescription: " . $i['description']);
+            print("\nTest: " . $test_index++);
+            print("\nDescription: " . $i['description']);
             $application = $this->getMock('OpenmixApplication', array('get_microtime'));
             $application->sticky_countries = $i['sticky_countries'];
             $application->freqtable = $i['freqtable_before'];
             $application->saved = $i['saved_before'];
-            $application->entries = $i['entries_before'];
+            $application->max = $i['max'];
             
             if (array_key_exists('microtime', $i)) {
                 $application->expects($this->once())
@@ -448,10 +473,14 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             }
             
             // Code under test
-            $application->update_sticky_data($i['key'], $i['country']);
+            if (array_key_exists('country', $i)) {
+                $application->update_sticky_data('some key', $i['country']);
+            }
+            else {
+                $application->update_sticky_data('some key', 'some country');
+            }
             
             // Assertions
-            $this->assertEquals($i['entries_after'], $application->entries);
             $this->assertEquals($i['saved_after'], $application->saved);
             $this->assertEquals($i['freqtable_after'], $application->freqtable);
         }

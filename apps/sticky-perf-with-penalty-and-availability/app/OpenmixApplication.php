@@ -33,12 +33,11 @@ class OpenmixApplication implements Lifecycle {
     
     public $saved = array();
     public $freqtable = array();
-    public $entries = 0;
     
     // Do not adjust above 800; it's been determined that 800 is an appropriate
     // maximum number of entries to keep the application below the imposed limit
     // of 2M.
-    private $max = 800;
+    public $max = 800;
     
     /**
      * @param Configuration $config
@@ -202,15 +201,12 @@ class OpenmixApplication implements Lifecycle {
         if (empty($this->sticky_countries) || !empty($filtered)) {
             if (!array_key_exists($key, $this->saved)) {
                 // when at max, evict the last one added
-                if ($this->entries >= $this->max) {
+                if (count($this->saved) >= $this->max) {
                     asort($this->freqtable);
                     $last_added = key($this->freqtable);
                     unset($this->saved[$last_added]);
                     unset($this->freqtable[$last_added]);
                     gc_collect_cycles();
-                }
-                else {
-                    $this->entries += 1;
                 }
                 $this->saved[$key] = null;
             }
