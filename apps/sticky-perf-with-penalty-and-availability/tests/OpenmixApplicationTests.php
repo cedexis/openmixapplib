@@ -109,6 +109,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             array(
                 'description' => 'no previous; all available; provider3 fastest',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 199 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider3',
@@ -122,6 +123,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'previous provider1; all available; provider1 selected; no other providers fast enough',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider1',
@@ -138,6 +140,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'previous provider1; provider1 not available; provider2 fastest',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 189, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 79, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider2',
@@ -154,6 +157,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'previous provider1; provider1 available; provider2 fastest but not fast enough',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 120, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider1',
@@ -170,6 +174,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'previous provider1; provider1 available; provider2 fast enough to replace it',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 119, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 80, 'provider2' => 80, 'provider3' => 80 ),
                 'alias' => 'provider2',
@@ -186,6 +191,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'previous provider1; no providers available; provider2 most available',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'provider1' => 78, 'provider2' => 79, 'provider3' => 78 ),
                 'alias' => 'provider2',
@@ -203,6 +209,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'RTT not an array',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => 'not an array',
                 'reason' => 'F',
                 'saved_before' => array( 'some other key' => array( 'provider' => 'some other alias' ) ),
@@ -211,6 +218,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'RTT contains invalid data',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
                 'reason' => 'F',
                 'saved_before' => array( 'some other key' => array( 'provider' => 'some other alias' ) ),
@@ -219,6 +227,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'Invalid previous alias',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'reason' => 'G',
                 'saved_before' => array( 'some key' => array( 'provider' => 'bogus alias' ) ),
                 'saved_after' => array( 'some key' => array( 'provider' => 'bogus alias' ) ),
@@ -226,6 +235,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'avail not an array',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => 'not an array',
                 'reason' => 'F',
@@ -235,6 +245,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'avail array empty',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array(),
                 'reason' => 'F',
@@ -244,6 +255,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             ,array(
                 'description' => 'avail array contains invalid data',
                 'get_key' => array('some key', 'some country'),
+                'availabilityThreshold' => 80,
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array( 'a' => 1, 'b' => 2, 'c' => 3 ),
                 'reason' => 'F',
@@ -261,6 +273,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase {
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
             $application = $this->getMock('OpenmixApplication', array('get_key', 'update_sticky_data'));
+            $application->availabilityThreshold = $i['availabilityThreshold'];
             
             $call_index = 0;
             $application_call_index = 0;

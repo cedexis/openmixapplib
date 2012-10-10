@@ -28,7 +28,7 @@ class OpenmixApplication implements Lifecycle {
     
     private $ttl = 30;
     
-    private $availabilityThreshold = 80;
+    public $availabilityThreshold = 60;
     private $varianceThreshold = .65;
     
     public $saved = array();
