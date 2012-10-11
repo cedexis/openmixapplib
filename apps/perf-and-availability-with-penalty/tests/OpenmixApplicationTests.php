@@ -53,14 +53,14 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
         $testData = array(
             // all are above avail threshold and provider1 is fastest after handicap
             array(
-                'rtt' => array('provider1' => 200, 'provider2' => 141, 'provider3' => 141),
+                'rtt' => array('provider1' => 150, 'provider2' => 141, 'provider3' => 141),
                 'avail' => array('provider1' => 100, 'provider2' => 100, 'provider3' => 100),
                 'expectedAlias' => 'provider1',
                 'expectedReasonCode' => 'A'
             ),
             // all are above avail threshold and provider2 is fastest after handicap
             array(
-                'rtt' => array('provider1' => 200, 'provider2' => 139, 'provider3' => 141),
+                'rtt' => array('provider1' => 200, 'provider2' => 139, 'provider3' => 161),
                 'avail' => array('provider1' => 100, 'provider2' => 100, 'provider3' => 100),
                 'expectedAlias' => 'provider2',
                 'expectedReasonCode' => 'A'

@@ -5,11 +5,12 @@ class OpenmixApplication implements Lifecycle
 {
     /**
      * @var The list of available CNAMEs, keyed by alias.
+     * padding is in percent. 10 = 10% slower (score * 1.1)
      */
     public $providers = array(
         'provider1' => array('cname' => 'provider1.example.com', 'padding' => 0),
-        'provider2' => array('cname' => 'provider2.example.com', 'padding' => 60),
-        'provider3' => array('cname' => 'provider3.example.com', 'padding' => 60));
+        'provider2' => array('cname' => 'provider2.example.com', 'padding' => 10),
+        'provider3' => array('cname' => 'provider3.example.com', 'padding' => 10));
     
     private $reasons = array(
         'Best performing provider selected' => 'A',
@@ -60,7 +61,8 @@ class OpenmixApplication implements Lifecycle
                 // Add penalties
                 foreach (array_keys($rtt) as $i)
                 {
-                    $candidates[$i] += $this->providers[$i]['padding'];
+                    $padding = 1 + floatval($this->providers[$i]['padding']) / 100;
+                    $candidates[$i] = $candidates[$i] * $padding;
                 }
                 
                 // Select the best performing provider that meets its minimum
