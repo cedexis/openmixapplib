@@ -24,7 +24,8 @@ class OpenmixApplication implements Lifecycle
     
     /**
      * @var array An array mapping networks to preferred providers.  Note that market
-     * and country codes must be UPPER CASE.
+     * and country codes must be UPPER CASE.  There's a memory limit here.  It's somewhere
+     * around 450 keys.
      *
      * Example::
      *
