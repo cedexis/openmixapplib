@@ -23,7 +23,10 @@ class OpenmixApplication implements Lifecycle
     private $varianceThreshold = .65;
     
     /**
-     * @var array An array mapping networks to preferred providers in the following format:
+     * @var array An array mapping networks to preferred providers.  Note that market
+     * and country codes must be UPPER CASE.
+     *
+     * Example::
      *
      * $preferred = array(
      *    'NA-US-1234' => array( 'provider' => 'cotendo' ),
