@@ -408,28 +408,13 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             //print("\nDescription: " . $i['description']);
             $request = $this->getMock('Request');
             $call_index = 0;
-                
-            $request->expects($this->at($call_index++))
-                ->method('geo')
-                ->with(GeoProperties::MARKET)
-                ->will($this->returnValue($i['market']));
-                    
-            $request->expects($this->at($call_index++))
-                ->method('geo')
-                ->with(GeoProperties::COUNTRY)
-                ->will($this->returnValue($i['country']));
-                    
-            $request->expects($this->at($call_index++))
-                ->method('geo')
-                ->with(GeoProperties::ASN)
-                ->will($this->returnValue($i['asn']));
-                
+            
             $request->expects($this->at($call_index++))
                 ->method('geo')
                 ->with(EDNSProperties::ENABLE)
                 ->will($this->returnValue($i['edns_enable']));
-                
-            if (array_key_exists('edns', $i)) {
+                    
+            if (true === $i['edns_enable']) {
                 $request->expects($this->at($call_index++))
                     ->method('geo')
                     ->with(EDNSProperties::MARKET)
@@ -445,9 +430,25 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     ->with(EDNSProperties::ASN)
                     ->will($this->returnValue($i['edns']['asn']));
             }
-            $application = new OpenmixApplication();
+            else {
+                $request->expects($this->at($call_index++))
+                    ->method('geo')
+                    ->with(GeoProperties::MARKET)
+                    ->will($this->returnValue($i['market']));
+                
+                $request->expects($this->at($call_index++))
+                    ->method('geo')
+                    ->with(GeoProperties::COUNTRY)
+                    ->will($this->returnValue($i['country']));
+                    
+                $request->expects($this->at($call_index++))
+                    ->method('geo')
+                    ->with(GeoProperties::ASN)
+                    ->will($this->returnValue($i['asn']));
+            }
             
             // Code under test
+            $application = new OpenmixApplication();
             $result = $application->get_key($request);
             
             // Assertions

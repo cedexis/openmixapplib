@@ -22,6 +22,15 @@ class OpenmixApplication implements Lifecycle
     public $availabilityThreshold = 60;
     private $varianceThreshold = .65;
     
+    /**
+     * @var array An array mapping networks to preferred providers in the following format:
+     *
+     * $preferred = array(
+     *    'NA-US-1234' => array( 'provider' => 'cotendo' ),
+     *    'NA-US-2345' => array( 'provider' => 'bitgravity' ),
+     *    'NA-US-3456' => array( 'provider' => 'akamai' ),
+     * );
+     */
     public $preferred = array();
     
     public $reasons = array(
@@ -175,13 +184,15 @@ class OpenmixApplication implements Lifecycle
     }
     
     public function get_key($request) {
-        $market = $request->geo(GeoProperties::MARKET);
-        $country = $request->geo(GeoProperties::COUNTRY);
-        $asn = $request->geo(GeoProperties::ASN);
         if ($request->geo(EDNSProperties::ENABLE)) {
             $market = $request->geo(EDNSProperties::MARKET);
             $country = $request->geo(EDNSProperties::COUNTRY);
             $asn = $request->geo(EDNSProperties::ASN);
+        }
+        else {
+            $market = $request->geo(GeoProperties::MARKET);
+            $country = $request->geo(GeoProperties::COUNTRY);
+            $asn = $request->geo(GeoProperties::ASN);
         }
         return "$market-$country-$asn";
     }
