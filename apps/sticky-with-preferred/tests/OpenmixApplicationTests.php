@@ -101,27 +101,27 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'description' => 'RTT empty array',
                 'rtt' => array(),
                 'reason' => 'A',
-                'preferred_after' => array()
+                'saved_after' => array()
             )
             ,array(
                 'description' => 'RTT not an array',
                 'rtt' => null,
                 'reason' => 'A',
-                'preferred_after' => array()
+                'saved_after' => array()
             )
             ,array(
                 'description' => 'Avail empty array',
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => array(),
                 'reason' => 'A',
-                'preferred_after' => array()
+                'saved_after' => array()
             )
             ,array(
                 'description' => 'Avail not an array',
                 'rtt' => array( 'provider1' => 200, 'provider2' => 200, 'provider3' => 200 ),
                 'avail' => null,
                 'reason' => 'A',
-                'preferred_after' => array()
+                'saved_after' => array()
             )
             ,array(
                 'description' => 'all providers unavailable',
@@ -135,8 +135,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 74, 'bitgravity' => 73, 'level3' => 73 ),
                 'alias' => 'akamai',
                 'reason' => 'C',
-                'preferred_before' => 'blah',
-                'preferred_after' => 'blah',
+                'saved_before' => 'blah',
+                'saved_after' => 'blah',
             )
             ,array(
                 'description' => 'level3 not available, bitgravity fastest, not sticky',
@@ -150,8 +150,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 75, 'level3' => 74 ),
                 'alias' => 'bitgravity',
                 'reason' => 'B',
-                'preferred_before' => array(),
-                'preferred_after' => array(),
+                'saved_before' => array(),
+                'saved_after' => array(),
             )
             ,array(
                 'description' => 'level3 not available, bitgravity fastest, akamai preferred, akamai selected',
@@ -165,17 +165,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 75, 'level3' => 74 ),
                 'alias' => 'akamai',
                 'reason' => 'D',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'akamai'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_after' => array( 'some key' => 'akamai' ),
             )
             ,array(
                 'description' => 'level3 fastest, none saved, akamai preferred, level3 selected',
@@ -189,17 +180,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 75, 'level3' => 75 ),
                 'alias' => 'level3',
                 'reason' => 'B',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'level3'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_after' => array( 'some key' => 'level3' ),
             )
             ,array(
                 'description' => 'level3 fastest, akamai preferred, bitgravity saved, level3 selected',
@@ -213,18 +195,9 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 75, 'level3' => 75 ),
                 'alias' => 'level3',
                 'reason' => 'B',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'bitgravity'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'level3'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_before' => array( 'some key' => 'bitgravity' ),
+                'saved_after' => array( 'some key' => 'level3' ),
             )
             ,array(
                 'description' => 'saved provider selected',
@@ -238,18 +211,9 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 75, 'level3' => 75 ),
                 'alias' => 'bitgravity',
                 'reason' => 'E',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'bitgravity'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'bitgravity'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_before' => array( 'some key' => 'bitgravity' ),
+                'saved_after' => array( 'some key' => 'bitgravity' ),
             )
             ,array(
                 'description' => 'saved provider not available, fastest overrides preferred',
@@ -263,18 +227,9 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 74, 'level3' => 75 ),
                 'alias' => 'level3',
                 'reason' => 'B',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'bitgravity'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'level3'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_before' => array( 'some key' => 'bitgravity' ),
+                'saved_after' => array( 'some key' => 'level3' ),
             )
             ,array(
                 'description' => 'saved provider not available, preferred selected',
@@ -288,18 +243,9 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'avail' => array( 'akamai' => 75, 'bitgravity' => 74, 'level3' => 75 ),
                 'alias' => 'akamai',
                 'reason' => 'D',
-                'preferred_before' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'bitgravity'
-                    )
-                ),
-                'preferred_after' => array(
-                    'some key' => array(
-                        'provider' => 'akamai',
-                        'saved' => 'akamai'
-                    )
-                ),
+                'preferred_before' => array( 'some key' => 'akamai' ),
+                'saved_before' => array( 'some key' => 'bitgravity' ),
+                'saved_after' => array( 'some key' => 'akamai' ),
             )
         );
         
@@ -323,6 +269,10 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             
             if (array_key_exists('preferred_before', $i)) {
                 $application->preferred = $i['preferred_before'];
+            }
+            
+            if (array_key_exists('saved_before', $i)) {
+                $application->saved = $i['saved_before'];
             }
             
             $application->expects($this->once())
@@ -369,7 +319,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             
             // Assertions
             $this->verifyMockObjects();
-            $this->assertEquals($i['preferred_after'], $application->preferred);
+            $this->assertEquals($i['saved_after'], $application->saved);
         }
     }
     
