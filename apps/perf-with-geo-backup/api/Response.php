@@ -16,10 +16,17 @@ interface Response
 
     /**
      * Called when you want to respond with the provider and hostname - equivalent to return "host.name,provider"
+     * Openmix now allows you to respond with an A record instead of CNAME only. To respond back with an A record,
+     * call respond() and provide an IP Address instead of CNAME. 
+     *
+     * while $response->respond('example.com') will respond with a CNAME record.
+     * 
+     * IP Addresses can be in the form of 'a.b.c.d', 'a.b.c', 'a.b', 'a' where a,b,c,d are between  0 and 255 inclusive.
      *
      * Example::
      *
      *      $response->respond('provider_a', 'a.example.com');
+     *      $response->respond('provider_a', '1.2.3.4'); will respond back with an A record
      */
     public function respond($provider,$cname);
 
