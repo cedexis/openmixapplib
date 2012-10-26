@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-# TODO figure out the correct base directory (the location of the script file itself)
-
 # Used for parsing the `applib.yaml` file for each app
 require "yaml"
 
