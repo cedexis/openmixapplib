@@ -1,3 +1,9 @@
+# Application: **Conditional Host Names**
+
+Some platforms use virtual-host specific hostnames, often for content localization, but you often want to centralize these into your Openmix script rather than creating many Openmix platforms. For example, imagine your website has the URLs http://&lt;country&gt;.example.com/ where &lt;country&gt; is replaced with ISO codes.  
+
+The solution is to dynamically construct the resulting hostname in the application as in this example application which routes traffic to the available platform with the lowest response time.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +17,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

@@ -1,3 +1,9 @@
+# Application: **Route Based on Geography**
+
+Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries.
+
+Contributed by Jake Maul of Mozilla
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +17,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

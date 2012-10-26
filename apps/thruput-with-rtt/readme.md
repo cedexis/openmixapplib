@@ -1,3 +1,7 @@
+# Application: **Throughput with RTT Tie Breaker**
+
+Choose the best provider based on HTTP Throughput. If the top 2 are with 5% of each other, use HTTP Response time to break the tie.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +15,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

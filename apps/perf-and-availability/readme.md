@@ -1,3 +1,9 @@
+# Application: **Optimal Round Trip Time**
+
+This application is ideal for getting started with Openmix application development. It uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance.
+
+There is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +17,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

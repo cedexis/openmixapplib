@@ -1,3 +1,9 @@
+# Application: **Performance Routing with Platform Penalty**
+
+The routing provided by the basic performance application is great for certain cases, but there are times when you know that you only want to use a specific platform when others are considerably worse. For example, you might only want to send traffic to your origin when it is significantly better than any other choice.  
+
+This application shows how this can work by using the concept of ‘padding’ to increase the value of the performance measure being used to decide where to send traffic.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +17,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

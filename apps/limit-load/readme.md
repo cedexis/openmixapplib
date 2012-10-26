@@ -1,3 +1,7 @@
+# Application: **Avoid Platforms that are Overloaded**
+
+This app demonstrates using Pulse Load to obtain current load data for each provider.  It uses this information to filter out providers that are currently overloaded.  Of the remaining providers, it selects the best-performing one.  If all providers are overloaded, it selects the best-performing overall.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +15,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

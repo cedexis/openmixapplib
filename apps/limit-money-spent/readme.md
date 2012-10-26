@@ -1,3 +1,7 @@
+# Application: **Avoid Platforms that have reached a cost threshold**
+
+This application demonstrates using Pulse Load to obtain cloud provider "cost", routing traffic away from a provider once it reaches a certain threshold.  Any servers below the cost threshold will be load-balanced with origin based on round-trip time performance.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +15,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

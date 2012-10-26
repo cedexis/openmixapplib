@@ -1,3 +1,7 @@
+# Application: **Performance with Sticky Winner**
+
+Routes requests to the highest performing available platform, but once a choice is made stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +15,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library

@@ -1,3 +1,7 @@
+# Application: **Performance with Geo Based Backup**
+
+This application demonstrates using Cedexis Radar as the primary way to select platforms, but where Geolocation data is used if there is inadequate radar data available.
+
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
@@ -11,7 +15,3 @@ These Openmix Application PHP scripts are used by specialized DNS servers to res
 Learn how to use the library to make your own applications in
 [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
-## Directories
-
-* **apps/** - contains the library of example applications
-* **scripts/** - utilities for maintaining this library
