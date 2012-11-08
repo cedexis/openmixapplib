@@ -20,6 +20,9 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
         $config = $this->getMock('Configuration');
         
         $callIndex = 0;
+        $config->expects($this->at($callIndex++))
+            ->method('declareInput')
+            ->with(EDNSProperties::ENABLE);
         
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
