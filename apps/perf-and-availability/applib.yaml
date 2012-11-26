@@ -1,5 +1,8 @@
-name: Basic Performance Application
-last_updated: 01/31/2012
+name: Optimal Round Trip Time
+author: Cedexis
+last_updated: 06/08/2012
 categories: Performance
 description: |
   This application is ideal for getting started with Openmix application development. It uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance.
+
+  There is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.
