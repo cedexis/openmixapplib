@@ -23,6 +23,9 @@ class EDNSProperties
 	 * EDNS is enabled and we have an EDNS_IP set.
      */		
 	const ENABLE = 'integer:enable_edns:enable_edns';
+
+	/* only for turning it off... */
+    const DISABLE = 'integer:disable_edns:disable_edns';
 }
 
 ?>
