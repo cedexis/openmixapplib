@@ -1,0 +1,6 @@
+name: Fusion Data Example
+author: Cedexis
+last_updated: 10/05/2012
+categories: 
+description: |
+  A simple example of using Fusion Data within an Openmix script. Instead of making a decision this application simply responds with the values available in Fusion at the moment of the request.
