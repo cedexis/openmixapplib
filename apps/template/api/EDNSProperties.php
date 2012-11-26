@@ -18,13 +18,22 @@ class EDNSProperties
      */
     const ASN     = 'integer:edns:asn';
 
-	/**
-	 * This is a hack to 'turn on' edns for apps. Returns true at service if
-	 * EDNS is enabled and we have an EDNS_IP set.
-     */		
-	const ENABLE = 'integer:enable_edns:enable_edns';
+    /**
+     * DEPRECATED
+     *
+     * This setting was previously used for enabling EDNS support. However,
+     * EDNS support is now enabled by default so this setting is replaced
+     * with `DISABLE`.
+     *
+     * Returns true in the `service` function if EDNS is enabled and we
+     * have an EDNS_IP set.
+     */
+    const ENABLE = 'integer:enable_edns:enable_edns';
 
-	/* only for turning it off... */
+    /**
+     * Disables EDNS support for an application. This can be used in the
+     * `init` method to disable the use of EDNS for the application.
+     */
     const DISABLE = 'integer:disable_edns:disable_edns';
 }
 
