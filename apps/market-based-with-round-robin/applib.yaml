@@ -1,0 +1,7 @@
+name: Market-Based Geo With Round-Robin
+author: Cedexis Developers
+last_updated: 11/28/2012
+categories: 
+description: |
+    Performs round-robin routing to a specific subset of providers
+    based on the current request's market.
