@@ -160,27 +160,6 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             $application->service($request, $response, $utilities);
         }
     }
-    
-    /**
-     * @test
-     */
-    public function service_exception_handling()
-    {
-        $request = $this->getMock('Request');
-        $response = $this->getMock('Response');
-        $utilities = $this->getMock('Utilities');
-        
-        $request->expects($this->once())
-            ->method('geo')
-            ->with(GeoProperties::MARKET)
-            ->will($this->throwException(new Exception('boo!!!')));
-            
-        $utilities->expects($this->once())
-            ->method('selectRandom');
-        
-        $application = new OpenmixApplication();
-        $application->service($request, $response, $utilities);
-    }
 }
 
 ?>

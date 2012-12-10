@@ -62,27 +62,22 @@ class OpenmixApplication implements Lifecycle
      **/
     public function service($request, $response, $utilities)
     {
-        try {
-            $market = $request->geo(GeoProperties::MARKET);
-            //print("\nMarket: $market");
-            
-            $candidates = $this->default_providers;
-            if (array_key_exists($market, $this->market_map)) {
-                $candidates = $this->market_map[$market];
-            }
-            
-            $random = $this->rand(0, count($candidates) - 1);
-            //print("\nRandom: $random");
-            
-            $alias = $candidates[$random];
-            //print("\nSelecting: $alias");
-            
-            $response->selectProvider($alias);
+        $market = $request->geo(GeoProperties::MARKET);
+        //print("\nMarket: $market");
+        
+        $candidates = $this->default_providers;
+        if (array_key_exists($market, $this->market_map)) {
+            $candidates = $this->market_map[$market];
         }
-        catch (Exception $e) {
-            //print("\nException: $e");
-            $utilities->selectRandom();
-        }
+		//print("\nCandidates: " . print_r($candidates, true));
+        
+        $random = $this->rand(0, count($candidates) - 1);
+        //print("\nRandom: $random");
+        
+        $alias = $candidates[$random];
+        //print("\nSelecting: $alias");
+        
+        $response->selectProvider($alias);
     }
     
     /**
