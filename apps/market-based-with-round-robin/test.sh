@@ -2,6 +2,10 @@
 
 set -v
 
+# USA 151.197.0.38
+# expecting one of: 50.97.227.68, 65.254.36.226
+dig +short 2-01-2a40-0009.cdx-i-151-197-0-38.cedexis.net
+
 # Canada 98.142.244.90
 # expecting one of: 50.97.227.68, 65.254.36.226
 dig +short 2-01-2a40-0009.cdx-i-98-142-244-90.cedexis.net
