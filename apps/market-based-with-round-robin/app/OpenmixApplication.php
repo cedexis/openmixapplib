@@ -6,7 +6,7 @@
  */
 class OpenmixApplication implements Lifecycle
 {
-    private $providers = array(
+    public $providers = array(
         'probe1.atl.tmd.prod' => '65.254.36.226',
         'probe1.rbx.ovh.prod' => '94.23.254.99',
         'probe1.sbg.ovh.prod' => '37.59.8.25',
@@ -32,7 +32,7 @@ class OpenmixApplication implements Lifecycle
     //    round robin between (probe1.atl.tmd.prod,65.254.36.226)
     //                    and (probe1.sbg.ovh.prod,37.59.8.25)
     
-    private $market_map = array(
+    public $market_map = array(
         'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
         'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
         'EU' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod' ),

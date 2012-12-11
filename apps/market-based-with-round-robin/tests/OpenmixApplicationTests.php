@@ -160,6 +160,103 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             $application->service($request, $response, $utilities);
         }
     }
+    
+    /**
+     * @test
+     */
+    public function service_with_one_object_array()
+    {
+        $test_data = array(
+            // 'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+            array(
+                'providers' => array(
+                    'probe1.atl.tmd.prod' => '65.254.36.226',
+                    'probe1.sbg.ovh.prod' => '37.59.8.25',
+                    'probe1.sin.sl.prod' => '119.81.23.243',
+                    'probe1.sjc.sl.prod' => '50.97.227.68',
+                ),
+                'market_map' => array(
+                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'EU' => array( 'probe1.sbg.ovh.prod', ),
+                    'AF' => array( 'probe1.sbg.ovh.prod', ),
+                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                ),
+                'market' => 'NA',
+                'rand' => array( 0, 1, 0 ),
+                'alias' => 'probe1.sjc.sl.prod',
+            ),
+            array(
+                'providers' => array(
+                    'probe1.atl.tmd.prod' => '65.254.36.226',
+                    'probe1.sbg.ovh.prod' => '37.59.8.25',
+                    'probe1.sin.sl.prod' => '119.81.23.243',
+                    'probe1.sjc.sl.prod' => '50.97.227.68',
+                ),
+                'market_map' => array(
+                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'EU' => array( 'probe1.sbg.ovh.prod', ),
+                    'AF' => array( 'probe1.sbg.ovh.prod', ),
+                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                ),
+                'market' => 'EU',
+                'rand' => array( 0, 0, 0 ),
+                'alias' => 'probe1.sbg.ovh.prod',
+            ),
+            array(
+                'providers' => array(
+                    'probe1.atl.tmd.prod' => '65.254.36.226',
+                    'probe1.sbg.ovh.prod' => '37.59.8.25',
+                    'probe1.sin.sl.prod' => '119.81.23.243',
+                    'probe1.sjc.sl.prod' => '50.97.227.68',
+                ),
+                'market_map' => array(
+                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
+                    'EU' => array( 'probe1.sbg.ovh.prod', ),
+                    'AF' => array( 'probe1.sbg.ovh.prod', ),
+                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+                ),
+                'market' => 'AF',
+                'rand' => array( 0, 0, 0 ),
+                'alias' => 'probe1.sbg.ovh.prod',
+            ),
+        );
+        
+        foreach ($test_data as $i) {
+            $request = $this->getMock('Request');
+            $response = $this->getMock('Response');
+            $utilities = $this->getMock('Utilities');
+            $application = $this->getMock('OpenmixApplication', array('rand'));
+            
+            $application->providers = $i['providers'];
+            $application->market_map = $i['market_map'];
+            
+            $request->expects($this->once())
+                ->method('geo')
+                ->with(GeoProperties::MARKET)
+                ->will($this->returnValue($i['market']));
+                
+            $application->expects($this->once())
+                ->method('rand')
+                ->with($i['rand'][0], $i['rand'][1])
+                ->will($this->returnValue($i['rand'][2]));
+                
+            
+            $response->expects($this->once())
+                ->method('selectProvider')
+                ->with($i['alias']);
+                
+            $utilities->expects($this->never())
+                ->method('selectRandom');
+            
+            $application->service($request, $response, $utilities);
+        }
+    }
 }
 
 ?>
