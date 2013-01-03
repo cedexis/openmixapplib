@@ -18,7 +18,7 @@ class OpenmixApplication implements Lifecycle
     
     private $reasons = array(
         'Best performing provider' => 'A',
-        'All servers over threshold' => 'B',
+        'All providers eliminated' => 'B',
         'Data problem' => 'C'
     );
     
@@ -134,13 +134,13 @@ class OpenmixApplication implements Lifecycle
         {
             $response->setReasonCode($this->reasons['Data problem']);
         }
-        $response->selectProvider(key($fallback));
+        $response->selectProvider(key($this->fallback));
         if (strlen($hostname) > 0)
         {
-            $response->setCName($hostname . "." . $fallback[key($fallback)]);
+            $response->setCName($hostname . "." . $this->fallback[key($this->fallback)]);
         } else
         {
-            $response->setCName($fallback[key($fallback)]);
+            $response->setCName($this->fallback[key($this->fallback)]);
         }
     }
 }
