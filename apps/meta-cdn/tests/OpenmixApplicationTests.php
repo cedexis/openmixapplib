@@ -64,7 +64,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function service()
+    public function service_site1_requested_cdn1_fastest()
     {
         $request = $this->getMock('Request');
         $response = $this->getMock('Response');
@@ -87,7 +87,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             ->with(RadarProbeTypes::HTTP_RTT)
             ->will($this->returnValue(
                 array(
-                    'cdn1' => 200,
+                    'cdn1' => 199,
                     'cdn2' => 200,
                     'cdn3' => 200,
                 )));
@@ -101,6 +101,14 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'cdn2' => 100,
                     'cdn3' => 100,
                 )));
+            
+        $response->expects($this->once())
+            ->method('selectProvider')
+            ->with('cdn1');
+            
+        $response->expects($this->once())
+            ->method('setReasonCode')
+            ->with('A');
         
         $application = new OpenmixApplication();
         $application->service($request, $response, $utilities);
