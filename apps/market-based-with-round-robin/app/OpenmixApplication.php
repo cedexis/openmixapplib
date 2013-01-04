@@ -7,38 +7,27 @@
 class OpenmixApplication implements Lifecycle
 {
     public $providers = array(
-        'probe1.atl.tmd.prod' => '65.254.36.226',
         'probe1.rbx.ovh.prod' => '94.23.254.99',
         'probe1.sbg.ovh.prod' => '37.59.8.25',
-        'probe1.sin.sl.prod' => '119.81.23.243',
-        'probe1.sjc.sl.prod' => '50.97.227.68',
+        'probe1.ams.hw.prod' => '81.171.102.234',
+        'probe1.phx.hw.prod' => '209.197.5.130',
+        'probe1.sjc.edg.prod' => '46.22.79.39',
+        'probe1.lax.llnw.prod' => '69.28.181.2',
+        'probe1.lga.llnw.prod' => '69.28.155.82',
+        'probe1.lhr.edg.prod' => '72.21.90.135',
+        'probe1.atl.tmd.prod' => '65.254.36.226',
     );
     
     private $ttl = 20;
     
-    //if geo.market = NA or SA
-    //    round robin between (probe1.sjc.sl.prod, 50.97.227.68)
-    //                    and (probe1.atl.tmd.prod,65.254.36.226)
-    //  
-    //if geo.market= EU or AF
-    //    round-robin between (probe1.rbx.ovh.prod,94.23.254.99
-    //                    and (probe1.sbg.ovh.prod,37.59.8.25)
-    //  
-    //if geo.market = AS or OC
-    //    round-robin between (probe1.sin.sl.prod,119.81.23.243)
-    //                    and (probe1.sjc.sl.prod, 50.97.227.68)
-    //  
-    //if unknown
-    //    round robin between (probe1.atl.tmd.prod,65.254.36.226)
-    //                    and (probe1.sbg.ovh.prod,37.59.8.25)
     
     public $market_map = array(
-        'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-        'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-        'EU' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod' ),
-        'AF' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod' ),
-        'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-        'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
+        'NA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
+        'SA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
+        'EU' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
+        'AF' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
+        'AS' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod'),
+        'OC' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod' ),
     );
     
     private $default_providers = array( 'probe1.atl.tmd.prod', 'probe1.sbg.ovh.prod' );
