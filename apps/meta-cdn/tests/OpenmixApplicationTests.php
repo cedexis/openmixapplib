@@ -44,15 +44,15 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
         
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('cdn1', 'provider1.example.com', 20);
+            ->with('cdn1', 'tobeoverwritten', 20);
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('cdn2', 'provider2.example.com', 20);
+            ->with('cdn2', 'tobeoverwritten', 20);
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('cdn3', 'provider3.example.com', 20);
+            ->with('cdn3', 'tobeoverwritten', 20);
             
         $config->expects($this->exactly(3))->method('declareReasonCode');
         
