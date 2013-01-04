@@ -120,8 +120,6 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             array(
                 'hostname' => 'site1',
                 'config' => $this->bad_config,
-                'rtt' => array('cdn1' => 201, 'cdn2' => 202, 'cdn3' => 202),
-                'avail' => array('cdn1' => 89, 'cdn2' => 89, 'cdn3' => 89),
                 'alias' => 'cdn1',
                 'reason' => 'C'
             ),
@@ -130,7 +128,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'hostname' => 'site1',
                 'config' => $this->sample_config,
                 'rtt' => array(),
-                'avail' => array(),
+                //'avail' => array(),
                 'alias' => 'cdn1',
                 'reason' => 'C'
             ),
@@ -139,7 +137,13 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'hostname' => 'site1',
                 'config' => $this->sample_config,
                 'rtt' => 'something not an array',
-                'avail' => array(),
+                'alias' => 'cdn1',
+                'reason' => 'C'
+            ),
+            // 8: site not listed in config, skip to fallback
+            array(
+                'hostname' => 'site4',
+                'config' => $this->sample_config,
                 'alias' => 'cdn1',
                 'reason' => 'C'
             )
