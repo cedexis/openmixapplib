@@ -19,53 +19,23 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             ->method('declareInput')
             ->with(GeoProperties::MARKET);
         
-        //'probe1.rbx.ovh.prod' => '94.23.254.99',
-        //'probe1.sbg.ovh.prod' => '37.59.8.25',
-        //'probe1.ams.hw.prod' => '81.171.102.234',
-        //'probe1.phx.hw.prod' => '209.197.5.130',
-        //'probe1.sjc.edg.prod' => '46.22.79.39',
-        //'probe1.lax.llnw.prod' => '69.28.181.2',
-        //'probe1.lga.llnw.prod' => '69.28.155.82',
-        //'probe1.lhr.edg.prod' => '72.21.90.135',
-        //'probe1.atl.tmd.prod' => '65.254.36.226'
-        
-        $config->expects($this->exactly(9))->method('declareResponseOption');
+        $config->expects($this->exactly(4))->method('declareResponseOption');
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('probe1.rbx.ovh.prod', '94.23.254.99', 20);
+            ->with('pacific-1', 'pacific-1.example.com', 20);
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('probe1.sbg.ovh.prod', '37.59.8.25', 20);
+            ->with('pacific-2', 'pacific-2.example.com', 20);
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('probe1.ams.hw.prod', '81.171.102.234', 20);
+            ->with('atlantic-1', 'atlantic-1.example.com', 20);
             
         $config->expects($this->at($call_index++))
             ->method('declareResponseOption')
-            ->with('probe1.phx.hw.prod', '209.197.5.130', 20);
-            
-        $config->expects($this->at($call_index++))
-            ->method('declareResponseOption')
-            ->with('probe1.sjc.edg.prod', '46.22.79.39', 20);
-            
-        $config->expects($this->at($call_index++))
-            ->method('declareResponseOption')
-            ->with('probe1.lax.llnw.prod', '69.28.181.2', 20);
-            
-        $config->expects($this->at($call_index++))
-            ->method('declareResponseOption')
-            ->with('probe1.lga.llnw.prod', '69.28.155.82', 20);
-            
-        $config->expects($this->at($call_index++))
-            ->method('declareResponseOption')
-            ->with('probe1.lhr.edg.prod', '72.21.90.135', 20);
-            
-        $config->expects($this->at($call_index++))
-            ->method('declareResponseOption')
-            ->with('probe1.atl.tmd.prod', '65.254.36.226', 20);
+            ->with('atlantic-2', 'atlantic-2.example.com', 20);
         
         $application->init($config);
     }
@@ -76,229 +46,92 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
     public function service()
     {
         $test_data = array(
-            // 'NA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
+            // 'NA' => array( 'pacific-2', 'atlantic-1' ),
             array(
                 'market' => 'NA',
-                'rand' => array( 0, 3, 0 ),
-                'alias' => 'probe1.phx.hw.prod',
-            ),
-            array(
-                'market' => 'NA',
-                'rand' => array( 0, 3, 1 ),
-                'alias' => 'probe1.sjc.edg.prod',
+                'rand' => array( 0, 1, 0 ),
+                'alias' => 'pacific-2',
             ),
             array(
                 'market' => 'NA',
-                'rand' => array( 0, 3, 2 ),
-                'alias' => 'probe1.lax.llnw.prod',
+                'rand' => array( 0, 1, 1 ),
+                'alias' => 'atlantic-1',
             ),
-            array(
-                'market' => 'NA',
-                'rand' => array( 0, 3, 3 ),
-                'alias' => 'probe1.lga.llnw.prod',
-            ),
-            // 'SA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
+            // 'SA' => array( 'pacific-2', 'atlantic-2' ),
             array(
                 'market' => 'SA',
-                'rand' => array( 0, 3, 0 ),
-                'alias' => 'probe1.phx.hw.prod',
+                'rand' => array( 0, 1, 0 ),
+                'alias' => 'pacific-2',
             ),
             array(
                 'market' => 'SA',
-                'rand' => array( 0, 3, 1 ),
-                'alias' => 'probe1.sjc.edg.prod',
+                'rand' => array( 0, 1, 1 ),
+                'alias' => 'atlantic-2',
             ),
-            array(
-                'market' => 'SA',
-                'rand' => array( 0, 3, 2 ),
-                'alias' => 'probe1.lax.llnw.prod',
-            ),
-            array(
-                'market' => 'SA',
-                'rand' => array( 0, 3, 3 ),
-                'alias' => 'probe1.lga.llnw.prod',
-            ),
-            // 'EU' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
+            // 'EU' => array( 'atlantic-1', 'atlantic-2' ),
             array(
                 'market' => 'EU',
-                'rand' => array( 0, 3, 0 ),
-                'alias' => 'probe1.rbx.ovh.prod',
+                'rand' => array( 0, 1, 0 ),
+                'alias' => 'atlantic-1',
             ),
             array(
                 'market' => 'EU',
-                'rand' => array( 0, 3, 1 ),
-                'alias' => 'probe1.sbg.ovh.prod',
+                'rand' => array( 0, 1, 1 ),
+                'alias' => 'atlantic-2',
             ),
-            array(
-                'market' => 'EU',
-                'rand' => array( 0, 3, 2 ),
-                'alias' => 'probe1.ams.hw.prod',
-            ),
-            array(
-                'market' => 'EU',
-                'rand' => array( 0, 3, 3 ),
-                'alias' => 'probe1.lhr.edg.prod',
-            ),
-            // 'AF' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
+            // 'AF' => array( 'atlantic-2' ),
             array(
                 'market' => 'AF',
-                'rand' => array( 0, 3, 0 ),
-                'alias' => 'probe1.rbx.ovh.prod',
+                'rand' => array( 0, 0, 0 ),
+                'alias' => 'atlantic-2',
             ),
-            array(
-                'market' => 'AF',
-                'rand' => array( 0, 3, 1 ),
-                'alias' => 'probe1.sbg.ovh.prod',
-            ),
-            array(
-                'market' => 'AF',
-                'rand' => array( 0, 3, 2 ),
-                'alias' => 'probe1.ams.hw.prod',
-            ),
-            array(
-                'market' => 'AF',
-                'rand' => array( 0, 3, 3 ),
-                'alias' => 'probe1.lhr.edg.prod',
-            ),
-            // 'AS' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod'),
+            // 'AS' => array( 'pacific-1', 'pacific-2'),
             array(
                 'market' => 'AS',
                 'rand' => array( 0, 1, 0 ),
-                'alias' => 'probe1.sjc.edg.prod',
+                'alias' => 'pacific-1',
             ),
             array(
                 'market' => 'AS',
                 'rand' => array( 0, 1, 1 ),
-                'alias' => 'probe1.lax.llnw.prod',
+                'alias' => 'pacific-2',
             ),
-            // 'OC' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod' ),
+            // 'OC' => array( 'pacific-1' ),
             array(
                 'market' => 'OC',
-                'rand' => array( 0, 1, 0 ),
-                'alias' => 'probe1.sjc.edg.prod',
+                'rand' => array( 0, 0, 0 ),
+                'alias' => 'pacific-1',
             ),
-            array(
-                'market' => 'OC',
-                'rand' => array( 0, 1, 1 ),
-                'alias' => 'probe1.lax.llnw.prod',
-            ),
-            // default, array( 'probe1.atl.tmd.prod', 'probe1.sbg.ovh.prod' )
+            // default, array( 'pacific-1', 'pacific-2', 'atlantic-1', 'atlantic-2' )
             array(
                 'market' => '',
-                'rand' => array( 0, 1, 0 ),
-                'alias' => 'probe1.atl.tmd.prod',
+                'rand' => array( 0, 3, 0 ),
+                'alias' => 'pacific-1',
             ),
             array(
                 'market' => '',
-                'rand' => array( 0, 1, 1 ),
-                'alias' => 'probe1.sbg.ovh.prod',
+                'rand' => array( 0, 3, 1 ),
+                'alias' => 'pacific-2',
+            ),
+            array(
+                'market' => '',
+                'rand' => array( 0, 3, 2 ),
+                'alias' => 'atlantic-1',
+            ),
+            array(
+                'market' => '',
+                'rand' => array( 0, 3, 3 ),
+                'alias' => 'atlantic-2',
             ),
         );
         
         $test = 0;
         foreach ($test_data as $i) {
-            print("\nTest: " . $test++);
+            //print("\nTest: " . $test++);
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
             $application = $this->getMock('OpenmixApplication', array('rand'));
-            
-            $request->expects($this->once())
-                ->method('geo')
-                ->with(GeoProperties::MARKET)
-                ->will($this->returnValue($i['market']));
-                
-            $application->expects($this->once())
-                ->method('rand')
-                ->with($i['rand'][0], $i['rand'][1])
-                ->will($this->returnValue($i['rand'][2]));
-                
-            
-            $response->expects($this->once())
-                ->method('selectProvider')
-                ->with($i['alias']);
-                
-            $utilities->expects($this->never())
-                ->method('selectRandom');
-            
-            $application->service($request, $response, $utilities);
-        }
-    }
-    
-    /**
-     * @test
-     */
-    public function service_with_one_object_array()
-    {
-        $test_data = array(
-            // 'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-            array(
-                'providers' => array(
-                    'probe1.atl.tmd.prod' => '65.254.36.226',
-                    'probe1.sbg.ovh.prod' => '37.59.8.25',
-                    'probe1.sin.sl.prod' => '119.81.23.243',
-                    'probe1.sjc.sl.prod' => '50.97.227.68',
-                ),
-                'market_map' => array(
-                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'EU' => array( 'probe1.sbg.ovh.prod', ),
-                    'AF' => array( 'probe1.sbg.ovh.prod', ),
-                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                ),
-                'market' => 'NA',
-                'rand' => array( 0, 1, 0 ),
-                'alias' => 'probe1.sjc.sl.prod',
-            ),
-            array(
-                'providers' => array(
-                    'probe1.atl.tmd.prod' => '65.254.36.226',
-                    'probe1.sbg.ovh.prod' => '37.59.8.25',
-                    'probe1.sin.sl.prod' => '119.81.23.243',
-                    'probe1.sjc.sl.prod' => '50.97.227.68',
-                ),
-                'market_map' => array(
-                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'EU' => array( 'probe1.sbg.ovh.prod', ),
-                    'AF' => array( 'probe1.sbg.ovh.prod', ),
-                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                ),
-                'market' => 'EU',
-                'rand' => array( 0, 0, 0 ),
-                'alias' => 'probe1.sbg.ovh.prod',
-            ),
-            array(
-                'providers' => array(
-                    'probe1.atl.tmd.prod' => '65.254.36.226',
-                    'probe1.sbg.ovh.prod' => '37.59.8.25',
-                    'probe1.sin.sl.prod' => '119.81.23.243',
-                    'probe1.sjc.sl.prod' => '50.97.227.68',
-                ),
-                'market_map' => array(
-                    'NA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'SA' => array( 'probe1.sjc.sl.prod', 'probe1.atl.tmd.prod' ),
-                    'EU' => array( 'probe1.sbg.ovh.prod', ),
-                    'AF' => array( 'probe1.sbg.ovh.prod', ),
-                    'AS' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                    'OC' => array( 'probe1.sin.sl.prod', 'probe1.sjc.sl.prod' ),
-                ),
-                'market' => 'AF',
-                'rand' => array( 0, 0, 0 ),
-                'alias' => 'probe1.sbg.ovh.prod',
-            ),
-        );
-        
-        foreach ($test_data as $i) {
-            $request = $this->getMock('Request');
-            $response = $this->getMock('Response');
-            $utilities = $this->getMock('Utilities');
-            $application = $this->getMock('OpenmixApplication', array('rand'));
-            
-            $application->providers = $i['providers'];
-            $application->market_map = $i['market_map'];
             
             $request->expects($this->once())
                 ->method('geo')

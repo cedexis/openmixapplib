@@ -7,30 +7,25 @@
 class OpenmixApplication implements Lifecycle
 {
     public $providers = array(
-        'probe1.rbx.ovh.prod' => '94.23.254.99',
-        'probe1.sbg.ovh.prod' => '37.59.8.25',
-        'probe1.ams.hw.prod' => '81.171.102.234',
-        'probe1.phx.hw.prod' => '209.197.5.130',
-        'probe1.sjc.edg.prod' => '46.22.79.39',
-        'probe1.lax.llnw.prod' => '69.28.181.2',
-        'probe1.lga.llnw.prod' => '69.28.155.82',
-        'probe1.lhr.edg.prod' => '72.21.90.135',
-        'probe1.atl.tmd.prod' => '65.254.36.226',
+        'pacific-1' => 'pacific-1.example.com',
+        'pacific-2' => 'pacific-2.example.com',
+        'atlantic-1' => 'atlantic-1.example.com',
+        'atlantic-2' => 'atlantic-2.example.com',
     );
     
     private $ttl = 20;
     
     
     public $market_map = array(
-        'NA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
-        'SA' => array( 'probe1.phx.hw.prod', 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod', 'probe1.lga.llnw.prod' ),
-        'EU' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
-        'AF' => array( 'probe1.rbx.ovh.prod', 'probe1.sbg.ovh.prod', 'probe1.ams.hw.prod', 'probe1.lhr.edg.prod' ),
-        'AS' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod'),
-        'OC' => array( 'probe1.sjc.edg.prod', 'probe1.lax.llnw.prod' ),
+        'NA' => array( 'pacific-2', 'atlantic-1' ),
+        'SA' => array( 'pacific-2', 'atlantic-2' ),
+        'EU' => array( 'atlantic-1', 'atlantic-2' ),
+        'AF' => array( 'atlantic-2' ),
+        'AS' => array( 'pacific-1', 'pacific-2' ),
+        'OC' => array( 'pacific-1' ),
     );
     
-    private $default_providers = array( 'probe1.atl.tmd.prod', 'probe1.sbg.ovh.prod' );
+    private $default_providers = array( 'pacific-1', 'pacific-2', 'atlantic-1', 'atlantic-2' );
     
     /**
      * @param Configuration $config
@@ -58,7 +53,7 @@ class OpenmixApplication implements Lifecycle
         if (array_key_exists($market, $this->market_map)) {
             $candidates = $this->market_map[$market];
         }
-		//print("\nCandidates: " . print_r($candidates, true));
+        //print("\nCandidates: " . print_r($candidates, true));
         
         $random = $this->rand(0, count($candidates) - 1);
         //print("\nRandom: $random");
@@ -75,7 +70,7 @@ class OpenmixApplication implements Lifecycle
      */
     public function rand($min, $max)
     {
-    	return rand($min, $max);
+        return rand($min, $max);
     }
 }
 
