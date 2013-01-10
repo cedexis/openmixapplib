@@ -49,6 +49,15 @@ class RequestProperties
      *      $value = $request->request(RequestProperties::IP);
      */
     const IP = 'string:request:ip';
+
+    /*  
+     * (string) The id of the worker processing the request
+     *
+     * Example::
+     *
+     *       $value = $request->request(RequestProperties:WORKERID);
+     */
+    const WORKERID = 'string:request:workerid';
 }
 
 ?>
