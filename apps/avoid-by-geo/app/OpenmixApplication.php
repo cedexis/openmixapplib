@@ -30,8 +30,6 @@ class OpenmixApplication implements Lifecycle
     public function init($config)
     {
 
-    	$config->declareInput(EDNSProperties::ENABLE);
-
         $config->declareInput(
             RadarProbeTypes::HTTP_RTT,
             implode(',', array_keys($this->servers)));
