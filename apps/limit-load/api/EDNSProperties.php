@@ -3,15 +3,37 @@
 class EDNSProperties
 {
     /**
-     * (string) ISO 10383 Market Identification Code of market in which the
-     * request's client is located
+     * (string) A two-letter code identifying the geographic market where the
+     * request's client is located.
+     *
+     * +------+---------------+
+     * | Code | Market        |
+     * +======+===============+
+     * | NA   | North America |
+     * +------+---------------+
+     * | OC   | Oceania       |
+     * +------+---------------+
+     * | EU   | Europe        |
+     * +------+---------------+
+     * | AS   | Asia          |
+     * +------+---------------+
+     * | AF   | Africa        |
+     * +------+---------------+
+     * | SA   | South America |
+     * +------+---------------+
+     *
+     * Example::
+     *
+     *      $value = $request->geo(EDNSProperties::MARKET);
      */
     const MARKET  = 'string:edns:market_iso';
+
     /**
      * (string) ISO 3166-1 alpha-2 code assigned to the country where the
      * request's client is located
      */
     const COUNTRY = 'string:edns:country_iso';
+
     /**
      * (integer) ASN (Autonomous System Number) assigned to the network of the
      * request's origin
