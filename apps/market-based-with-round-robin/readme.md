@@ -1,6 +1,7 @@
-# Application: **Template**
+# Application: **Market-Based Geo With Round-Robin**
 
-The most basic template for an Openmix application.
+Performs round-robin routing to a specific subset of providers
+based on the current request's market.
 
 # Openmix Application Library
 

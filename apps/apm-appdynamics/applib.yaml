@@ -3,4 +3,4 @@ author: Cedexis
 last_updated: 01/22/2013
 categories: APM, Performance
 description: |
-  AppDynamics is an APM vendor focused on enterprise Java and .NET web applications. This app demonstrates using real time data from AppDynamics for decision making. Using FusionCustom, we will dynamically collect server health stats using a collector and basic HTTP authentication. This is a very simple example using current CPU threshold to switch between hosts. Refer to the wiki for details on URLs etc.
+  AppDynamics is an APM vendor focused on enterprise Java and .NET web applications. This app demonstrates using real time data from AppDynamics for decision making. Using FusionCustom, we will dynamically collect server health stats using a collector and basic HTTP authentication. This is a very simple example using current CPU threshold to switch between hosts. Refer to [the wiki](https://github.com/cedexis/openmixapplib/wiki/AppDynamics-Integration) for details on URLs etc.
