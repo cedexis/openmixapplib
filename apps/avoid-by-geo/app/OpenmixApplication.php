@@ -22,7 +22,7 @@ class OpenmixApplication implements Lifecycle
     
     private $ttl = 30;
     
-    private $availabilityThreshold = 80;
+    private $availabilityThreshold = 90;
     
     /**
      * @param Configuration $config
@@ -30,7 +30,7 @@ class OpenmixApplication implements Lifecycle
     public function init($config)
     {
 
-        $config->declareInput(EDNSProperties::ENABLE);
+        //$config->declareInput(EDNSProperties::ENABLE);
         
         $config->declareInput(
             RadarProbeTypes::HTTP_RTT,
@@ -41,8 +41,7 @@ class OpenmixApplication implements Lifecycle
             implode(',', array_keys($this->servers)));
 
         $config->declareInput(GeoProperties::COUNTRY);
-        $config->declareInput(EDNSProperties::COUNTRY);
-        
+
         foreach ($this->servers as $alias => $cname)
         {
             $config->declareResponseOption($alias, $cname, $this->ttl);
@@ -62,11 +61,8 @@ class OpenmixApplication implements Lifecycle
     public function service($request, $response, $utilities)
     {
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
-        if($request->geo(EDNSProperties::ENABLE)) {
-            $country = $request->geo(EDNSProperties::COUNTRY);
-        } else {
-            $country = $request->geo(GeoProperties::COUNTRY);
-        }
+
+        $country = $request->geo(GeoProperties::COUNTRY);
 
         // Only consider cdn2 for requests originating from China
         if ( $country != 'CN' )

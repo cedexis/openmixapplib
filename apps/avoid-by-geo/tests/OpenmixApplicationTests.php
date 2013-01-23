@@ -33,14 +33,14 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
         $config->expects($this->at($callIndex++))
             ->method('declareInput')
             ->with(GeoProperties::COUNTRY);
-            
+
         foreach ($servers as $alias => $cname)
         {
             $config->expects($this->at($callIndex++))
                 ->method('declareResponseOption')
                 ->with($alias, $cname, 30);
         }
-        
+
         foreach ($reasons as $code)
         {
             $config->expects($this->at($callIndex++))
@@ -111,7 +111,7 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
         $testIndex = 0;
         foreach ($testData as $i)
         {
-            //print("\nTest index: " . $testIndex++);
+
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
@@ -161,6 +161,7 @@ class OpenmixTest extends PHPUnit_Framework_TestCase
             $app = new OpenmixApplication();
             $app->service($request, $response, $utilities);
             $this->verifyMockObjects();
+            print("\nTest index: " . $testIndex++."\n");
         }
     }
 }
