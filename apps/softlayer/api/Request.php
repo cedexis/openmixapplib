@@ -22,7 +22,7 @@ interface Request
      *      $value = $request->radar(RadarProbeTypes::HTTP_RTT);
      */
     public function radar($radarProbeType);
-    
+
     /**
      * @param string $geoProperty One of the constants defined in GeoProperties
      *
@@ -33,7 +33,7 @@ interface Request
      *      $asn = $request->geo(GeoProperties::ASN);
      */
     public function geo($geoProperty);
-    
+
     /**
      * @param string $bgpProperty One of the constants defined in BgpProperties
      *
@@ -42,7 +42,7 @@ interface Request
      *      $value = $request->bgp(BgpProperties::NEXT_HOP);
      */
     public function bgp($bgpProperty);
-    
+
     /**
      *
      * @param string $pulseProperty One of the constants defined in PulseProperties or RadarProbeTypes
@@ -52,7 +52,7 @@ interface Request
      *      $dataArray = $request->pulse(PulseProperties::LOAD);
      */
     public function pulse($pulseProperty);
-    
+
     /**
      * @param string $fusionProperty One of the constants defined in FusionProperties
      *
@@ -61,7 +61,7 @@ interface Request
      *      $dataArray = $request->fusion(FusionProperties::GB);
      */
     public function fusion($fusionProperty);
-    
+
     /**
      * @param string $ankeenaProperty One of the constants defined in AnkeenaProperties
      *

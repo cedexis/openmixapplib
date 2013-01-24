@@ -12,8 +12,8 @@ class FusionProperties
      *
      *      $value = $request->fusion(FusionProperties::GB);
      */
-    const GB  ='real:fusion:gb';
-    
+    const GB = 'real:fusion:gb';
+
     /**
      * (real) The rate of content being delivered by this provider right now.
      *
@@ -21,7 +21,7 @@ class FusionProperties
      *
      *      $value = $request->fusion(FusionProperties::MBPS);
      */
-    const MBPS='real:fusion:mbps';
+    const MBPS = 'real:fusion:mbps';
 }
 
 ?>

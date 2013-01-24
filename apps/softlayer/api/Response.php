@@ -21,7 +21,7 @@ interface Response
      *
      *      $response->respond('provider_a', 'a.example.com');
      */
-    public function respond($provider,$cname);
+    public function respond($provider, $cname);
 
     /**
      * Override the CNAME to return.
@@ -56,6 +56,6 @@ interface Response
      *
      * if location==null, the current request location is used
      */
-    public function emitSignal($signal,$value,$location=null);
+    public function emitSignal($signal, $value, $location = null);
 }
 ?>

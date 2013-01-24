@@ -15,7 +15,7 @@ class PulseProperties
      *      $data = $request->pulse(PulseProperties::LOAD);
      */
     const LOAD = 'longstring:pload:load';
-    
+
     /**
      * (real) A percentage of the number of Pulse live checks that are positive.
      *

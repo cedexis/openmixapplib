@@ -25,7 +25,7 @@ interface Configuration
      *      $config->declareInput(RadarProbeTypes::HTTP_RTT, 'provider_a,provider_b, provider_c');
      *
      */
-    public function declareInput($what,$who=null);
+    public function declareInput($what, $who = null);
 
     /**
      * This lets us know about a response option.  You select
@@ -37,15 +37,15 @@ interface Configuration
      *
      *      $config->declareResponseOption('provider_a', 'a.example.com', 60);
      */
-    public function declareResponseOption($nickname,$cname,$ttl);
+    public function declareResponseOption($nickname, $cname, $ttl);
 
     /**
      * Name an alto cost function
-     * 
+     *
      * @param string $who is as in declareInput
      * @param mixed $type is either 'numeric' or 'string' - numeric only is currently supported.
      */
-    public function declareAltoCostFunction($costFunction,$type,$who);
+    public function declareAltoCostFunction($costFunction, $type, $who);
 
     /**
      * Declare a reason code to return via setReasonCode

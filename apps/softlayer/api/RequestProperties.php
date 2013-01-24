@@ -29,7 +29,7 @@ class RequestProperties
      *         {
      *             $config->declareInput(RequestProperties::HOSTNAME);
      *         }
-     *         
+     *
      *         public function service($request,$response,$utilities)
      *         {
      *             $hostname = $request->request(RequestProperties::HOSTNAME);
@@ -40,7 +40,7 @@ class RequestProperties
      *     }
      */
     const HOSTNAME = 'string:request:hostname';
-    
+
     /**
      * (string) The IP address of the user's nameserver
      *
