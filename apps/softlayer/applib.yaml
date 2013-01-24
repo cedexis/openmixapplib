@@ -1,0 +1,6 @@
+name: Softlayer Integration
+author: Cedexis
+last_updated: 01/24/2013
+categories: Network, Real-time
+description: |
+  This app demonstrates using real time data from Softlayer for decision making. Using FusionCustom, we will dynamically collect server network status over their REST API and depending on status, switch between hosts. Refer to [the wiki](https://github.com/cedexis/openmixapplib/wiki/Softlayer-Integration) for more details.
