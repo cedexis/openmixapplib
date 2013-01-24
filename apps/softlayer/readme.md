@@ -1,6 +1,6 @@
 # Application: **Softlayer Integration**
 
-This app demonstrates using real time data from Softlayer for decision making. Using FusionCustom, we will dynamically collect server network status over their REST API and depending on status, switch between hosts. Refer to [the wiki](https://github.com/cedexis/openmixapplib/wiki/Softlayer-Integration) for more details.
+This app demonstrates using real time data from SoftLayer for decision making. Using FusionCustom, we will dynamically collect server network status over their REST API and depending on status, switch between hosts. SoftLayer exposes 100s of interesting methods in their API, including performance metrics that would allow for the detection of service disruptions or degradations and service data that can enable costs based traffic shaping scenarios based on aggregate consumption and bandwidth usage. Refer to [the wiki](https://github.com/cedexis/openmixapplib/wiki/SoftLayer-Integration) for more details.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
