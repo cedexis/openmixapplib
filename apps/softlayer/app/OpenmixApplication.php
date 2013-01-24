@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This app demonstrates using real time data from SoftLayer for decision making. 
+ * Using FusionCustom, we will dynamically collect server network status over their REST API and
+ * depending on status, switch between hosts. 
+ */
 class OpenmixApplication implements Lifecycle
 {
     private $providers = array(
