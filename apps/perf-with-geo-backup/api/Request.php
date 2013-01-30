@@ -54,15 +54,6 @@ interface Request
     public function fusion($fusionProperty);
     
     /**
-     * @param string $ankeenaProperty One of the constants defined in AnkeenaProperties
-     *
-     * Examples::
-     *
-     *      $dataArray = $request->ankeena(AnkeenaProperties::TOTAL_ACTIVE_CONNS);
-     */
-    public function ankeena($ankeenaProperty);
-    
-    /**
      * @param string $newrelicProperty One of the constants defined in NewrelicProperties
      *
      */
