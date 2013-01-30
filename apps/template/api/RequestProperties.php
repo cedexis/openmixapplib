@@ -55,7 +55,7 @@ class RequestProperties
      *
      * Example::
      *
-     *       $value = $request->request(RequestProperties:WORKERID);
+     *       $value = $request->request(RequestProperties::WORKERID);
      */
     const WORKERID = 'string:request:workerid';
 }
