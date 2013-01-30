@@ -1,7 +1,7 @@
 <?php
 
 /**
- * These properties allow access to the data provided by the Pulse server.
+ * These properties allow access to the data provided by the Pulse and Sonar.
  */
 class PulseProperties
 {
@@ -15,15 +15,17 @@ class PulseProperties
      *      $data = $request->pulse(PulseProperties::LOAD);
      */
     const LOAD = 'longstring:pload:load';
-
+    
     /**
-     * (real) A percentage of the number of Pulse live checks that are positive.
+     * (real) A percentage of the number of Sonar pings that are positive.
      *
      * Example::
      *
-     *      $data = $request->pulse(PulseProperties::LIVE);
+     *      $data = $request->pulse(PulseProperties::SONAR);
      */
     const LIVE = 'real:plive:live';
+
+    const SONAR = 'real:plive:live';
 }
 
 ?>

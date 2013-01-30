@@ -35,15 +35,6 @@ interface Request
     public function geo($geoProperty);
     
     /**
-     * @param string $bgpProperty One of the constants defined in BgpProperties
-     *
-     * Examples::
-     *
-     *      $value = $request->bgp(BgpProperties::NEXT_HOP);
-     */
-    public function bgp($bgpProperty);
-    
-    /**
      *
      * @param string $pulseProperty One of the constants defined in PulseProperties or RadarProbeTypes
      *
@@ -77,13 +68,5 @@ interface Request
      */
     public function newrelic($newrelicProperty);
     
-    /**
-     * @param string $costFunction one of the cost functions declared by $config->declareAltoCostFunction
-     *
-     * Examples::
-     *
-     *      $costMap = $request->alto('myFunction');
-     */
-    public function alto($costFunction);
 }
 ?>

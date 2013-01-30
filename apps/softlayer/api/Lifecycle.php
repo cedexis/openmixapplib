@@ -16,6 +16,6 @@ interface Lifecycle
     /**
      * This function is called to handle each request.
      */
-    public function service($request, $response, $utilities);
+    public function service($request,$response,$utilities);
 }
 ?>
