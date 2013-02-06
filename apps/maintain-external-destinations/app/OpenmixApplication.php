@@ -1,6 +1,7 @@
 <?php
 /**
- * Choose valid destinations from an external file
+ * Choose valid destinations from an external file associated with a Cloud Region 
+ * measured by Radar
  */
 class OpenmixApplication implements Lifecycle
 {
