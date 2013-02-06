@@ -65,11 +65,11 @@ class OpenmixApplication implements Lifecycle
     {
         $configData = $request->pulse(PulseProperties::LOAD);
         //print("\nPulse data:\n" . print_r($configData, true));
-        
         $destinations = array();
-        if (is_array($configData) && (count($configData) == 1))
-        {
 
+        if (is_array($configData))
+        {
+            
             $val = $configData['dc1'];
             //print("\nVal:\n" . print_r($val, true));
             
@@ -140,6 +140,16 @@ class OpenmixApplication implements Lifecycle
                     return;
                 }
             }
+        } else
+        {
+            //In the unlikely event there is no RTT data, round robin
+            //convert destination to simple list
+            $considered = array_keys($destinations);
+            $idx = $this->rand(0, count($considered) - 1);
+            $response->selectProvider($destinations[$considered[$idx]]);
+            $response->setCName($considered[$idx]);
+            $response->setReasonCode($this->reasons['Data problem']);
+            return;
         }
         
         $response->setReasonCode($this->reasons['Data Problem']);
