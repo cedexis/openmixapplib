@@ -155,6 +155,29 @@ amazon_ec2___us_east_1a,useastaws03.cedexis.com,0'),
                 'alias' => 'dc1',
                 'reason' => 'B'
             ),
+            // 6: no config data to load, serve Fallback
+            array(
+                'config' => 'no there',
+                'alias' => 'dc1',
+                'reason' => 'B'
+            ),
+            // 7: No RTT data, round robin amongst availabe instances
+            array(
+                'config' => array( 'dc1' => 'amazon_ec2___asia_se__singapore__1a,sin01.cedexis.com,1
+amazon_ec2___asia_se__singapore__1a,sin02.cedexis.com,0
+amazon_ec2___eu_west_1a,euaws01.cedexis.com,1
+amazon_ec2___eu_west_1a,euaws02.cedexis.com,1
+amazon_ec2___eu_west_1a,euaws03.cedexis.com,1
+amazon_ec2___us_east_1a,useastaws01.cedexis.com,1
+amazon_ec2___us_east_1a,useastaws02.cedexis.com,1
+amazon_ec2___us_east_1a,useastaws03.cedexis.com,1'),
+                'rtt' => 'not an array',
+                'alias' => 'amazon_ec2___eu_west_1a',
+                'cname' => 'euaws03.cedexis.com',
+                'rand' => 3,
+                'randMax' => 6,
+                'reason' => 'D'
+            ),
         );
 
         $test=0;
