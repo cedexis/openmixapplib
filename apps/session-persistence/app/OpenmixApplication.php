@@ -82,8 +82,7 @@ class OpenmixApplication implements Lifecycle
             // remove any that don't meet the Sonar or the Avail threshold
             foreach (array_keys($candidates) as $akey)
             {
-                if ((isset($sonar[$akey]) 
-                     && $sonar[$akey] <= $this->sonarThreshold) 
+                if ((isset($sonar[$akey]) && $sonar[$akey] <= $this->sonarThreshold) 
                      || (isset($avail[$akey]) && $avail[$akey] < $this->availabilityThreshold))
                 {
                     unset($candidates[$akey]);
