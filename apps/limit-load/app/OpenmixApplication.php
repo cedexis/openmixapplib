@@ -1,6 +1,6 @@
 <?php
 /**
- * This app demonstrates using Pulse Load to obtain current load data for each
+ * This app demonstrates using Fusion Custom to obtain current load data for each
  * provider.  It uses this information to filter out providers that are currently
  * overloaded.  Of the remaining providers, it selects the best-performing one.
  * If all providers are overloaded, it selects the best-performing overall.
