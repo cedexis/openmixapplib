@@ -1,8 +1,6 @@
-# Application: **Performance Routing with Platform Penalty**
+# Application: **Fusion Custom - Manage Cloud Instances externally**
 
-The routing provided by the basic performance application is great for certain cases, but there are times when you know that you only want to use a specific platform when others are considerably worse. For example, you might only want to send traffic to your origin when it is significantly better than any other choice.  
-
-This application shows how this can work by using the concept of ‘padding’ to increase the value of the performance measure being used to decide where to send traffic.
+Demonstrates how to mix Radar performance data with a dynamically maintained list of Cloud Instances. Each cloud instance is associated with a Cloud Provider Region (like AWS US-East) for which we have Radar Performance data. Each instance also has a destination hostname or IP address and a "status". Openmix will first determine the least latent Cloud Region and then Round Robin within the specific Cloud Instances marked as "UP" in the destinations.txt file.
 
 # Openmix Application Library
 

@@ -35,6 +35,15 @@ interface Request
     public function geo($geoProperty);
     
     /**
+     * @param string $bgpProperty One of the constants defined in BgpProperties
+     *
+     * Examples::
+     *
+     *      $value = $request->bgp(BgpProperties::NEXT_HOP);
+     */
+    public function bgp($bgpProperty);
+    
+    /**
      *
      * @param string $pulseProperty One of the constants defined in PulseProperties or RadarProbeTypes
      *
@@ -54,10 +63,27 @@ interface Request
     public function fusion($fusionProperty);
     
     /**
+     * @param string $ankeenaProperty One of the constants defined in AnkeenaProperties
+     *
+     * Examples::
+     *
+     *      $dataArray = $request->ankeena(AnkeenaProperties::TOTAL_ACTIVE_CONNS);
+     */
+    public function ankeena($ankeenaProperty);
+    
+    /**
      * @param string $newrelicProperty One of the constants defined in NewrelicProperties
      *
      */
     public function newrelic($newrelicProperty);
     
+    /**
+     * @param string $costFunction one of the cost functions declared by $config->declareAltoCostFunction
+     *
+     * Examples::
+     *
+     *      $costMap = $request->alto('myFunction');
+     */
+    public function alto($costFunction);
 }
 ?>

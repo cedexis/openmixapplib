@@ -1,9 +1,8 @@
-# Application: **Session Persistence: Radar + Consistent Hashing**
+# Application: **Session Persistence**
 
-Demonstrates how to use Radar performance data to reduce end-user latency while still ensuring session persistence by
-network.
+Demonstrates how to use Radar performance data to reduce end-user latency while still ensuring session persistence by network.
 
-Openmix Application Library
+# Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications
 give you dynamic, flexible, and automatic control over where your traffic is

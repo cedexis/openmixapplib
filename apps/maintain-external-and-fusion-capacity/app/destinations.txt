@@ -1,0 +1,11 @@
+# This is the destinations file!
+# region_alias, dest_hostname, status
+
+amazon_ec2___asia_se__singapore__1a,sin01.cedexis.com,1
+amazon_ec2___asia_se__singapore__1a,sin02.cedexis.com,1
+amazon_ec2___eu_west_1a,euaws01.cedexis.com,1
+amazon_ec2___eu_west_1a,euaws02.cedexis.com,0
+amazon_ec2___eu_west_1a,euaws03.cedexis.com,1
+amazon_ec2___us_east_1a,useastaws01.cedexis.com,0
+amazon_ec2___us_east_1a,useastaws02.cedexis.com,1
+amazon_ec2___us_east_1a,useastaws03.cedexis.com,1

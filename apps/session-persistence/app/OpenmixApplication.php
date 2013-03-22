@@ -154,7 +154,6 @@ class OpenmixApplication implements Lifecycle
         
         //print_r($this->target_buckets);
         //print "$this->sorted_hashes[$index]\n";
-        
         //print_r($this->target_buckets[$this->sorted_hashes[$index]]);
         
         $response->selectProvider($this->target_buckets[$this->sorted_hashes[$index]]);

@@ -6,7 +6,7 @@
  */
 class OpenmixApplication implements Lifecycle
 {
-    private $providers = array(
+    public $providers = array(
         'server_us' => 'us.example.com',
         'server_gb' => 'gb.example.com',
         'server_bf' => 'bf.example.com',
