@@ -1,6 +1,6 @@
-# Application: **Fusion Custom - Cloud Bursting with Weighted Round Robin**
+# Application: **Fusion Custom - Manage Cloud Instances externally**
 
-Demonstrates how to mix Radar performance data with a dynamically maintained list of Cloud Instances and instance capacity data from Nagios or New Relic. Each cloud instance is associated with a Cloud Provider Region (like AWS US-East) for which we have Radar Performance data. Each instance also has a destination hostname or IP address and a "health" value between 1 and 10. Openmix will first determine the least latent Cloud Region and then use a Wieghted Round Robin approach within the specific Cloud Instances. If the instances in a specific region are unhealthy this app will automatically decrease traffic to the impacted region until instance health improves.
+Demonstrates how to mix Radar performance data with a dynamically maintained list of Cloud Instances. Each cloud instance is associated with a Cloud Provider Region (like AWS US-East) for which we have Radar Performance data. Each instance also has a destination hostname or IP address and a "status". Openmix will first determine the least latent Cloud Region and then Round Robin within the specific Cloud Instances marked as "UP" in the destinations.txt file.
 
 # Openmix Application Library
 
