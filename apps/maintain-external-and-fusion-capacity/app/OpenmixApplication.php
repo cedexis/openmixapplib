@@ -185,14 +185,14 @@ class OpenmixApplication implements Lifecycle
             // First convert regions to simple list
             $list_of_regions = array_keys($regions);
             $idx = $this->rand(0, count($list_of_regions) - 1);
-            print("idx: $idx\n");
+            //print("idx: $idx\n");
             //pick a random region
             $region = $list_of_regions[$idx];
             $considered = $regions[$region];
             // But we can still do a weighted round robin within the region
             $hostname = $this->weighted_round_robin($considered);
-            $response->setReasonCode($this->reasons['Best Region']);
-            $response->selectProvider($chosen_region);
+            $response->setReasonCode($this->reasons['Data problem']);
+            $response->selectProvider($region);
             $response->setCName($hostname);
             return;
         }
@@ -214,7 +214,7 @@ class OpenmixApplication implements Lifecycle
     {
         $totalWeight = array_sum($considered);
         $random = $this->rand(0, $totalWeight - 1);
-        print("$totalWeight $random\n");
+        //print("$totalWeight $random\n");
         $mark = 0;
         foreach ($considered as $hostname => $weight) 
         {
@@ -224,7 +224,6 @@ class OpenmixApplication implements Lifecycle
             // Check whether this candidate pushed `$mark` past `$random`. If
             // so then respond with the current candidate.
             if ($random < $mark) {
-                print("random: $random mark: $mark\n");
                 return $hostname;
             }
         }

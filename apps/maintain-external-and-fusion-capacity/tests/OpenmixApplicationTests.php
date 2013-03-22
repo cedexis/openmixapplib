@@ -73,8 +73,8 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                 'rtt' => array('softlayer_ams' => 100, 'ec2_us_east' => 175, 'ec2_asia_se_singapore' => 202, 'ec2_us_west_ca' => 300),
                 'alias' => 'softlayer_ams',
                 'cname' => 'eu-sl02.cedexis.com',
-                'rand' => 15,
-                'randMax' => 29,
+                'rand' => array(15),
+                'randMax' => array(29),
                 'reason' => 'A'
             ),
             // 1: all are good and Singapore is fastest
@@ -94,8 +94,8 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                 'rtt' => array('softlayer_ams' => 300, 'ec2_us_east' => 202, 'ec2_asia_se_singapore' => 102, 'ec2_us_west_ca' => 400),
                 'alias' => 'ec2_asia_se_singapore',
                 'cname' => 'sin01.cedexis.com',
-                'rand' => 1,
-                'randMax' => 19,
+                'rand' => array(1),
+                'randMax' => array(19),
                 'reason' => 'A'
             ),
             // 2: Singapore is fastest but one destination is poor and the other at 80%, traffic shifts to US West
@@ -115,8 +115,8 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                 'rtt' => array('softlayer_ams' => 300, 'ec2_us_east' => 202, 'ec2_asia_se_singapore' => 101, 'ec2_us_west_ca' => 145),
                 'alias' => 'ec2_us_west_ca',
                 'cname' => 'ec2_uswestor03.cedexis.com',
-                'rand' => 21,
-                'randMax' => 29,
+                'rand' => array(21),
+                'randMax' => array(29),
                 'reason' => 'A'
             ),
             // 3: EU is fastest but all destinations are unavailable, choose one from the second fastest region
@@ -133,8 +133,8 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                 'rtt' => array('softlayer_ams' => 100, 'ec2_us_east' => 202, 'ec2_asia_se_singapore' => 502, 'ec2_us_west_ca' => 400),
                 'alias' => 'ec2_us_east',
                 'cname' => 'useastaws02.cedexis.com',
-                'rand' => 13,
-                'randMax' => 29,
+                'rand' => array(13),
+                'randMax' => array(29),
                 'reason' => 'A'
             ),
             // 4: no config data to load, serve Fallback
@@ -160,8 +160,8 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                 'rtt' => 'not an array',
                 'alias' => 'softlayer_ams',
                 'cname' => 'eu-sl01.cedexis.com',
-                'rand' => 0,
-                'randMax' => array( 0 => 3, 1 => 19),
+                'rand' => array(0 => 1, 1 => 1),
+                'randMax' => array( 0 => 3, 1 => 29),
                 'reason' => 'D'
             ),
         );
@@ -195,23 +195,17 @@ ec2_us_west_ca,ec2_uswestor03.cedexis.com,10'
                     ->will($this->returnValue($i['rtt']));
             }
 
-            $pos=0;
-            if(array_key_exists('rand', $i) && is_array($i['randMax']))
+            if(array_key_exists('rand', $i))
             {
-                print("pos: $pos\n");
-                $rmax=$i['randMax'][$pos++];
-                print("randMax: $rmax\n");
-                $application->expects($this->exactly(count($i['randMax'])))
-                    ->method('rand')
-                    ->with(0, $i['randMax'][$pos])
-                    ->will($this->returnValue($i['rand']));
-                $pos++;
-            } elseif (array_key_exists('rand', $i))
-            {
-                $application->expects($this->once())
-                    ->method('rand')
-                    ->with(0, $i['randMax'])
-                    ->will($this->returnValue($i['rand']));
+                $pos=0;
+                foreach($i['rand'] as $j)
+                {
+                    $application->expects($this->at($pos))
+                        ->method('rand')
+                        ->with(0, $i['randMax'][$pos])
+                        ->will($this->returnValue($i['rand'][$pos]));
+                    $pos++;
+                }
             }
 
             
