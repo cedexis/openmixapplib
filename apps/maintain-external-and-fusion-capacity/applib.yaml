@@ -1,6 +1,6 @@
-name: Fusion Custom - Manage Cloud Instances externally
+name: Fusion Custom - cloud bursting with weighted round robin based on an instance health check
 author: Cedexis
-last_updated: 02/04/2013
+last_updated: 03/23/2013
 categories: 
 description: |
-    Demonstrates how to mix Radar performance data with a dynamically maintained list of Cloud Instances. Each cloud instance is associated with a Cloud Provider Region (like AWS US-East) for which we have Radar Performance data. Each instance also has a destination hostname or IP address and a "status". Openmix will first determine the least latent Cloud Region and then Round Robin within the specific Cloud Instances marked as "UP" in the destinations.txt file.
+    Demonstrates how to mix Radar performance data with a dynamically maintained list of Cloud Instances. Each cloud instance is associated with a Cloud Provider Region (like AWS US-East) for which we have Radar Performance data. Each instance also has a destination hostname or IP address and a "health" value (1-10). Openmix will first determine the health of all the instances in each region. Regions where instances are struggling will have a handicap applied to their Radar score. This will shed traffic away from struggling regions. Users are sent to least latent Cloud Region and then an instance within using a weighted round robin approach taking into account the instance health score.
