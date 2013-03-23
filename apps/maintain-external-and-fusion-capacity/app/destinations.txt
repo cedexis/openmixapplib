@@ -1,11 +1,20 @@
 # This is the destinations file!
-# region_alias, dest_hostname, status
+# region_alias, dest_hostname, health
 
-amazon_ec2___asia_se__singapore__1a,sin01.cedexis.com,1
-amazon_ec2___asia_se__singapore__1a,sin02.cedexis.com,1
-amazon_ec2___eu_west_1a,euaws01.cedexis.com,1
-amazon_ec2___eu_west_1a,euaws02.cedexis.com,0
-amazon_ec2___eu_west_1a,euaws03.cedexis.com,1
-amazon_ec2___us_east_1a,useastaws01.cedexis.com,0
-amazon_ec2___us_east_1a,useastaws02.cedexis.com,1
-amazon_ec2___us_east_1a,useastaws03.cedexis.com,1
+# EU Region
+softlayer_ams,sl_eu01.cedexis.com,10
+softlayer_ams,sl_eu02.cedexis.com,10
+softlayer_ams,sl_eu03.cedexis.com,10
+softlayer_ams,sl_eu04.cedexis.com,10
+# US East
+ec2_us_east,ec2_useast01.cedexis.com,10
+ec2_us_east,ec2_useast02.cedexis.com,10
+ec2_us_east,ec2_useast03.cedexis.com,10
+ec2_us_east,ec2_useast04.cedexis.com,10
+# US West
+ec2_us_west_ca,ec2_uswestca01.cedexis.com,10
+ec2_us_west_ca,ec2_uswestca02.cedexis.com,10
+ec2_us_west_ca,ec2_uswestca03.cedexis.com,10
+# Asia Singapore
+ec2_asia_se_singapore,ec2_sin01.cedexis.com,10
+ec2_asia_se_singapore,ec2_sin02.cedexis.com,10

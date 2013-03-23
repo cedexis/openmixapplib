@@ -18,6 +18,11 @@ class OpenmixApplication implements Lifecycle
         with the best global response time relative to your web visitors
     */
     private $fallback = 'ec2_us_east';
+
+    /* Applied to the difference between the best case
+    *  total capacity of the instances in a region
+    *  and the actual before being added to the platform padding
+    */
     private $multiplier = 2.0;
     
     private $reasons = array(
