@@ -109,6 +109,25 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'alias' => 'dc1'
             ),
             array(
+                'description' => 'crazy newlines',
+                'data_centers' => array(
+                    'dc1' => 'dc1.example.com',
+                    'dc2' => 'dc2.example.com'
+                ),
+                'cdns' => array(
+                    'cdn1' => 'example.cdn1.com',
+                    'cdn2' => 'example.cdn2.com'
+                ),
+                'fc' => array(
+                    'dc1' => "\r\n\r\n80\r\n\r\n80\n",
+                    'dc2' => "\r\n\r\n80\r\n\r\n80\n",
+                ),
+                'getRand' => array(
+                    array(0, 1, 0)
+                ),
+                'alias' => 'dc1'
+            ),
+            array(
                 'description' => 'dc1 above threshold; dc1 selected but route to cdn1',
                 'data_centers' => array(
                     'dc1' => 'dc1.example.com',

@@ -41,7 +41,9 @@ class OpenmixApplication implements Lifecycle
         $selected_dc = array_keys($this->data_centers)[$random];
         $select_dc_load_data = $load_data[$selected_dc];
         $select_dc_load_data = trim($select_dc_load_data);
+        $select_dc_load_data = str_replace("\r\n", "\n", $select_dc_load_data);
         $select_dc_load_data = explode("\n", $select_dc_load_data);
+        $select_dc_load_data = array_values(array_filter($select_dc_load_data, array($this, 'containsData')));
         $selected_dc_current_load = $select_dc_load_data[0];
         $selected_dc_threshold = $select_dc_load_data[1];
         if ($selected_dc_current_load > $selected_dc_threshold) {
@@ -63,6 +65,10 @@ class OpenmixApplication implements Lifecycle
     
     public function getRand($min, $max) {
         return rand($min, $max);
+    }
+    
+    public function containsData($value) {
+        return is_string($value) && (0 < strlen($value));
     }
 }
 
