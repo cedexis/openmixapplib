@@ -226,6 +226,29 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     array(1, 100, 96)
                 ),
                 'alias' => 'dc'
+            ),
+            array(
+                'description' => 'default; dc almost maxed; cdn selected; floats',
+                'fc' => array(
+                    'dc' => "99.99\n80\n"
+                ),
+                'getRand' => array(
+                    array(0, 0, 0),
+                    array(1, 100, 99),
+                    array(0, 0, 0)
+                ),
+                'alias' => 'cdn'
+            ),
+            array(
+                'description' => 'default; dc almost maxed; dc selected; floats',
+                'fc' => array(
+                    'dc' => "99.99\n80\n"
+                ),
+                'getRand' => array(
+                    array(0, 0, 0),
+                    array(1, 100, 100)
+                ),
+                'alias' => 'dc'
             )
         );
         

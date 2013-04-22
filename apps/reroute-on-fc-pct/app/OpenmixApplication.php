@@ -44,14 +44,17 @@ class OpenmixApplication implements Lifecycle
         $select_dc_load_data = str_replace("\r\n", "\n", $select_dc_load_data);
         $select_dc_load_data = explode("\n", $select_dc_load_data);
         $select_dc_load_data = array_values(array_filter($select_dc_load_data, array($this, 'containsData')));
-        $selected_dc_current_load = $select_dc_load_data[0];
-        $selected_dc_threshold = $select_dc_load_data[1];
+        $selected_dc_current_load = floatval($select_dc_load_data[0]);
+        //print("\ncurrent load: $selected_dc_current_load");
+        $selected_dc_threshold = floatval($select_dc_load_data[1]);
         if ($selected_dc_current_load > $selected_dc_threshold) {
             // Calculate the CDN selection criteria
             $cdn_pct_factor = 100 / (100 - $selected_dc_threshold);
             $cdn_pct = ($selected_dc_current_load - $selected_dc_threshold);
-            $cdn_pct = $cdn_pct * $cdn_pct_factor;
+            $cdn_pct = floor($cdn_pct * $cdn_pct_factor);
+            //print("\ncdn pct: $cdn_pct");
             $random = $this->getRand(1, 100);
+            //print("\nrandom: $random");
             if ($random <= $cdn_pct) {
                 // Select CDN
                 $random = $this->getRand(0, count($this->cdns) - 1);
