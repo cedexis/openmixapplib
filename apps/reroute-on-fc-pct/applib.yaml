@@ -1,0 +1,7 @@
+name: Template
+author: Cedexis
+last_updated: 04/22/2013
+categories: 
+description: |
+  Using Fusion Custom data to provide current load data, route a percentage of
+  traffic away from a datacenter as load there increases.
