@@ -10,7 +10,7 @@ class OpenmixApplication implements Lifecycle
         'dc' => 'dc.example.com'
     );
     
-    public $cdns = array(
+    public $providers = array(
         'cdn' => 'example.cdn.com'
     );
     
@@ -21,7 +21,7 @@ class OpenmixApplication implements Lifecycle
      **/
     public function init($config)
     {
-        foreach (array_merge($this->data_centers, $this->cdns) as $alias => $cname) {
+        foreach (array_merge($this->data_centers, $this->providers) as $alias => $cname) {
             $config->declareResponseOption($alias, $cname, $this->ttl);
         }
         $config->declareInput(
@@ -38,7 +38,8 @@ class OpenmixApplication implements Lifecycle
     {
         $load_data = $request->pulse(PulseProperties::LOAD);
         $random = $this->getRand(0, count($this->data_centers) - 1);
-        $selected_dc = array_keys($this->data_centers)[$random];
+        $data_center_keys = array_keys($this->data_centers);
+        $selected_dc = $data_center_keys[$random];
         $select_dc_load_data = $load_data[$selected_dc];
         $select_dc_load_data = trim($select_dc_load_data);
         $select_dc_load_data = str_replace("\r\n", "\n", $select_dc_load_data);
@@ -57,8 +58,9 @@ class OpenmixApplication implements Lifecycle
             //print("\nrandom: $random");
             if ($random <= $cdn_pct) {
                 // Select CDN
-                $random = $this->getRand(0, count($this->cdns) - 1);
-                $selected_cdn = array_keys($this->cdns)[$random];
+                $random = $this->getRand(0, count($this->providers) - 1);
+                $providers_keys = array_keys($this->providers);
+                $selected_cdn = $providers_keys[$random];
                 $response->selectProvider($selected_cdn);
                 return;
             }

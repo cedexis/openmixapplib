@@ -24,7 +24,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'dc1' => 'dc1.example.com',
                     'dc2' => 'dc2.example.com'
                 ),
-                'cdns' => array(
+                'providers' => array(
                     'cdn1' => 'example.cdn1.com',
                     'cdn2' => 'example.cdn2.com'
                 ),
@@ -54,8 +54,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 $application->data_centers = $i['data_centers'];
             }
             
-            if (array_key_exists('cdns', $i)) {
-                $application->cdns = $i['cdns'];
+            if (array_key_exists('providers', $i)) {
+                $application->providers = $i['providers'];
             }
             
             if (array_key_exists('ttl', $i)) {
@@ -95,7 +95,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'dc1' => 'dc1.example.com',
                     'dc2' => 'dc2.example.com'
                 ),
-                'cdns' => array(
+                'providers' => array(
                     'cdn1' => 'example.cdn1.com',
                     'cdn2' => 'example.cdn2.com'
                 ),
@@ -114,7 +114,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'dc1' => 'dc1.example.com',
                     'dc2' => 'dc2.example.com'
                 ),
-                'cdns' => array(
+                'providers' => array(
                     'cdn1' => 'example.cdn1.com',
                     'cdn2' => 'example.cdn2.com'
                 ),
@@ -133,7 +133,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'dc1' => 'dc1.example.com',
                     'dc2' => 'dc2.example.com'
                 ),
-                'cdns' => array(
+                'providers' => array(
                     'cdn1' => 'example.cdn1.com',
                     'cdn2' => 'example.cdn2.com'
                 ),
@@ -154,7 +154,7 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     'dc1' => 'dc1.example.com',
                     'dc2' => 'dc2.example.com'
                 ),
-                'cdns' => array(
+                'providers' => array(
                     'cdn1' => 'example.cdn1.com',
                     'cdn2' => 'example.cdn2.com'
                 ),
@@ -268,8 +268,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 $application->data_centers = $i['data_centers'];
             }
             
-            if (array_key_exists('cdns', $i)) {
-                $application->cdns = $i['cdns'];
+            if (array_key_exists('providers', $i)) {
+                $application->providers = $i['providers'];
             }
             
             // Expectations
