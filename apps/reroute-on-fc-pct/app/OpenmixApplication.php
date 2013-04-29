@@ -57,8 +57,8 @@ class OpenmixApplication implements Lifecycle
         if ($selected_dc_current_load > $selected_dc_threshold) {
             // Calculate the CDN selection criteria
             $cdn_pct_factor = 100 / (100 - $selected_dc_threshold);
-            $cdn_pct = ($selected_dc_current_load - $selected_dc_threshold);
-            $cdn_pct = floor($cdn_pct * $cdn_pct_factor);
+            //print("\nCDN pct factor: $cdn_pct_factor");
+            $cdn_pct = floor(($selected_dc_current_load - $selected_dc_threshold) * $cdn_pct_factor);
             //print("\ncdn pct: $cdn_pct");
             $random = $this->getRand(1, 100);
             //print("\nrandom: $random");

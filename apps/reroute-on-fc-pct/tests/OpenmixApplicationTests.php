@@ -313,7 +313,31 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                 'fc' => array( 'DataCentre1' => "98\n98" ),
                 'getRand' => array( array(0, 0, 0) ),
                 'alias' => 'DataCentre1'
-            )
+            ),
+            array(
+                'description' => 'production, low threshold, high load, select CDN (high)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "99\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 98), array(0, 0, 0) ),
+                'alias' => 'amazon_ec2___eu__ireland'
+            ),
+            array(
+                'description' => 'production, low threshold, high load, select data center (low)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "99\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 99) ),
+                'alias' => 'DataCentre1'
+            ),
+            array(
+                'description' => 'production, low threshold, max load, select CDN (high)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "100\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 100), array(0, 0, 0) ),
+                'alias' => 'amazon_ec2___eu__ireland'
+            ),
         );
         
         $test = 0;
