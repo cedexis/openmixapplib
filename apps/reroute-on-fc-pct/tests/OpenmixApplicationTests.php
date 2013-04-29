@@ -14,8 +14,8 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
             array(
                 'description' => 'default',
                 'declareResponseOption' => array(
-                    array('dc', 'dc.example.com', 20),
-                    array('cdn', 'example.cdn.com', 20)
+                    array('dc', 'dc.example.com', 5),
+                    array('cdn', 'example.cdn.com', 5)
                 ),
                 'pulse_load_providers' => 'dc'
             ),
@@ -249,6 +249,70 @@ class OpenmixApplicationTests extends PHPUnit_Framework_TestCase
                     array(1, 100, 100)
                 ),
                 'alias' => 'dc'
+            ),
+            array(
+                'description' => 'production, low threshold, not over threshold',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "48\n50" ),
+                'getRand' => array( array(0, 0, 0) ),
+                'alias' => 'DataCentre1'
+            ),
+            array(
+                'description' => 'production, low threshold, over threshold, select CDN (low)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "51\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 1), array(0, 0, 0) ),
+                'alias' => 'amazon_ec2___eu__ireland'
+            ),
+            array(
+                'description' => 'production, low threshold, over threshold, select CDN (high)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "51\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 2), array(0, 0, 0) ),
+                'alias' => 'amazon_ec2___eu__ireland'
+            ),
+            array(
+                'description' => 'production, low threshold, over threshold, select data center (low)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "51\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 3) ),
+                'alias' => 'DataCentre1'
+            ),
+            array(
+                'description' => 'production, low threshold, over threshold, select data center (high)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "51\n50" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 100) ),
+                'alias' => 'DataCentre1'
+            ),
+            array(
+                'description' => 'production, high threshold, over threshold, select data center (low)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "99\n98" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 51) ),
+                'alias' => 'DataCentre1'
+            ),
+            array(
+                'description' => 'production, high threshold, over threshold, select CDN (high)',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "99\n98" ),
+                'getRand' => array( array(0, 0, 0), array(1, 100, 50), array(0, 0, 0) ),
+                'alias' => 'amazon_ec2___eu__ireland'
+            ),
+            array(
+                'description' => 'production, high threshold, at threshold',
+                'data_centers' => array( 'DataCentre1' => 'dc.example.com' ),
+                'providers' => array( 'amazon_ec2___eu__ireland' => 'example.cdn.com' ),
+                'fc' => array( 'DataCentre1' => "98\n98" ),
+                'getRand' => array( array(0, 0, 0) ),
+                'alias' => 'DataCentre1'
             )
         );
         

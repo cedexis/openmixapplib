@@ -1,20 +1,25 @@
 <?php
 
 /**
- * For information on writing Openmix applications, check out
- * https://github.com/cedexis/openmixapplib/wiki
+ * Application to use Cloud/CDN Bursting. Application takes Fusion datafeeds in
+ * from different data centers and if over a certain value will start moving load
+ * elsewhere.
+ * 
+ * Fusion file should have 2 values: Line 1 = Current Load, Line 2 = Threshold Load.
+ * 
+ * For information on writing Openmix applications, check out https://github.com/cedexis/openmixapplib/wiki
  */
 class OpenmixApplication implements Lifecycle
 {
     public $data_centers = array(
         'dc' => 'dc.example.com'
     );
-    
+     
     public $providers = array(
         'cdn' => 'example.cdn.com'
     );
     
-    public $ttl = 20;
+    public $ttl = 5;
     
     /**
      * @param Configuration $config
@@ -40,6 +45,7 @@ class OpenmixApplication implements Lifecycle
         $random = $this->getRand(0, count($this->data_centers) - 1);
         $data_center_keys = array_keys($this->data_centers);
         $selected_dc = $data_center_keys[$random];
+        //print("\nSelected data center: $selected_dc");
         $select_dc_load_data = $load_data[$selected_dc];
         $select_dc_load_data = trim($select_dc_load_data);
         $select_dc_load_data = str_replace("\r\n", "\n", $select_dc_load_data);
@@ -60,7 +66,9 @@ class OpenmixApplication implements Lifecycle
                 // Select CDN
                 $random = $this->getRand(0, count($this->providers) - 1);
                 $providers_keys = array_keys($this->providers);
+                //print("\nCDN random: $random");
                 $selected_cdn = $providers_keys[$random];
+                //print("\nSelected CDN: $selected_cdn");
                 $response->selectProvider($selected_cdn);
                 return;
             }
