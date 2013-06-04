@@ -12,37 +12,37 @@
 class NewrelicProperties
 {
     /**
-     * (real) Apdex value returned from Newrelic
+     * *(real)* Apdex value returned from Newrelic
      */
     const APDEX                         = 'real:newrelic:apdex';
     
     /**
-     * (real) CPU value returned from Newrelic
+     * *(real)* CPU value returned from Newrelic
      */
     const CPU                  = 'real:newrelic:cpu';
     
     /**
-     * (real) Memory value returned from Newrelic
+     * *(real)* Memory value returned from Newrelic
      */
     const MEMORY                 = 'real:newrelic:memory';
     
     /**
-     * (real) Errors value returned from Newrelic
+     * *(real)* Errors value returned from Newrelic
      */
     const ERRORS                       = 'real:newrelic:errors';
     
     /**
-     * (real) Response time returned from Newrelic
+     * *(real)* Response time returned from Newrelic
      */
     const RESPONSE_TIME                   = 'real:newrelic:response_time';
     
     /**
-     * (real) Throughput value returned from Newrelic
+     * *(real)* Throughput value returned from Newrelic
      */
     const THROUGHPUT                  = 'real:newrelic:throughput';
     
     /**
-     * (real) DB value returned from Newrelic
+     * *(real)* DB value returned from Newrelic
      */
     const DB                 = 'real:newrelic:db';
 }

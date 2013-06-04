@@ -3,7 +3,7 @@
 class EDNSProperties
 {
     /**
-     * (string) A two-letter code identifying the geographic market where the
+     * *(string)* A two-letter code identifying the geographic market where the
      * request's client is located.  **Always upper case.**
      *
      * +------+---------------+
@@ -29,16 +29,16 @@ class EDNSProperties
     const MARKET  = 'string:edns:market_iso';
 
     /**
-     * (string) ISO 3166-1 alpha-2 code assigned to the country where the
+     * *(string)* ISO 3166-1 alpha-2 code assigned to the country where the
      * request's client is located.  **Always upper case.**
      */
     const COUNTRY = 'string:edns:country_iso';
 
     /**
-     * (integer) ASN (Autonomous System Number) assigned to the network of the
-     * request's origin.  **Always upper case.**
+     * *(integer)* ASN (Autonomous System Number) assigned to the network of the
+     * request's origin.
      */
-    const ASN     = 'integer:edns:asn';
+    const ASN = 'integer:edns:asn';
 
     /**
      * DEPRECATED

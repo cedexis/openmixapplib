@@ -5,7 +5,7 @@
 class FusionProperties
 {
     /**
-     * (real) The mount of content delivered by this provider since the beginning
+     * *(real)* The mount of content delivered by this provider since the beginning
      * of the month.
      *
      * Example::
@@ -15,7 +15,7 @@ class FusionProperties
     const GB  ='real:fusion:gb';
     
     /**
-     * (real) The rate of content being delivered by this provider right now.
+     * *(real)* The rate of content being delivered by this provider right now.
      *
      * Example::
      *

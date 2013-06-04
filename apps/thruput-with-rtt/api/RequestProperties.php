@@ -3,7 +3,7 @@
 class RequestProperties
 {
     /**
-     * (string) This is the "hostname" of the Openmix app that processed the
+     * *(string)* This is the "hostname" of the Openmix app that processed the
      * request.  This bears some explanation because it's a bit of a misnomer
      * that has persisted for historical reasons.  It is not necessarily
      * the hostname of the request, as you might think.  Rather it's the **optional**
@@ -42,7 +42,7 @@ class RequestProperties
     const HOSTNAME = 'string:request:hostname';
     
     /**
-     * (string) The IP address of the user's nameserver
+     * *(string)* The IP address of the user's nameserver
      *
      * Example::
      *
@@ -51,7 +51,7 @@ class RequestProperties
     const IP = 'string:request:ip';
 
     /**
-     * (string) The id of the worker processing the request
+     * *(string)* The id of the worker processing the request
      *
      * Some worker ID examples:
      *
