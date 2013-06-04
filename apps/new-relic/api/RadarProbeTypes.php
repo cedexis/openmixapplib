@@ -296,20 +296,20 @@ class RadarProbeTypes
      *      $value = $request->radar(RadarProbeTypes::HTTP_RTT);
      */
     const HTTP_RTT = 'real:score:http_rtt';
-
+    
     /**
      * *(real)* Percentage of successful visits; returns a number from 0-100.
      *
      * Example::
      *
-     *      $value = $request->radar(RadarProbeTypes::AVAILABILITY);
-     */
-    const AVAILABILITY = 'real:score:avail';
-    
-    /**
-     * Synonym for RadarProbeTypes::AVAILABILITY.
+     *      $value = $request->radar(RadarProbeTypes::AVAIL);
      */
     const AVAIL = 'real:score:avail';
+    
+    /**
+     * Synonym for RadarProbeTypes::AVAIL.
+     */
+    const AVAILABILITY = 'real:score:avail';
 
     /**
      * *(real)* Time to load a custom probe.
