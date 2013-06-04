@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Figure out where this script file is so that the `apps` directory can be
 # conclusively found. Thanks to
