@@ -4,7 +4,7 @@ class GeoProperties
 {
     /**
      * (string) A two-letter code identifying the geographic market where the
-     * request's nameserver is located.  Always upper case.
+     * request's nameserver is located.  **Always upper case.**
      *
      * +------+---------------+
      * | Code | Market        |
@@ -30,7 +30,7 @@ class GeoProperties
     
     /**
      * (string) ISO 3166-1 alpha-2 code assigned to the country where the
-     * request's nameserver is located.  Always upper case.
+     * request's nameserver is located.  **Always upper case.**
      *
      * See `Wikipedia <http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements>`_.
      *
@@ -42,7 +42,7 @@ class GeoProperties
     
     /**
      * (integer) ASN (Autonomous System Number) assigned to the network of the
-     * request's origin.  Always upper case.
+     * request's origin.  **Always upper case.**
      *
      * Example::
      *
