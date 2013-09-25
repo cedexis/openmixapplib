@@ -6,6 +6,8 @@
 class PulseProperties
 {
     /**
+     * **Deprecated**: Please use $request->fusion(FusionProperties::CUSTOM) instead.
+     *
      * *(string)* Contains the contents of a file that the provider loads
      * periodically.  This may be used for dynamic configuration of an
      * Openmix application.
