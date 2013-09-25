@@ -50,10 +50,7 @@ class OpenmixApplication implements Lifecycle
      */
     public function init($config)
     {
-        foreach($this->burstable_cdns as $alias => $settings)
-        {
-            $config->declareInput(FusionProperties::MBPS, $alias);
-        } 
+        $config->declareInput(FusionProperties::MBPS, implode(',', array_keys($this->burstable_cdns))); 
         $config->declareInput(
             RadarProbeTypes::HTTP_RTT,
             implode(',', array_keys($this->providers)));
