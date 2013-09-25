@@ -3,7 +3,7 @@
 class RequestProperties
 {
     /**
-     * (string) This is the "hostname" of the Openmix app that processed the
+     * *(string)* This is the "hostname" of the Openmix app that processed the
      * request.  This bears some explanation because it's a bit of a misnomer
      * that has persisted for historical reasons.  It is not necessarily
      * the hostname of the request, as you might think.  Rather it's the **optional**
@@ -42,7 +42,7 @@ class RequestProperties
     const HOSTNAME = 'string:request:hostname';
     
     /**
-     * (string) The IP address of the user's nameserver
+     * *(string)* The IP address of the user's nameserver
      *
      * Example::
      *
@@ -50,12 +50,42 @@ class RequestProperties
      */
     const IP = 'string:request:ip';
 
-    /*  
-     * (string) The id of the worker processing the request
+    /**
+     * *(string)* The id of the worker processing the request
      *
-     * Example::
+     * Some worker ID examples:
      *
-     *       $value = $request->request(RequestProperties:WORKERID);
+     *     * worker-opx1.jfk.hw.prod
+     *     * worker-opx1.mia.hw.prod
+     *     * worker-opx1.sin.edg.prod
+     *     * worker-opx1.ord.edg.prod
+     *
+     * Customers will generally be interested in the second part of this value, which
+     * represents the **location** of the worker handling the request.  Please
+     * contact `Sales <mailto:sales@cedexis.com>`_ for a list of available locations.
+     *
+     * From within the app::
+     *
+     *     class OpenmixApplication implements Lifecycle
+     *     {
+     *         public function init($config)
+     *         {
+     *             $config->declareInput(RequestProperties::WORKERID);
+     *         }
+     *         
+     *         public function service($request,$response,$utilities)
+     *         {
+     *             $worker_id = $request->request(RequestProperties::WORKERID);
+     *
+     *             // $worker_id is now something like: worker-opx1.ord.edg.prod
+     *             $location = explode('.', $worker_id)[1];
+     *             
+     *             // Now you can use the location in your app's business logic.
+     *             
+     *         }
+     *     }
+     *
+     *       
      */
     const WORKERID = 'string:request:workerid';
 }

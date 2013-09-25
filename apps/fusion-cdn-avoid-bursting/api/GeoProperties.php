@@ -3,8 +3,8 @@
 class GeoProperties
 {
     /**
-     * (string) A two-letter code identifying the geographic market where the
-     * request's nameserver is located.
+     * *(string)* A two-letter code identifying the geographic market where the
+     * request's nameserver is located.  **Always upper case.**
      *
      * +------+---------------+
      * | Code | Market        |
@@ -29,9 +29,10 @@ class GeoProperties
     const MARKET  = 'string:geo:market_iso';
     
     /**
-     * (string) ISO 3166-1 alpha-2 code assigned to the country where the
-     * request's nameserver is located.  See
-     * `Wikipedia <http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements>`_.
+     * *(string)* ISO 3166-1 alpha-2 code assigned to the country where the
+     * request's nameserver is located.  **Always upper case.**
+     *
+     * See `Wikipedia <http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements>`_.
      *
      * Example::
      *
@@ -40,14 +41,14 @@ class GeoProperties
     const COUNTRY = 'string:geo:country_iso';
     
     /**
-     * (integer) ASN (Autonomous System Number) assigned to the network of the
+     * *(integer)* ASN (Autonomous System Number) assigned to the network of the
      * request's origin.
      *
      * Example::
      *
      *      $value = $request->geo(GeoProperties::ASN);
      */
-    const ASN     = 'integer:geo:asn';
+    const ASN = 'integer:geo:asn';
 }
 
 ?>

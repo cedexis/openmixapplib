@@ -1,7 +1,6 @@
-# Application: **Optimal Round Trip Time With Penalty**
+# Application: **Avoid CDN Bursting Charges by tracking MBPS via Fusion Data API**
 
-This version of the Optimal Round Trip Time application allows you to set a percent based
-"handicap" for each provider.  This should cause decisions to favor one or more providers.
+This version of the Optimal Round Trip Time application allows you track your monthly 95/5 MBPS usage via that CDN's API. If your usage exceeds your commit, penalize that CDN enough to avoid a bursting charge. Otherwise use the Optimal Round Trip time approach.
 
 # Openmix Application Library
 
