@@ -12,14 +12,16 @@ class OpenmixApplication implements Lifecycle
      */
     public $platforms = array(
         'cdn1' => 'cdn1.cedexis.com',
-        'cdn2' => 'cdn2.cedexis.com');
-    
+        'cdn2' => 'cdn2.cedexis.com'
+    );
+
     private $reasons = array(
-        'Best performing platform selected by KBPS' => 'A',
-        'Best performing platform selected by RTT' => 'B',
-        'Data problem' => 'C',
-        'All platforms eliminated' => 'D');
-    
+        'A', // Best performing platform selected by KBPS
+        'B', // Best performing platform selected by RTT
+        'C', // Data problem
+        'D', // All platforms eliminated
+    );
+
     private $ttl = 20;
     
     private $availabilityThreshold = 90;
@@ -79,13 +81,13 @@ class OpenmixApplication implements Lifecycle
             //print "Availability Issue, choosing the best: {$avail[key($avail)]}\n";
             arsort($avail);
             $response->selectProvider(key($avail));
-            $response->setReasonCode($this->reasons['All platforms eliminated']);
+            $response->setReasonCode('D');
             return;
         }
 
         $kbps = $request->radar(RadarProbeTypes::HTTP_KBPS);
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
-        if (is_array($kbps) && 0 < count($kbps)) 
+        if (!empty($kbps)) 
         {
             //print_r($kbps);
             //$candidates now has the KBPS info for the reminaing platforms
@@ -101,32 +103,32 @@ class OpenmixApplication implements Lifecycle
                 print "first:   "; print_r($first); print "second:   "; print_r($second);
                 */
                 //Access the 0th value in an array w/o knowing the key
-                if($first[key($first)] * $this->tieThreshold <= $second[key($second)] && is_array($rtt))
+                if($first[key($first)] * $this->tieThreshold <= $second[key($second)] && !empty($rtt))
                 {
                     //print "a tie! \n";
                     $candidates = array_intersect_key($rtt, $candidates);
                     asort($candidates);
                     $response->selectProvider(key($candidates));
-                    $response->setReasonCode($this->reasons['Best performing platform selected by RTT']);
+                    $response->setReasonCode('B');
                     return;
                 }
             }
             //print "not a tie or only 1 platform passed availability: \n";
             $response->selectProvider(key($first));
-            $response->setReasonCode($this->reasons['Best performing platform selected by KBPS']);
+            $response->setReasonCode('A');
             return;
-        } elseif (is_array($rtt) && 0 < count($rtt))
+        } elseif (!empty($rtt))
         {
             //We lack KBPS measurements so choose by RTT
             $candidates = array_intersect_key($rtt, $candidates);
             asort($candidates);
             $response->selectProvider(key($rtt));
-            $response->setReasonCode($this->reasons['Best performing platform selected by RTT']);
+            $response->setReasonCode('B');
             return;
         }
         else
         {
-            $response->setReasonCode($this->reasons['Data problem']);
+            $response->setReasonCode('C');
         }
         $utilities->selectRandom();
     }

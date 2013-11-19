@@ -57,8 +57,8 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
     public function service()
     {
         $testData = array(
-            //0:both are above avail threshold and cdn2 is fastest by more than 5%
             array(
+                'desc' => 'both are above avail threshold and cdn2 is fastest by more than 5%',
                 'kbps' => array('cdn1' => 1000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
@@ -66,9 +66,8 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'A'
             ),
-            //1:both are above avail threshold and cdn2 is fastest by less than 5%
-            // use RTT to tie break and cdn1 wins
             array(
+                'desc' => 'both are above avail threshold and cdn2 is fastest by less than 5%; use RTT to tie break and cdn1 wins',
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
@@ -76,9 +75,8 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'B'
             ),
-            //2:both are above avail threshold and cdn2 is fastest by less than 5%
-            // use RTT to tie break and cdn2 still wins
             array(
+                'desc' => 'both are above avail threshold and cdn2 is fastest by less than 5%; use RTT to tie break and cdn2 still wins',
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 200),
                 'avail' => array('cdn1' => 100, 'cdn2' => 99),
@@ -86,8 +84,8 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'B'
             ),
-            //3:both are above avail threshold and cdn1 is fastest by more than 5%
             array(
+                'desc' => 'both are above avail threshold and cdn1 is fastest by more than 5%',
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 1009),
@@ -95,41 +93,29 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'A'
             ),
-            //4: both are below avail threshold, cdn1 is least bad
-            // removing KBPS and RTT since we won't reach
-            // that part of the test plan
             array(
+                'desc' => 'both are below avail threshold, cdn1 is least bad removing KBPS and RTT since we won\'t reach that part of the test plan',
                 'avail' => array('cdn1' => 88, 'cdn2' => 51),
                 'expectedAlias' => 'cdn1',
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'D'
             ),
-            //5: only cdn2 is above avail threshold
             array(
+                'desc' => 'only cdn2 is above avail threshold',
                 'avail' => array('cdn1' => 88, 'cdn2' => 90),
                 'expectedAlias' => 'cdn2',
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'D'
             ),
-            //6: Both are below cdn2 least bad
             array(
+                'desc' => 'Both are below cdn2 least bad',
                 'avail' => array('cdn1' => 0, 'cdn2' => 20),
                 'expectedAlias' => 'cdn2',
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'D'
             ),
-            // Data problems
-            // 7: no KBPS data so use RTT, cdn1 wins
             array(
-                'rtt' => array('cdn1' => 201, 'cdn2' => 202),
-                'avail' => array('cdn1' => 100, 'cdn2' => 100),
-                'kbps' => 'something no at array',
-                'expectedAlias' => 'cdn1',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'B'
-            ),
-            // 8: no KBPS data so use RTT, cdn1 wins
-            array(
+                'desc' => 'no KBPS data so use RTT, cdn1 wins',
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array(), // empty array
@@ -137,29 +123,24 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'B'
             ),
-            // 9: No RTT or KBPS data, choose randomly
             array(
-                'rtt' => 'foo',
-                'avail' => array('cdn1' => 100, 'cdn2' => 100),
-                'kbps' => 'bar',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'C'
-            ),
-            // 10: No RTT or KBPS data, choose randomly
-            array(
+                'desc' => 'No RTT or KBPS data, choose randomly',
                 'rtt' => array(),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array(),
                 'expectedTTL' => 20,
                 'expectedReasonCode' => 'C'
             ),
+            array(
+                'desc' => 'No avail data',
+                'avail' => array(),
+                'expectedReasonCode' => 'C',
+            ),
         );
-
         $test=0;
         foreach ($testData as $i)
         {
-            print("\nTest: " . $test++ . "\n");
-
+            print("\nTest: " . $test++ . ": " . $i['desc']);
             $request = $this->getMock('Request');
             $response = $this->getMock('Response');
             $utilities = $this->getMock('Utilities');
