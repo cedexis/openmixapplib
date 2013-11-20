@@ -11,9 +11,10 @@ class OpenmixApplication implements Lifecycle
         'thiscdn' => 'www.customer.net.thiscdn.net');
     
     private $reasons = array(
-        'Best performing provider selected' => 'A',
-        'Data problem' => 'B',
-        'All providers eliminated' => 'C');
+        'A', // Best performing provider selected
+        'B', // Data problem
+        'C', // All providers eliminated
+    );
     
     private $ttl = 20;
     
@@ -61,29 +62,36 @@ class OpenmixApplication implements Lifecycle
                 // availability score, if given
                 asort($candidates);
                 $avail = $request->radar(RadarProbeTypes::AVAILABILITY);
-                foreach (array_keys($candidates) as $alias)
-                {
-                    if ($avail[$alias] >= $this->availabilityThreshold)
+                if (!empty($avail)) {
+                    foreach (array_keys($candidates) as $alias)
                     {
-                        $response->selectProvider($alias);
-                        $response->setReasonCode($this->reasons['Best performing provider selected']);
-                        return;
+                        if (array_key_exists($alias, $avail)) {
+                            if ($avail[$alias] >= $this->availabilityThreshold)
+                            {
+                                $response->selectProvider($alias);
+                                $response->setReasonCode('A');
+                                return;
+                            }
+                        }
                     }
+                    // No provider passed the availability threshold. Select the most available.
+                    arsort($avail);
+                    $response->selectProvider(key($avail));
+                    $response->setReasonCode('C');
+                    return;
                 }
-                // No provider passed the availability threshold. Select the most available.
-                arsort($avail);
-                $response->selectProvider(key($avail));
-                $response->setReasonCode($this->reasons['All providers eliminated']);
-                return;
+                else {
+                    $response->setReasonCode('B');
+                }
             }
             else
             {
-                $response->setReasonCode($this->reasons['Data problem']);
+                $response->setReasonCode('B');
             }
         }
         else
         {
-            $response->setReasonCode($this->reasons['Data problem']);
+            $response->setReasonCode('B');
         }
         $utilities->selectRandom();
     }

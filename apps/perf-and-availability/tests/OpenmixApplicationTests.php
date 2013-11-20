@@ -117,6 +117,19 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
             array(
                 'rtt' => 'something not an array',
                 'expectedReasonCode' => 'B'
+            ),
+            // thiscdn fastest, but missing availability
+            array(
+                'rtt' => array( 'origin' => 200, 'thiscdn' => 199 ),
+                'avail' => array( 'origin' => 100 ),
+                'expectedAlias' => 'origin',
+                'expectedReasonCode' => 'A'
+            ),
+            // got RTT, but missing all availability data
+            array(
+                'rtt' => array( 'origin' => 200, 'thiscdn' => 199 ),
+                'avail' => array(),
+                'expectedReasonCode' => 'B'
             )
         );
 
