@@ -76,6 +76,19 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'expectedAlias' => 'provider1',
                 'expectedReasonCode' => 'C'
             ),
+            // provider1 fastest, but missing availability; provider2 next fastest
+            array(
+                'rtt' => array( 'provider1' => 199, 'provider2' => 200, 'provider3' => 201 ),
+                'avail' => array( 'provider2' => 100, 'provider2' => 100 ),
+                'expectedAlias' => 'provider2',
+                'expectedReasonCode' => 'A'
+            ),
+            // got RTT, but missing all availability data
+            array(
+                'rtt' => array( 'provider1' => 199, 'provider2' => 200, 'provider3' => 201 ),
+                'avail' => array(),
+                'expectedReasonCode' => 'B'
+            )
         );
 
         $test = 0;
