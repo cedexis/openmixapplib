@@ -62,79 +62,80 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'kbps' => array('cdn1' => 1000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
-                'expectedAlias' => 'cdn2',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'A'
+                'alias' => 'cdn2',
+                'reason' => 'A'
             ),
             array(
                 'desc' => 'both are above avail threshold and cdn2 is fastest by less than 5%; use RTT to tie break and cdn1 wins',
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
-                'expectedAlias' => 'cdn1',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'B'
+                'alias' => 'cdn1',
+                'reason' => 'B'
             ),
             array(
                 'desc' => 'both are above avail threshold and cdn2 is fastest by less than 5%; use RTT to tie break and cdn2 still wins',
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 2009),
                 'rtt' => array('cdn1' => 201, 'cdn2' => 200),
                 'avail' => array('cdn1' => 100, 'cdn2' => 99),
-                'expectedAlias' => 'cdn2',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'B'
+                'alias' => 'cdn2',
+                'reason' => 'B'
             ),
             array(
                 'desc' => 'both are above avail threshold and cdn1 is fastest by more than 5%',
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array('cdn1' => 2000, 'cdn2' => 1009),
-                'expectedAlias' => 'cdn1',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'A'
+                'alias' => 'cdn1',
+                'reason' => 'A'
             ),
             array(
                 'desc' => 'both are below avail threshold, cdn1 is least bad removing KBPS and RTT since we won\'t reach that part of the test plan',
                 'avail' => array('cdn1' => 88, 'cdn2' => 51),
-                'expectedAlias' => 'cdn1',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'D'
+                'alias' => 'cdn1',
+                'reason' => 'D'
             ),
             array(
                 'desc' => 'only cdn2 is above avail threshold',
                 'avail' => array('cdn1' => 88, 'cdn2' => 90),
-                'expectedAlias' => 'cdn2',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'D'
+                'alias' => 'cdn2',
+                'reason' => 'D'
             ),
             array(
                 'desc' => 'Both are below cdn2 least bad',
                 'avail' => array('cdn1' => 0, 'cdn2' => 20),
-                'expectedAlias' => 'cdn2',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'D'
+                'alias' => 'cdn2',
+                'reason' => 'D'
             ),
             array(
                 'desc' => 'no KBPS data so use RTT, cdn1 wins',
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array(), // empty array
-                'expectedAlias' => 'cdn1',
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'B'
+                'alias' => 'cdn1',
+                'reason' => 'B'
             ),
             array(
                 'desc' => 'No RTT or KBPS data, choose randomly',
                 'rtt' => array(),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
                 'kbps' => array(),
-                'expectedTTL' => 20,
-                'expectedReasonCode' => 'C'
+                'reason' => 'C'
             ),
             array(
-                'desc' => 'No avail data',
+                'desc' => 'No KBPS data and RTT data is all zeroes; choose random',
+                'rtt' => array( 'cdn1' => 0, 'cdn2' => 0 ),
+                'avail' => array( 'cdn1' => 100, 'cdn2' => 100 ),
+                'kbps' => array(),
+                'reason' => 'C',
+            ),
+            array(
+                'desc' => 'No avail data; cdn1 selected on RTT',
                 'avail' => array(),
-                'expectedReasonCode' => 'C',
+                'rtt' => array( 'cdn1' => 200, 'cdn2' => 201 ),
+                'kbps' => array( 'cdn1' => 1000, 'cdn2' => 1000 ),
+                'alias' => 'cdn1',
+                'reason' => 'B',
             ),
         );
         $test=0;
@@ -172,11 +173,11 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                     ->will($this->returnValue($i['rtt']));
             }
 
-            if (array_key_exists('expectedAlias', $i))
+            if (array_key_exists('alias', $i))
             {
                 $response->expects($this->once())
                     ->method('selectProvider')
-                    ->with($i['expectedAlias']);
+                    ->with($i['alias']);
                     
                 $utilities->expects($this->never())
                     ->method('selectRandom');
@@ -192,7 +193,7 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
 
             $response->expects($this->once())
                 ->method('setReasonCode')
-                ->with($i['expectedReasonCode']);
+                ->with($i['reason']);
             
             $app = new OpenmixApplication();
             $app->service($request, $response, $utilities);

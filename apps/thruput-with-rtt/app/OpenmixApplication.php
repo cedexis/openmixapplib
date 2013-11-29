@@ -87,6 +87,7 @@ class OpenmixApplication implements Lifecycle
 
         $kbps = $request->radar(RadarProbeTypes::HTTP_KBPS);
         $rtt = $request->radar(RadarProbeTypes::HTTP_RTT);
+        $rtt = array_filter($rtt, array($this, 'has_score'));
         if (!empty($kbps)) 
         {
             //print_r($kbps);
@@ -131,6 +132,10 @@ class OpenmixApplication implements Lifecycle
             $response->setReasonCode('C');
         }
         $utilities->selectRandom();
+    }
+
+    public function has_score($value) {
+        return 0 < $value;
     }
 }
 ?>
