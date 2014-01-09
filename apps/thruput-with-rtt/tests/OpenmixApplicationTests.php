@@ -82,6 +82,15 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'reason' => 'B'
             ),
             array(
+                'desc' => 'both are above avail threshold and cdn2 is fastest by less than 5%; use RTT to tie break; but we have only cdn1\'s RTT data',
+                'kbps' => array('cdn1' => 2000, 'cdn2' => 2009),
+                'rtt' => array('cdn1' => 200),
+                'avail' => array('cdn1' => 100, 'cdn2' => 99),
+                'expectedAlias' => 'cdn1',
+                'expectedTTL' => 20,
+                'expectedReasonCode' => 'B'
+            ),
+            array(
                 'desc' => 'both are above avail threshold and cdn1 is fastest by more than 5%',
                 'rtt' => array('cdn1' => 201, 'cdn2' => 202),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
@@ -114,6 +123,15 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'kbps' => array(), // empty array
                 'alias' => 'cdn1',
                 'reason' => 'B'
+            ),
+            array(
+                'desc' => "no KBPS data so use RTT; but we have only cdn1's RTT data",
+                'rtt' => array('cdn1' => 201 ),
+                'avail' => array('cdn1' => 100, 'cdn2' => 100),
+                'kbps' => array(), // empty array
+                'expectedAlias' => 'cdn1',
+                'expectedTTL' => 20,
+                'expectedReasonCode' => 'B'
             ),
             array(
                 'desc' => "only one provider's KBPS data, so select it",
