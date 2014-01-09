@@ -93,6 +93,7 @@ class OpenmixApplication implements Lifecycle
             //print_r($kbps);
             //$candidates now has the KBPS info for the reminaing platforms
             $candidates = array_intersect_key($kbps, $candidates);
+            $first = $candidates;
             if (1 < count($candidates))
             {
                 arsort($candidates);

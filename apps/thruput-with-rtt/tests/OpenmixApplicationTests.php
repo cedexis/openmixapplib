@@ -116,6 +116,15 @@ class OpenmixApplicationTests  extends PHPUnit_Framework_TestCase
                 'reason' => 'B'
             ),
             array(
+                'desc' => "only one provider's KBPS data, so select it",
+                'rtt' => array('cdn1' => 201, 'cdn2' => 202),
+                'avail' => array('cdn1' => 100, 'cdn2' => 100),
+                'kbps' => array('cdn1' => 1000), // empty array
+                'expectedAlias' => 'cdn1',
+                'expectedTTL' => 20,
+                'expectedReasonCode' => 'A'
+            ),
+            array(
                 'desc' => 'No RTT or KBPS data, choose randomly',
                 'rtt' => array(),
                 'avail' => array('cdn1' => 100, 'cdn2' => 100),
