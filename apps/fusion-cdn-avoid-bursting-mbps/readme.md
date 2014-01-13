@@ -1,6 +1,9 @@
 # Application: **Avoid CDN Bursting Charges by tracking MBPS via Fusion Data API**
 
-This version of the Optimal Round Trip Time application allows you track your monthly 95/5 MBPS usage via that CDN's API. If your usage exceeds your commit, penalize that CDN enough to avoid a bursting charge. Otherwise use the Optimal Round Trip time approach.
+This version of the Optimal Round Trip Time application allows you track your
+monthly 95/5 MBPS usage via that CDN's API. If your usage exceeds your commit,
+penalize that CDN enough to avoid a bursting charge. Otherwise use the Optimal
+Round Trip time approach.
 
 # Openmix Application Library
 
