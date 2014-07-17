@@ -117,6 +117,15 @@ function OpenmixApplication() {
             return result;
         }
 
+        function select_random(that) {
+            var aliases = Object.keys(that.providers),
+                min = 0,
+                max = aliases.length - 1,
+                random_int = Math.floor(that.get_random() * (max - min + 1)) + min;
+            //console.log('Random int: ' + random_int);
+            return aliases[random_int];
+        };
+
         avail = request.getProbe('avail');
 
         // First figure out the available platforms
@@ -128,7 +137,11 @@ function OpenmixApplication() {
         if (1 >= candidates.length) {
             // If one or fewer candidates are available, then select the least bad
             avail_candidates = get_most_available();
-            selected_alias = avail_candidates[0][0];
+            if (0 < avail_candidates.length) {
+                selected_alias = avail_candidates[0][0];
+            } else {
+                selected_alias = select_random(this);
+            }
             reason = 'D';
         } else {
             kbps = request.getProbe('http_kbps');
@@ -169,14 +182,7 @@ function OpenmixApplication() {
                 selected_alias = rtt_candidates[0][0];
                 reason = 'B';
             } else {
-                selected_alias = (function(that) {
-                    var aliases = Object.keys(that.providers),
-                        min = 0,
-                        max = aliases.length - 1,
-                        random_int = Math.floor(that.get_random() * (max - min + 1)) + min;
-                    //console.log('Random int: ' + random_int);
-                    return aliases[random_int];
-                }(this));
+                selected_alias = select_random(this);
                 reason = 'C';
             }
         }

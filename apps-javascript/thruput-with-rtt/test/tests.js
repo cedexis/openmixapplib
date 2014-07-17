@@ -286,4 +286,20 @@ var handler;
         }
     ));
 
+    test('no data', test_onRequest(
+        {
+            setup: function(i) {
+                i.getProbe.withArgs('avail').returns({});
+                i.getProbe.withArgs('http_kbps').returns({});
+                i.getProbe.withArgs('http_rtt').returns({});
+                i.get_random.returns(0.6789);
+            },
+            verify: function(i) {
+                deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
+                deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
+                deepEqual(i.setReasonCode.args, [ [ 'D' ] ], 'Verifying setReasonCode');
+            }
+        }
+    ));
+
 }());
