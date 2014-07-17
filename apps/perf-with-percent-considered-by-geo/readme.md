@@ -1,11 +1,12 @@
-# Application: **Performance with Penalty and Availability, Sticky Winner**
+# Application: **Performance with Percent Considered by requestor GEO**
 
 Routes requests to the highest performing available platform, applying an optional
-handicap to each.  Once a choice is made, stick with that choice until an alternative
-is significantly better or the original choice no longer exceeds the availability
-threshold.
+"percent considered" to each.  The "percent considered" value can me managed globally
+or for each Market or Country. 
 
-Stickiness may optionally be limited to specific countries.
+Percent Considered does not need to add up to 100 when summed for all platforms.
+e.g. 100 means the provider is always considered. 50 means the provider is
+considered approximately half the time, 0 means the provider is never considered, etc.
 
 # Openmix Application Library
 
