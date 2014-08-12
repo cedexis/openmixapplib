@@ -65,6 +65,12 @@ class OpenmixApplication implements Lifecycle
     {
         //First, remove unavailable platforms
         $avail = $request->radar(RadarProbeTypes::AVAILABILITY);
+        if (empty($avail)) {
+            $response->setReasonCode('C');
+            $utilities->selectRandom();
+            return;
+        }
+        
         $candidates = $this->platforms;
         foreach ($avail as $alias => $value)
         {
@@ -79,6 +85,7 @@ class OpenmixApplication implements Lifecycle
         if(count($candidates) <= 1)
         {
             //print "Availability Issue, choosing the best: {$avail[key($avail)]}\n";
+            reset($avail);
             arsort($avail);
             $response->selectProvider(key($avail));
             $response->setReasonCode('D');
