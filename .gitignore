@@ -17,3 +17,6 @@
 .idea/vcs.xml
 .idea/workspace.xml
 openmixapplib.iml
+
+node_modules/
+karma.app.results.xml

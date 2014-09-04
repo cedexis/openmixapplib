@@ -1,6 +1,7 @@
 /*global
     module,
     test,
+    equal,
     deepEqual,
     OpenmixApplication,
     init,
@@ -133,24 +134,25 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 89.99999,
-                    'c': 90
+                    'a': { avail: 90 },
+                    'b': { avail: 89.99999 },
+                    'c': { avail: 90 }
                 });
                 i.getProbe.withArgs('http_kbps').returns({
-                    'a': 5000,
-                    'b': 6000
+                    'a': { http_kbps: 5000 },
+                    'b': { http_kbps: 6000 }
                 });
                 i.getProbe.withArgs('http_rtt').returns({
-                    'a': 200,
-                    'b': 200,
-                    'c': 200
+                    'a': { http_rtt: 200 },
+                    'b': { http_rtt: 200 },
+                    'c': { http_rtt: 200 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'a', 'a.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'A' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'A2' ] ], 'Verifying setReasonCode');
+                equal(i.get_random.callCount, 0);
             }
         }
     ));
@@ -159,25 +161,25 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 89.99999,
-                    'c': 90
+                    'a': { avail: 90 },
+                    'b': { avail: 89.99999 },
+                    'c': { avail: 90 }
                 });
                 i.getProbe.withArgs('http_kbps').returns({
-                    'a': 5000,
-                    'b': 6000,
-                    'c': 7000
+                    'a': { http_kbps: 5000 },
+                    'b': { http_kbps: 6000 },
+                    'c': { http_kbps: 7000 }
                 });
                 i.getProbe.withArgs('http_rtt').returns({
-                    'a': 200,
-                    'b': 200,
-                    'c': 200
+                    'a': { http_rtt: 200 },
+                    'b': { http_rtt: 200 },
+                    'c': { http_rtt: 200 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'A' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'A1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -186,25 +188,25 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 90,
-                    'c': 90
+                    'a': { avail: 90 },
+                    'b': { avail: 90 },
+                    'c': { avail: 90 }
                 });
                 i.getProbe.withArgs('http_kbps').returns({
-                    'a': 5000,
-                    'b': 5000,
-                    'c': 5000
+                    'a': { http_kbps: 5000 },
+                    'b': { http_kbps: 5000 },
+                    'c': { http_kbps: 5000 }
                 });
                 i.getProbe.withArgs('http_rtt').returns({
-                    'a': 200,
-                    'b': 199,
-                    'c': 200
+                    'a': { http_rtt: 200 },
+                    'b': { http_rtt: 199 },
+                    'c': { http_rtt: 200 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'b', 'b.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'B' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'B1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -213,21 +215,25 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 90,
-                    'c': 8.99999
+                    'a': { avail: 90 },
+                    'b': { avail: 90 },
+                    'c': { avail: 89.99999 }
                 });
-                i.getProbe.withArgs('http_kbps').returns({});
+                i.getProbe.withArgs('http_kbps').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
                 i.getProbe.withArgs('http_rtt').returns({
-                    'a': 150,
-                    'b': 149,
-                    'c': 100
+                    'a': { http_rtt: 150 },
+                    'b': { http_rtt: 149 },
+                    'c': { http_rtt: 100 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'b', 'b.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'B' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'B2' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -236,15 +242,15 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 89.99998,
-                    'c': 89.99999
+                    'a': { avail: 90 },
+                    'b': { avail: 89.99998 },
+                    'c': { avail: 89.99999 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'a', 'a.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'D' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'D1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -253,15 +259,15 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 89.99997,
-                    'b': 89.99998,
-                    'c': 89.99999
+                    'a': { avail: 89.99997 },
+                    'b': { avail: 89.99998 },
+                    'c': { avail: 89.99999 }
                 });
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'D' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'D1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -270,18 +276,26 @@ var handler;
         {
             setup: function(i) {
                 i.getProbe.withArgs('avail').returns({
-                    'a': 90,
-                    'b': 90,
-                    'c': 90
+                    'a': { avail: 90 },
+                    'b': { avail: 90 },
+                    'c': { avail: 90 }
                 });
-                i.getProbe.withArgs('http_kbps').returns({});
-                i.getProbe.withArgs('http_rtt').returns({});
+                i.getProbe.withArgs('http_kbps').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
+                i.getProbe.withArgs('http_rtt').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
                 i.get_random.returns(0.6789);
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'C' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'C1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
@@ -289,15 +303,64 @@ var handler;
     test('no data', test_onRequest(
         {
             setup: function(i) {
-                i.getProbe.withArgs('avail').returns({});
-                i.getProbe.withArgs('http_kbps').returns({});
-                i.getProbe.withArgs('http_rtt').returns({});
+                i.getProbe.withArgs('avail').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
+                i.getProbe.withArgs('http_kbps').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
+                i.getProbe.withArgs('http_rtt').returns({
+                    'a': {},
+                    'b': {},
+                    'c': {}
+                });
                 i.get_random.returns(0.6789);
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'D' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'D2' ] ], 'Verifying setReasonCode');
+            }
+        }
+    ));
+
+    test('no KBPS data for available providers', test_onRequest(
+        {
+            setup: function(i) {
+                i.getProbe.withArgs('avail').returns({
+                    'a': { avail: 90 },
+                    'b': { avail: 90 },
+                    'c': { avail: 89.99999 }
+                });
+                i.getProbe.withArgs('http_kbps').returns({
+                    'a': {},
+                    'b': {},
+                    'c': { http_kbps: 4000 }
+                });
+                i.getProbe.withArgs('http_rtt').returns({
+                    'a': {},
+                    'b': {},
+                    'c': { http_rtt: 200 }
+                });
+                i.get_random.returns(0.0101);
+            },
+            verify: function(i) {
+                deepEqual(
+                    i.respond.args,
+                    [
+                        [
+                            'a',
+                            'a.com'
+                        ]
+                    ],
+                    'Verifying respond'
+                );
+                deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
+                deepEqual(i.setReasonCode.args, [ [ 'C2' ] ], 'Verifying setReasonCode');
             }
         }
     ));

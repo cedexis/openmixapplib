@@ -18,6 +18,22 @@ function OpenmixApplication() {
         }
     };
 
+    // Reason codes:
+    // A1: Best performing platform selected by KBPS
+    // A2: Only one available provider with KBPS data
+
+    // Best performing selected by RTT
+    // B1: Select provider with the fastest RTT that also has KBPS data
+    // B2: No KBPS data but we do have RTT to work with
+
+    // Data problems (selected randomly)
+    // C1: No KBPS or RTT data
+    // C2: No available providers with KBPS data
+
+    // Limited availability
+    // D1: Selected most available
+    // D2: No availability data (selected randomly)
+
     this.avail_threshold = 90.0;
     this.tie_threshold = 0.95;
     this.ttl = 20;
@@ -48,7 +64,8 @@ function OpenmixApplication() {
             rtt_candidates,
             selected_alias,
             reason,
-            avail_threshold = this.avail_threshold;
+            avail_threshold = this.avail_threshold,
+            cname_override = '';
 
         function sort_fun(left, right) {
             if (left[1] < right[1]) {
@@ -73,7 +90,7 @@ function OpenmixApplication() {
         function get_most_available() {
             var result = [], i;
             for (i in avail) {
-                if (avail.hasOwnProperty(i)) {
+                if (avail.hasOwnProperty(i) && avail[i]) {
                     result.push([ i, avail[i] ]);
                 }
             }
@@ -102,6 +119,9 @@ function OpenmixApplication() {
         }
 
         function empty(obj) {
+            if ('[object Array]' === Object.prototype.toString.call(obj)) {
+                return 1 > obj.length;
+            }
             return 1 > Object.keys(obj).length;
         }
 
@@ -124,9 +144,21 @@ function OpenmixApplication() {
                 random_int = Math.floor(that.get_random() * (max - min + 1)) + min;
             //console.log('Random int: ' + random_int);
             return aliases[random_int];
-        };
+        }
 
-        avail = request.getProbe('avail');
+        function flatten(obj, property) {
+            var result = {}, i;
+            for (i in obj) {
+                if (obj.hasOwnProperty(i)) {
+                    if (obj[i].hasOwnProperty(property) && obj[i][property]) {
+                        result[i] = obj[i][property];
+                    }
+                }
+            }
+            return result;
+        }
+
+        avail = flatten(request.getProbe('avail'), 'avail');
 
         // First figure out the available platforms
         candidates = properties_array(avail, function(i) {
@@ -137,15 +169,17 @@ function OpenmixApplication() {
         if (1 >= candidates.length) {
             // If one or fewer candidates are available, then select the least bad
             avail_candidates = get_most_available();
+            //console.log('Sorted availability: ' + JSON.stringify(avail_candidates));
             if (0 < avail_candidates.length) {
                 selected_alias = avail_candidates[0][0];
+                reason = 'D1';
             } else {
                 selected_alias = select_random(this);
+                reason = 'D2';
             }
-            reason = 'D';
         } else {
-            kbps = request.getProbe('http_kbps');
-            rtt = request.getProbe('http_rtt');
+            kbps = flatten(request.getProbe('http_kbps'), 'http_kbps');
+            rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
             //console.log('Raw KBPS data: ' + JSON.stringify(kbps));
             //console.log('Raw RTT data: ' + JSON.stringify(rtt));
             if (!empty(kbps)) {
@@ -162,16 +196,22 @@ function OpenmixApplication() {
                         rtt_candidates.sort(sort_fun);
                         //console.log('RTT (sorted): ' + JSON.stringify(rtt_candidates));
                         selected_alias = rtt_candidates[0][0];
-                        reason = 'B';
+                        reason = 'B1';
                     } else {
-                        //console.log('Not a tie or only one provider with KBPS data available');
+                        //console.log('Not a tie');
                         //console.log('Selecting the provider with the fastest KBPS score');
                         selected_alias = kbps_candidates[0][0];
-                        reason = 'A';
+                        //console.log(kbps_candidates[0]);
+                        reason = 'A1';
                     }
+                } else if (1 === kbps_candidates.length) {
+                    //console.log('Only one available provider with KBPS data');
+                    selected_alias = kbps_candidates[0][0];
+                    reason = 'A2';
                 } else {
-                    selected_alias = candidates[0];
-                    reason = 'A';
+                    //console.log('No available providers with KBPS data');
+                    selected_alias = select_random(this);
+                    reason = 'C2';
                 }
             } else if (!empty(rtt)) {
                 //console.log('No KBPS data but we do have RTT to work with');
@@ -180,14 +220,14 @@ function OpenmixApplication() {
                 rtt_candidates.sort(sort_fun);
                 //console.log('RTT (sorted): ' + JSON.stringify(rtt_candidates));
                 selected_alias = rtt_candidates[0][0];
-                reason = 'B';
+                reason = 'B2';
             } else {
                 selected_alias = select_random(this);
-                reason = 'C';
+                reason = 'C1';
             }
         }
 
-        response.respond(selected_alias, this.providers[selected_alias].cname);
+        response.respond(selected_alias, cname_override || this.providers[selected_alias].cname);
         response.setTTL(this.ttl);
         response.setReasonCode(reason);
         //console.log(this.providers);
