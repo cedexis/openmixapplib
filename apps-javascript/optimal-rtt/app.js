@@ -186,7 +186,7 @@ handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced
     // `alias` is the Openmix alias set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
-    // `padding` is a penalty (or bones) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
+    // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
     providers: [
         {
             alias: 'foo',
