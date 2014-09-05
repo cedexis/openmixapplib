@@ -135,11 +135,15 @@ function OpenmixApplication(settings) {
         if (!decision_provider) {
             // Get the RTT scores, transformed and filtered for use
             rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
+            // rtt now maps provider alias to round-trip time
             rtt = add_rtt_padding(rtt);
+            // rtt now contains scores with penalties/bonuses applied
             rtt = object_to_tuples_array(rtt);
+            // rtt is now a multi-dimensional array; [ [alias, score], [alias, score] ]
             rtt = rtt.filter(function(tuple) {
                 return -1 < candidates.indexOf(tuple[0]);
             });
+            // rtt now only contains those providers that meet the availability threshold
             rtt.sort(function(left, right) {
                 if (left[1] < right[1]) {
                     return -1;
@@ -149,6 +153,7 @@ function OpenmixApplication(settings) {
                 }
                 return 0;
             });
+            // rtt is now sorted in ascending order of round-trip time
             //console.log('rtt: ' + JSON.stringify(rtt));
 
             if (0 < rtt.length) {
