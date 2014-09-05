@@ -203,7 +203,7 @@ handler = new OpenmixApplication({
         {
             alias: 'bar',
             cname: 'www.bar.com',
-            padding: -70
+            padding: 0
         },
         {
             alias: 'baz',
