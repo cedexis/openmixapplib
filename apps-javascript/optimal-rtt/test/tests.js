@@ -381,7 +381,7 @@
             equal(i.respond.args[0][0], 'bar', 'Verifying selected alias');
             equal(i.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.setReasonCode.args[0][0], 'EA', 'Verifying reason code');
+            equal(i.setReasonCode.args[0][0], 'E,A', 'Verifying reason code');
         }
     }));
 
@@ -434,7 +434,7 @@
             equal(i.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.setReasonCode.args[0][0], 'EHB', 'Verifying reason code');
+            equal(i.setReasonCode.args[0][0], 'E,H,B', 'Verifying reason code');
         }
     }));
 
@@ -501,7 +501,7 @@
             equal(i.respond.args[0][0], 'blah', 'Verifying selected alias');
             equal(i.respond.args[0][1], 'www.blah.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.setReasonCode.args[0][0], 'EHA', 'Verifying reason code');
+            equal(i.setReasonCode.args[0][0], 'E,H,A', 'Verifying reason code');
         }
     }));
 

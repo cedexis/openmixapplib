@@ -25,10 +25,10 @@ function OpenmixApplication(settings) {
         var avail,
             candidates,
             rtt,
-            provider,
-            reasons,
-            current_reasons = [],
-            override_ttl;
+            all_reasons,
+            decision_provider,
+            decision_reasons = [],
+            decision_ttl;
 
         function provider_from_alias(alias) {
             var i;
@@ -86,7 +86,7 @@ function OpenmixApplication(settings) {
             return result;
         }
 
-        reasons = {
+        all_reasons = {
             optimum_server_chosen: 'A',
             no_available_servers: 'B',
             geo_override_on_country: 'C',
@@ -110,85 +110,77 @@ function OpenmixApplication(settings) {
             if (settings.country_to_provider[request.country]) {
                 if (-1 < candidates.indexOf(settings.country_to_provider[request.country])) {
                     // Override based on the request country
-                    provider = provider_from_alias(settings.country_to_provider[request.country]);
-                    response.respond(provider.alias, provider.cname);
-                    response.setTTL(settings.default_ttl);
-                    response.setReasonCode(reasons.geo_override_on_country);
-                    return;
+                    decision_provider = provider_from_alias(settings.country_to_provider[request.country]);
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(all_reasons.geo_override_on_country);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_override_not_available_country);
                 }
-                current_reasons.push(reasons.geo_override_not_available_country);
-                override_ttl = settings.error_ttl;
             }
 
-            if (settings.market_to_provider[request.market]) {
-                if (-1 < candidates.indexOf(settings.market_to_provider[request.market])) {
-                    // Override based on the request market
-                    provider = provider_from_alias(settings.market_to_provider[request.market]);
-                    response.respond(provider.alias, provider.cname);
-                    response.setTTL(settings.default_ttl);
-                    response.setReasonCode(reasons.geo_override_on_market);
-                    return;
+            if (!decision_provider) {
+                if (settings.market_to_provider[request.market]) {
+                    if (-1 < candidates.indexOf(settings.market_to_provider[request.market])) {
+                        // Override based on the request market
+                        decision_provider = provider_from_alias(settings.market_to_provider[request.market]);
+                        decision_ttl = decision_ttl || settings.default_ttl;
+                        decision_reasons.push(all_reasons.geo_override_on_market);
+                    } else {
+                        decision_ttl = decision_ttl || settings.error_ttl;
+                        decision_reasons.push(all_reasons.geo_override_not_available_market);
+                    }
                 }
-                current_reasons.push(reasons.geo_override_not_available_market);
-                override_ttl = settings.error_ttl;
             }
         }
 
-        // Get the RTT scores, transformed and filtered for use
-        rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
-        rtt = add_rtt_padding(rtt);
-        rtt = object_to_tuples_array(rtt);
-        rtt = rtt.filter(function(tuple) {
-            return -1 < candidates.indexOf(tuple[0]);
-        });
-        rtt.sort(function(left, right) {
-            if (left[1] < right[1]) {
-                return -1;
-            }
-            if (left[1] > right[1]) {
-                return 1;
-            }
-            return 0;
-        });
-        //console.log('rtt: ' + JSON.stringify(rtt));
+        if (!decision_provider) {
+            // Get the RTT scores, transformed and filtered for use
+            rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
+            rtt = add_rtt_padding(rtt);
+            rtt = object_to_tuples_array(rtt);
+            rtt = rtt.filter(function(tuple) {
+                return -1 < candidates.indexOf(tuple[0]);
+            });
+            rtt.sort(function(left, right) {
+                if (left[1] < right[1]) {
+                    return -1;
+                }
+                if (left[1] > right[1]) {
+                    return 1;
+                }
+                return 0;
+            });
+            //console.log('rtt: ' + JSON.stringify(rtt));
 
-        if (0 < rtt.length) {
-            provider = provider_from_alias(rtt[0][0]);
-            response.respond(provider.alias, provider.cname);
-            response.setTTL(override_ttl || settings.default_ttl);
-            current_reasons.push(reasons.optimum_server_chosen);
-            response.setReasonCode(current_reasons.join(''));
-            return;
-        }
-
-        if (settings.geo_default) {
-            if (settings.country_to_provider[request.country]) {
-                // Default based on the request country
-                provider = provider_from_alias(settings.country_to_provider[request.country]);
-                response.respond(provider.alias, provider.cname);
-                response.setTTL(settings.error_ttl);
-                current_reasons.push(reasons.geo_default_on_country);
-                response.setReasonCode(current_reasons.join(''));
-                return;
-            }
-
-            if (settings.market_to_provider[request.market]) {
-                // Default based on the request market
-                provider = provider_from_alias(settings.market_to_provider[request.market]);
-                response.respond(provider.alias, provider.cname);
-                response.setTTL(settings.error_ttl);
-                current_reasons.push(reasons.geo_default_on_market);
-                response.setReasonCode(current_reasons.join(''));
-                return;
+            if (0 < rtt.length) {
+                decision_provider = provider_from_alias(rtt[0][0]);
+                decision_reasons.push(all_reasons.optimum_server_chosen);
+                decision_ttl = decision_ttl || settings.default_ttl;
+            } else if (settings.geo_default) {
+                if (settings.country_to_provider[request.country]) {
+                    // Default based on the request country
+                    decision_provider = provider_from_alias(settings.country_to_provider[request.country]);
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_default_on_country);
+                } else if (settings.market_to_provider[request.market]) {
+                    // Default based on the request market
+                    decision_provider = provider_from_alias(settings.market_to_provider[request.market]);
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_default_on_market);
+                }
             }
         }
 
-        // If we get here, select the default provider
-        provider = provider_from_alias(settings.default_provider);
-        response.respond(provider.alias, provider.cname);
-        response.setTTL(settings.error_ttl);
-        current_reasons.push(reasons.no_available_servers);
-        response.setReasonCode(current_reasons.join(''));
+        if (!decision_provider) {
+            decision_provider = provider_from_alias(settings.default_provider);
+            decision_ttl = decision_ttl || settings.error_ttl;
+            decision_reasons.push(all_reasons.no_available_servers);
+        }
+
+        response.respond(decision_provider.alias, decision_provider.cname);
+        response.setTTL(decision_ttl);
+        response.setReasonCode(decision_reasons.join(','));
     };
 }
 
