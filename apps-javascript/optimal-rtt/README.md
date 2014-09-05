@@ -97,7 +97,14 @@ an installer from [nodejs.org](http://nodejs.org/download/).  Or via
 
 With Homebrew,
 
-    brew install node
+    $ brew install node
+
+### On Linux (Ubuntu)
+
+Installing on Ubuntu is simple, but requires an extra package that users
+sometimes miss:
+
+    $ sudo apt-get install nodejs nodejs-legacy
 
 ## Installing Karma and other dependencies
 
