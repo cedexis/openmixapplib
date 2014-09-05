@@ -51,7 +51,7 @@ most runtime conditions.
 Unit tests are found in the test/tests.js file.
 
 There are two different ways to execute the unit tests.  The simplest is to open
-the test/test.html file in your browser (e.g. file:///<path to test/test.html>).
+the test/test.html file in your browser (e.g. file:///path/to/test/test.html).
 Google Chrome works well for this.  You can use the Chrome Developer Tools to
 debug any failed tests.
 
