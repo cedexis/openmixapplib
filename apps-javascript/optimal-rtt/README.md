@@ -3,7 +3,13 @@ Optimal Round-Trip Time
 
 # Description
 
-Blah blah blah
+This application template provides load-balancing between multiple providers
+based on optimal round-trip time.  Optional features:
+
+* Performance penalty - You can assign an optional penalty (or bonus) to each
+  provider as a percentage of the actual score.
+
+* Geo Override - You can map specific providers to countries and market.  Country
 
 # Validating the Code
 
