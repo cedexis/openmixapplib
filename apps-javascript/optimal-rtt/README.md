@@ -1,11 +1,11 @@
-Openmix Application Template
-============================
+Optimal Round-Trip Time
+=======================
 
-Description
------------
+# Description
 
-Validating the Code
--------------------
+Blah blah blah
+
+# Validating the Code
 
 The validate-js.sh script looks for possible errors in the application and test
 code.  You must have Java installed for it to run.  It executes both the Google
@@ -29,8 +29,7 @@ statement.  We'd want to fix these issues before uploading the Openmix app.
 
     jslint:app.js:17:13:'console' was used before it was defined.
 
-Running Unit Tests
-------------------
+# Running Unit Tests
 
 Unit tests are a great way to make sure your application runs properly.  Given
 an adequate understanding of the Openmix API, you can write tests to simulate
@@ -85,29 +84,24 @@ Runner.  Here's an example:
 
     All unit tests passed
 
-Installing Node.js and npm
---------------------------
+## Installing Node.js and npm
 
-On Mac OS X:
+Node.js is used by Karma Runner to run and execute your test code.  It is
+installed using **npm**, the package manager for Node.js.
 
-First install Homebrew
+### On Mac OS X
 
-https://github.com/Homebrew/homebrew/blob/master/README.md
+There are two good options for installing Node on Mac OS X.  You can download
+an installer from [nodejs.org](http://nodejs.org/download/).  Or via
+[Homebrew](https://github.com/Homebrew/homebrew/blob/master/README.md).
 
-Install Node.js:
+With Homebrew,
 
-Install Karma:
+    brew install node
+
+## Installing Karma and other dependencies
+
+The project directory contains a package.json file, which npm uses to download
+and install software locally.  From the directory containing package.json:
 
     $ npm install
-
-Validate application and test JavaScript:
-
-    $ ./validate-js.sh
-
-Run unit tests from command line:
-
-    $ ./run-tests.sh
-
-Run the unit tests in a browser (preferabley Chrome):
-
-    file:///<path to test dir>/test.html
