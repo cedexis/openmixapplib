@@ -9,7 +9,14 @@ based on optimal round-trip time.  Optional features:
 * Performance penalty - You can assign an optional penalty (or bonus) to each
   provider as a percentage of the actual score.
 
-* Geo Override - You can map specific providers to countries and market.  Country
+* Geo Override - You can map specific providers to countries and markets.  If it
+  matches the request's geo information to a mapped provider, the application
+  will select it as long as it meets the availability threshold.  Country
+  mappings take precedence over market mappings.
+
+* Geo Default - In the event that an optimal provider cannot be selected based
+  on round-trip time, the application can use the country and market mappings to
+  choose a default provider based on the request's geo information.
 
 # Validating the Code
 
