@@ -55,10 +55,10 @@ the test/test.html file in your browser (e.g. file:///path/to/test/test.html).
 Google Chrome works well for this.  You can use the Chrome Developer Tools to
 debug any failed tests.
 
-Another way to run the unit tests on the command line using Karma Runner and
-PhantomJS.  This requires that you have Node.js and npm installed.  It's a
-little work to set up, but probably worthwhile in the long run if you anticipate
-writing a lot of Openmix code.
+Another way to run the unit tests is on the command line using Karma Runner and
+PhantomJS.  This requires that you have Node.js installed.  It's a little more
+work to set up, but probably worthwhile in the long run if you anticipate writing
+a lot of Openmix code.
 
 You can run the run-tests.sh script provided to executes the tests in Karma
 Runner.  Here's an example:
