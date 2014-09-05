@@ -1,5 +1,3 @@
-/*global
-*/
 
 var handler;
 
@@ -185,7 +183,10 @@ function OpenmixApplication(settings) {
 }
 
 handler = new OpenmixApplication({
-    // provider padding is in percent, e.g. 10 = 10% slower (score * 1.1)
+    // `providers` contains a list of the providers to be load-balanced
+    // `alias` is the Openmix alias set in the Portal
+    // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
+    // `padding` is a penalty (or bones) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
     providers: [
         {
             alias: 'foo',
@@ -208,13 +209,21 @@ handler = new OpenmixApplication({
             padding: 0
         }
     ],
+    // The minimum availability score that providers must have in order to be considered available
     availability_threshold: 90,
+    // A mapping of ISO 3166-1 country codes to provider aliases
     country_to_provider: {},
+    // A mapping of market codes to provider aliases
     market_to_provider: {},
+    // Set to `true` to enable the geo override feature
     geo_override: false,
+    // Set to `true` to enable the geo default feature
     geo_default: false,
+    // Selected if an optimal provider can't be determined
     default_provider: 'foo',
+    // The TTL to be set when the application chooses an optimal provider, including geo override.
     default_ttl: 20,
+    // The TTL to be set when the application chooses a potentially non-optimal provider, e.g. default or geo default.
     error_ttl: 20
 });
 
