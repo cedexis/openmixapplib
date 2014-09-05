@@ -84,10 +84,9 @@ Runner.  Here's an example:
 
     All unit tests passed
 
-## Installing Node.js and npm
+## Installing Node.js
 
-Node.js is used by Karma Runner to run and execute your test code.  It is
-installed using **npm**, the package manager for Node.js.
+Node.js is used by Karma Runner to run and execute your test code.
 
 ### On Mac OS X
 
@@ -108,7 +107,10 @@ sometimes miss:
 
 ## Installing Karma and other dependencies
 
-The project directory contains a package.json file, which npm uses to download
-and install software locally.  From the directory containing package.json:
+With Node.js installed you can use *npm*, the package manager for Node.js, to
+install Karma Runner and other dependencies.  The project directory contains a
+package.json file, which npm uses to download and install software locally.
+
+From the directory containing package.json:
 
     $ npm install
