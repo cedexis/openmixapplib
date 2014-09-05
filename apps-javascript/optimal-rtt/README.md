@@ -60,7 +60,7 @@ PhantomJS.  This requires that you have Node.js installed.  It's a little more
 work to set up, but probably worthwhile in the long run if you anticipate writing
 a lot of Openmix code.
 
-You can run the run-tests.sh script provided to executes the tests in Karma
+You can run the run-tests.sh script provided to execute the tests in Karma
 Runner.  Here's an example:
 
     $ ./run-tests.sh
@@ -113,7 +113,7 @@ With Homebrew,
 
 ### On Linux (Ubuntu)
 
-Installing on Ubuntu is simple, but requires an extra package that users
+Installing Node.js on Ubuntu is simple, but requires an extra package that users
 sometimes miss:
 
     $ sudo apt-get install nodejs nodejs-legacy
