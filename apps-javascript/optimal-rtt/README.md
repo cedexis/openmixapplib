@@ -1,6 +1,99 @@
 Openmix Application Template
 ============================
 
+Description
+-----------
+
+Validating the Code
+-------------------
+
+The validate-js.sh script looks for possible errors in the application and test
+code.  You must have Java installed for it to run.  It executes both the Google
+Closure compiler and JSLint (jslint4java).
+
+Here's an example where Google Closure compiler detects a misspelled property
+name, and JSLint detects that we forgot to comment-out a console print
+statement.  We'd want to fix these issues before uploading the Openmix app.
+
+    $ ./validate-js.sh
+
+    Validating with Google Closure Compiler
+
+    app.js:171: WARNING - Property geo_default_on_marketasdf never defined on all_reasons
+                        decision_reasons.push(all_reasons.geo_default_on_marketasdf);
+                                              ^
+
+    0 error(s), 1 warning(s), 65.1% typed
+
+    Validating with JSLint
+
+    jslint:app.js:17:13:'console' was used before it was defined.
+
+Running Unit Tests
+------------------
+
+Unit tests are a great way to make sure your application runs properly.  Given
+an adequate understanding of the Openmix API, you can write tests to simulate
+most runtime conditions.
+
+Unit tests are found in the test/tests.js file.
+
+There are two different ways to execute the unit tests.  The simplest is to open
+the test/test.html file in your browser (e.g. file:///<path to test/test.html>).
+Google Chrome works well for this.  You can use the Chrome Developer Tools to
+debug any failed tests.
+
+Another way to run the unit tests on the command line using Karma Runner and
+PhantomJS.  This requires that you have Node.js and npm installed.  It's a
+little work to set up, but probably worthwhile in the long run if you anticipate
+writing a lot of Openmix code.
+
+You can run the run-tests.sh script provided to executes the tests in Karma
+Runner.  Here's an example:
+
+    $ ./run-tests.sh
+
+    Running Openmix application unit tests
+
+    INFO [karma]: Karma v0.10.10 server started at http://localhost:9876/
+    INFO [launcher]: Starting browser PhantomJS
+    INFO [PhantomJS 1.9.7 (Mac OS X)]: Connected on socket KHoK6W4HH8YDwj9EHCSk
+    LOG: Object{requireProvider: requireProvider}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    PhantomJS 1.9.7 (Mac OS X): Executed 12 of 12 SUCCESS (0.075 secs / 0.017 secs)
+
+    All unit tests passed
+
+Installing Node.js and npm
+--------------------------
+
+On Mac OS X:
+
+First install Homebrew
+
+https://github.com/Homebrew/homebrew/blob/master/README.md
+
 Install Node.js:
 
 Install Karma:
