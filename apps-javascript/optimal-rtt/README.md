@@ -1,7 +1,6 @@
-Optimal Round-Trip Time
-=======================
+# Optimal Round-Trip Time
 
-# Description
+## Description
 
 This application template provides load-balancing between multiple providers
 based on optimal round-trip time.  Optional features:
@@ -18,7 +17,7 @@ based on optimal round-trip time.  Optional features:
   on round-trip time, the application can use the country and market mappings to
   choose a default provider based on the request's geo information.
 
-# Validating the Code
+## Validating the Code
 
 The validate-js.sh script looks for possible errors in the application and test
 code.  You must have Java installed for it to run.  It executes both the Google
@@ -42,7 +41,7 @@ statement.  We'd want to fix these issues before uploading the Openmix app.
 
     jslint:app.js:17:13:'console' was used before it was defined.
 
-# Running Unit Tests
+## Running Unit Tests
 
 Unit tests are a great way to make sure your application runs properly.  Given
 an adequate understanding of the Openmix API, you can write tests to simulate
@@ -97,11 +96,11 @@ Runner.  Here's an example:
 
     All unit tests passed
 
-## Installing Node.js
+### Installing Node.js
 
 Node.js is used by Karma Runner to run and execute your test code.
 
-### On Mac OS X
+#### On Mac OS X
 
 There are two good options for installing Node on Mac OS X.  You can download
 an installer from [nodejs.org](http://nodejs.org/download/).  Or via
@@ -111,14 +110,14 @@ With Homebrew,
 
     $ brew install node
 
-### On Linux (Ubuntu)
+#### On Linux (Ubuntu)
 
 Installing Node.js on Ubuntu is simple, but requires an extra package that users
 sometimes miss:
 
     $ sudo apt-get install nodejs nodejs-legacy
 
-## Installing Karma and other dependencies
+### Installing Karma and other dependencies
 
 With Node.js installed you can use *npm*, the package manager for Node.js, to
 install Karma Runner and other dependencies.  The project directory contains a
