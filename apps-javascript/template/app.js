@@ -1,9 +1,11 @@
 
 var handler;
 
+/** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
 
+    /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
         var i;
         if (settings.providers) {
@@ -13,6 +15,10 @@ function OpenmixApplication(settings) {
         }
     };
 
+    /**
+     * @param {OpenmixRequest} request
+     * @param {OpenmixResponse} response
+     */
     this.handle_request = function(request, response) {
         function flatten(obj, property) {
             var result = {}, i;
