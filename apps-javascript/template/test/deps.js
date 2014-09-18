@@ -13,6 +13,7 @@ function OpenmixRequest() {
 }
 
 OpenmixRequest.prototype.getProbe = function(probe_type) {};
+OpenmixRequest.prototype.getData = function(feed_name) {};
 
 /** @constructor */
 function OpenmixResponse() {}
