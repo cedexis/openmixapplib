@@ -17,7 +17,7 @@
             {
                 alias: 'foo',
                 cname: 'www.foo.com',
-                base_padding: 0
+                base_padding: 50
             },
             {
                 alias: 'bar',
@@ -26,7 +26,8 @@
             },
             {
                 alias: 'baz',
-                cname: 'www.baz.com'
+                cname: 'www.baz.com',
+                base_padding: 0
             }
         ],
         burstable_cdns: {
@@ -182,7 +183,7 @@
         }
     }));
 
-    test('foo fastest after padding', test_handle_request({
+    test('baz fastest after padding', test_handle_request({
         setup: function(i) {
             i.request
                 .getProbe
@@ -231,8 +232,8 @@
                 });
         },
         verify: function(i) {
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
         }

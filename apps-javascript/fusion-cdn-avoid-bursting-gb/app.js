@@ -116,12 +116,17 @@ function OpenmixApplication(settings) {
         }
 
         function add_rtt_padding(data) {
-            var result = {}, i, j, usage_value, current, padding_pct, padding, hit_threshold;
+            var result = {}, i, j, usage_value, current, padding_pct, padding, hit_threshold, provider, base_padding;
             for (i in data.rtt) {
                 if (data.rtt.hasOwnProperty(i)) {
                     if (settings.burstable_cdns[i]) {
                         //console.log(data.fusion[i]);
                         //console.log(data.rtt[i]);
+                        provider = provider_from_alias(i);
+                        base_padding = 0;
+                        if (undefined !==  provider.base_padding) {
+                            base_padding = provider.base_padding;
+                        }
 
                         if (data.fusion[i] && data.fusion[i].usage && data.fusion[i].usage.value && settings.burstable_cdns[i].gb) {
                             usage_value = parseFloat(data.fusion[i].usage.value);
@@ -141,20 +146,20 @@ function OpenmixApplication(settings) {
                                 //console.log('padding_pct: ' + padding_pct);
                                 padding = 1 + padding_pct / 100;
                                 //console.log('padding: ' + padding);
-                                result[i] = padding * data.rtt[i];
+                                result[i] = base_padding + padding * data.rtt[i];
                             } else {
-                                result[i] = data.rtt[i];
+                                result[i] = base_padding + data.rtt[i];
                             }
                         } else {
                             // No padding, but note the reason
-                            result[i] = data.rtt[i];
+                            result[i] = base_padding + data.rtt[i];
                             if (-1 === decision_reasons.indexOf(reasons.missing_usage_data)) {
                                 decision_reasons.push(reasons.missing_usage_data);
                             }
                         }
                     } else {
                         // Not concerned about bursting for this provider
-                        result[i] = data.rtt[i];
+                        result[i] = base_padding + data.rtt[i];
                     }
                 }
             }

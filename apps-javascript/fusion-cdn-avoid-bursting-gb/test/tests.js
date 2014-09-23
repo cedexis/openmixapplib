@@ -22,7 +22,7 @@
             {
                 alias: 'bar',
                 cname: 'www.bar.com',
-                base_padding: 0
+                base_padding: 10
             },
             {
                 alias: 'baz',
@@ -121,7 +121,7 @@
         };
     }
 
-    test('foo faster; bar fastest after padding', test_handle_request({
+    test('bar fastest after padding', test_handle_request({
         setup: function(i) {
             i.request
                 .getProbe
@@ -145,7 +145,7 @@
                         "http_rtt": 200
                     },
                     "bar": {
-                        "http_rtt": 201
+                        "http_rtt": 190
                     },
                     "baz": {
                         "http_rtt": 220
