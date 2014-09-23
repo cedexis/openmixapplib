@@ -1,16 +1,15 @@
-# Openmix Application Template
+# Avoid CDN Bursting Using Fusion GB Data
 
 ## Description
 
-This template can be used as a starting point for Openmix applications.
-
 Application features:
 
-* TODO
+* Specify one or more CDNs for which to consider Fusion usage data.
 
-* TODO
+* Specify multiple thresholds in order to scale the effect of RTT padding as CDN
+  usage increases.
 
-* TODO
+* Random selection when Radar data is sparse.
 
 ## Validating the Code
 
