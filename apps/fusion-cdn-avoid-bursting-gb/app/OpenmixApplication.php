@@ -49,20 +49,20 @@ class OpenmixApplication implements Lifecycle {
         $config->declareInput(
             RadarProbeTypes::HTTP_RTT,
             implode(',', array_keys($this->providers)));
-        
+
         $config->declareInput(
             RadarProbeTypes::AVAILABILITY,
             implode(',', array_keys($this->providers)));
-        
+
         foreach ($this->providers as $alias => $providerSettings) {
             $config->declareResponseOption($alias, $providerSettings['cname'], $this->ttl);
         }
-        
+
         foreach ($this->reasons as $code) {
             $config->declareReasonCode($code);
         }
     }
-    
+
     /**
      * @param Request $request
      * @param Response $response
@@ -107,7 +107,7 @@ class OpenmixApplication implements Lifecycle {
                     $candidates[$i] = $candidates[$i] * $padding;
                 }
                 //print("\ncandidates: " . print_r($candidates, true));
-                
+
                 // Select the best performing provider that meets its minimum
                 // availability score, if given
                 asort($candidates);
