@@ -26,7 +26,8 @@ function OpenmixApplication(settings) {
             all_reasons,
             decision_provider,
             decision_reasons = [],
-            decision_ttl;
+            decision_ttl,
+            override_cname;
 
         function provider_from_alias(alias) {
             var i;
@@ -181,13 +182,13 @@ function OpenmixApplication(settings) {
             decision_reasons.push(all_reasons.no_available_servers);
         }
 
-        if (settings.conditional_hostname[request.country]) {
+        if (settings.conditional_hostname && settings.conditional_hostname[request.country]) {
             // Confirm and translate the ISO country code to the numeric identifier
             // and append to the front of the provider cname
-            decision_provider.cname = settings.conditional_hostname[request.country] + '.' +  decision_provider.cname;
+            override_cname = settings.conditional_hostname[request.country] + '.' +  decision_provider.cname;
         }
 
-        response.respond(decision_provider.alias, decision_provider.cname);
+        response.respond(decision_provider.alias, override_cname || decision_provider.cname);
         response.setTTL(decision_ttl);
         response.setReasonCode(decision_reasons.join(','));
     };
