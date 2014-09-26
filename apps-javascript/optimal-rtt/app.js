@@ -182,10 +182,10 @@ function OpenmixApplication(settings) {
             decision_reasons.push(all_reasons.no_available_servers);
         }
 
-        if (settings.conditional_hostname && settings.conditional_hostname[request.country]) {
+        if (settings.conditional_hostname && settings.conditional_hostname[request.hostname_prefix]) {
             // Confirm and translate the ISO country code to the numeric identifier
             // and append to the front of the provider cname
-            override_cname = settings.conditional_hostname[request.country] + '.' +  decision_provider.cname;
+            override_cname = settings.conditional_hostname[request.hostname_prefix] + '.' +  decision_provider.cname;
         }
 
         response.respond(decision_provider.alias, override_cname || decision_provider.cname);
