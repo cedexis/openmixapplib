@@ -238,12 +238,16 @@ handler = new OpenmixApplication({
      * The solution is to dynamically construct the resulting hostname in the
      * application as in this example, which routes traffic to the available
      * platform with the lowest response time.
+     *
+     * Example configuration:
+     *
+     * conditional_hostname: {
+     *     'DE': '123',
+     *     'UK': '456',
+     *     'ES': '789'
+     * },
      */
-    conditional_hostname: {
-        'DE': '123',
-        'UK': '456',
-        'ES': '789'
-    },
+    conditional_hostname: {},
     // Set to `true` to enable the geo override feature
     geo_override: false,
     // Set to `true` to enable the geo default feature
