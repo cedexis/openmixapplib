@@ -114,6 +114,7 @@
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
+            conditional_hostname: {},
             geo_override: false,
             geo_default: false,
             default_provider: 'foo',
@@ -144,6 +145,59 @@
         }
     }));
 
+    test('foo fastest conditional hostname', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'bar.com',
+                    padding: 0
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {
+                'DE': '123',
+                'UK': '456',
+                'ES': '789'
+            },
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 200 },
+                bar: { http_rtt: 201 }
+            });
+            i.request.country = 'UK';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.respond.args[0][1], '456.foo.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
     test('foo fastest after padding', test_handle_request({
         settings: {
             providers: [
@@ -161,6 +215,7 @@
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
+            conditional_hostname: {},
             geo_override: false,
             geo_default: false,
             default_provider: 'foo',
@@ -208,6 +263,7 @@
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
+            conditional_hostname: {},
             geo_override: false,
             geo_default: false,
             default_provider: 'foo',
@@ -257,6 +313,7 @@
                 'NA': 'bar'
             },
             country_to_provider: {},
+            conditional_hostname: {},
             geo_override: true,
             geo_default: false,
             default_provider: 'foo',
@@ -306,6 +363,7 @@
             country_to_provider: {
                 'US': 'foo'
             },
+            conditional_hostname: {},
             geo_override: true,
             geo_default: false,
             default_provider: 'foo',
@@ -353,6 +411,7 @@
                 'US': 'foo'
             },
             market_to_provider: {},
+            conditional_hostname: {},
             geo_override: true,
             geo_default: false,
             default_provider: 'foo',
@@ -406,6 +465,7 @@
             market_to_provider: {
                 'NA': 'bar'
             },
+            conditional_hostname: {},
             geo_override: true,
             geo_default: false,
             default_provider: 'foo',
@@ -469,6 +529,7 @@
             market_to_provider: {
                 'NA': 'bar'
             },
+            conditional_hostname: {},
             geo_override: true,
             geo_default: false,
             default_provider: 'foo',
@@ -524,6 +585,7 @@
                 'NA': 'bar'
             },
             country_to_provider: {},
+            conditional_hostname: {},
             geo_override: false,
             geo_default: true,
             default_provider: 'foo',
@@ -577,6 +639,7 @@
             country_to_provider: {
                 'US': 'foo'
             },
+            conditional_hostname: {},
             geo_override: false,
             geo_default: true,
             default_provider: 'foo',
@@ -636,6 +699,7 @@
             availability_threshold: 90,
             country_to_provider: {},
             market_to_provider: {},
+            conditional_hostname: {},
             geo_override: false,
             geo_default: false,
             default_provider: 'foo',

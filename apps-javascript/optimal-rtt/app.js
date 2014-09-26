@@ -181,6 +181,12 @@ function OpenmixApplication(settings) {
             decision_reasons.push(all_reasons.no_available_servers);
         }
 
+        if (settings.conditional_hostname[request.country]) {
+            // Confirm and translate the ISO country code to the numeric identifier
+            // and append to the front of the provider cname
+            decision_provider.cname = settings.conditional_hostname[request.country] + '.' +  decision_provider.cname;
+        }
+
         response.respond(decision_provider.alias, decision_provider.cname);
         response.setTTL(decision_ttl);
         response.setReasonCode(decision_reasons.join(','));
@@ -220,6 +226,23 @@ handler = new OpenmixApplication({
     country_to_provider: {},
     // A mapping of market codes to provider aliases
     market_to_provider: {},
+    // A mapping of ISO 3166-1 country to identifier (hostname prefix)
+    /**
+     * Some platforms use virtual-host specific hostnames, often for content
+     * localization, but you often want to centralize these into your Openmix
+     * script rather than creating many Openmix platforms. For example, imagine
+     * your website has the URLs http://<country>.example.com, where <country>
+     * is replaced with ISO codes.
+     *
+     * The solution is to dynamically construct the resulting hostname in the
+     * application as in this example, which routes traffic to the available
+     * platform with the lowest response time.
+     */
+    conditional_hostname: {
+        'DE': '123',
+        'UK': '456',
+        'ES': '789'
+    },
     // Set to `true` to enable the geo override feature
     geo_override: false,
     // Set to `true` to enable the geo default feature
