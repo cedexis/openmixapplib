@@ -184,6 +184,7 @@
                 bar: { http_rtt: 201 }
             });
             i.request.country = 'UK';
+            i.request.hostname_prefix = 'UK';
         },
         verify: function(i) {
             console.log(i);
