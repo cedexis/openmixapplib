@@ -737,4 +737,329 @@
         }
     }));
 
+    test('avoid by geo country (request from CN)', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                {
+                    alias: 'baz',
+                    cname: 'www.baz.com',
+                    padding: 0
+                },
+                {
+                    alias: 'qux',
+                    cname: 'www.qux.com',
+                    padding: 0,
+                    // Considered only in the following countries
+                    countries: [ 'CN' ]
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {},
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 201 },
+                qux: { http_rtt: 200 }
+            });
+            i.request.country = 'CN';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'qux', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.qux.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo country (request from US)', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                {
+                    alias: 'baz',
+                    cname: 'www.baz.com',
+                    padding: 0
+                },
+                {
+                    alias: 'qux',
+                    cname: 'www.qux.com',
+                    padding: 0,
+                    // Considered only in the following countries
+                    countries: [ 'CN' ]
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {},
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 200 },
+                baz: { http_rtt: 201 },
+                qux: { http_rtt: 100 }
+            });
+            i.request.country = 'US';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'bar', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo market (request from NA)', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                {
+                    alias: 'baz',
+                    cname: 'www.baz.com',
+                    padding: 0,
+                    // Considered only in the following markets
+                    markets: [ 'NA', 'SA' ]
+                },
+                {
+                    alias: 'qux',
+                    cname: 'www.qux.com',
+                    padding: 0
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {},
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 200 },
+                qux: { http_rtt: 200 }
+            });
+            i.request.market = 'NA';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'baz', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo market (request from SA)', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                {
+                    alias: 'baz',
+                    cname: 'www.baz.com',
+                    padding: 0,
+                    // Considered only in the following markets
+                    markets: [ 'NA', 'SA' ]
+                },
+                {
+                    alias: 'qux',
+                    cname: 'www.qux.com',
+                    padding: 0
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {},
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 200 },
+                qux: { http_rtt: 200 }
+            });
+            i.request.market = 'SA';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'baz', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo market (request from AS)', test_handle_request({
+        settings: {
+            providers: [
+                {
+                    alias: 'foo',
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                {
+                    alias: 'bar',
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                {
+                    alias: 'baz',
+                    cname: 'www.baz.com',
+                    padding: 0,
+                    // Considered only in the following markets
+                    markets: [ 'NA', 'SA' ]
+                },
+                {
+                    alias: 'qux',
+                    cname: 'www.qux.com',
+                    padding: 0
+                }
+            ],
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            conditional_hostname: {},
+            geo_override: false,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 200 },
+                qux: { http_rtt: 200 }
+            });
+            i.request.market = 'AS';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'qux', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.qux.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+        }
+    }));
+
 }());

@@ -101,6 +101,15 @@ function OpenmixApplication(settings) {
 
         // First figure out the available platforms
         candidates = properties_array(avail, function(i) {
+            var provider = provider_from_alias(i);
+            // Considered only in the provider countries
+            if (provider.countries && (0 > provider.countries.indexOf(request.country))) {
+                return false;
+            }
+            // Considered only in the provider markets
+            if (provider.markets && (0 > provider.markets.indexOf(request.market))) {
+                return false;
+            }
             return (avail[i] && (settings.availability_threshold <= avail[i]));
         });
         //console.log('available candidates: ' + JSON.stringify(candidates));
