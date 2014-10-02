@@ -118,12 +118,12 @@ function OpenmixApplication(settings) {
         function add_rtt_padding(data) {
             var result = {}, i, j, usage_value, current, padding_pct, padding, hit_threshold, provider, base_padding;
             for (i in data.rtt) {
+                base_padding = 0;
                 if (data.rtt.hasOwnProperty(i)) {
                     if (settings.burstable_cdns[i]) {
                         //console.log(data.fusion[i]);
                         //console.log(data.rtt[i]);
                         provider = provider_from_alias(i);
-                        base_padding = 0;
                         if (undefined !==  provider.base_padding) {
                             base_padding = provider.base_padding;
                         }
