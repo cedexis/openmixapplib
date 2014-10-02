@@ -1,5 +1,6 @@
 *.swp
 .DS_Store
+*~
 .gradle/1.3/taskArtifacts/cache.properties
 .gradle/1.3/taskArtifacts/cache.properties.lock
 .gradle/1.3/taskArtifacts/fileSnapshots.bin
