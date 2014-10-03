@@ -91,8 +91,10 @@ handler = new OpenmixApplication({
         }
     ],
     // A mapping of ISO 3166-1 country codes to provider aliases
+    //country_overrides: { 'UK': 'bar', 'ES': 'baz' },
     country_overrides: {},
     // A mapping of market codes to provider aliases
+    //market_to_provider: { 'EG': 'foo' }
     market_to_provider: {},
     // Selected if a provider can't be determined
     default_provider: 'foo',
