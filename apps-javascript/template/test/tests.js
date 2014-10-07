@@ -13,16 +13,14 @@
     'use strict';
 
     var default_settings = {
-        providers: [
-            {
-                alias: 'foo',
-                cname: 'www.foo.com'
+        providers: {
+            'foo': {
+                'cname': 'www.foo.com'
             },
-            {
-                alias: 'bar',
-                cname: 'www.bar.com'
+            'bar': {
+                'cname': 'www.bar.com'
             }
-        ],
+        },
         default_ttl: 20
     };
 
@@ -65,6 +63,9 @@
     function test_handle_request(i) {
         return function() {
             var sut,
+                config = {
+                    requireProvider: this.stub()
+                },
                 request = {
                     getProbe: this.stub()
                 },
@@ -81,6 +82,7 @@
             i.setup(test_stuff);
 
             sut = new OpenmixApplication(i.settings || default_settings);
+            sut.do_init(config);
 
             // Test
             sut.handle_request(request, response);

@@ -1,17 +1,17 @@
-
 var handler;
 
 /** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
 
+    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
-        var i;
-        if (settings.providers) {
-            for (i = 0; i < settings.providers.length; i += 1) {
-                config.requireProvider(settings.providers[i].alias);
-            }
+        var i = aliases.length;
+
+        while (i --) {
+            config.requireProvider(aliases[i]);
         }
     };
 
@@ -20,44 +20,64 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        function flatten(obj, property) {
-            var result = {}, i;
-            for (i in obj) {
-                if (obj.hasOwnProperty(i)) {
-                    if (obj[i].hasOwnProperty(property) && obj[i][property]) {
-                        result[i] = obj[i][property];
-                    }
-                }
-            }
-            return result;
-        }
-
-        function provider_from_alias(alias) {
-            var i;
-            for (i = 0; i < settings.providers.length; i += 1) {
-                if (alias === settings.providers[i].alias) {
-                    return settings.providers[i];
-                }
-            }
-            return null;
-        }
-
         // Application logic here
     };
 
+    /**
+     * @param {Object} object
+     * @param {Function} filter
+     */
+    function filter_object(object, filter) {
+        var keys = Object.keys(object),
+            i = keys.length,
+            key;
+
+        while (i --) {
+            key = keys[i];
+
+            if (!filter(object[key], key)) {
+                delete object[key];
+            }
+        }
+
+        return object;
+    }
+
+    /**
+     * @param {Object} source
+     * @param {String} property
+     */
+    function get_lowest(source, property) {
+        var keys = Object.keys(source),
+            i = keys.length,
+            key,
+            candidate,
+            min = Infinity,
+            value;
+
+        while (i --) {
+            key = keys[i];
+            value = source[key][property];
+
+            if (value < min) {
+                candidate = key;
+                min = value;
+            }
+        }
+
+        return candidate;
+    }
 }
 
 handler = new OpenmixApplication({
-    providers: [
-        {
-            alias: 'foo',
-            cname: 'www.foo.com'
+    providers: {
+        'foo': {
+            'cname': 'www.foo.com'
         },
-        {
-            alias: 'bar',
-            cname: 'www.bar.com'
+        'bar': {
+            'cname': 'www.bar.com'
         }
-    ],
+    },
     default_ttl: 20
 });
 
