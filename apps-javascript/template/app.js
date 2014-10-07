@@ -1,4 +1,24 @@
-var handler;
+var handler = new OpenmixApplication({
+    providers: {
+        'foo': {
+            'cname': 'www.foo.com'
+        },
+        'bar': {
+            'cname': 'www.bar.com'
+        }
+    },
+    default_ttl: 20
+});
+
+function init(config) {
+    'use strict';
+    handler.do_init(config);
+}
+
+function onRequest(request, response) {
+    'use strict';
+    handler.handle_request(request, response);
+}
 
 /** @constructor */
 function OpenmixApplication(settings) {
@@ -77,26 +97,4 @@ function OpenmixApplication(settings) {
 
         return candidate;
     }
-}
-
-handler = new OpenmixApplication({
-    providers: {
-        'foo': {
-            'cname': 'www.foo.com'
-        },
-        'bar': {
-            'cname': 'www.bar.com'
-        }
-    },
-    default_ttl: 20
-});
-
-function init(config) {
-    'use strict';
-    handler.do_init(config);
-}
-
-function onRequest(request, response) {
-    'use strict';
-    handler.handle_request(request, response);
 }
