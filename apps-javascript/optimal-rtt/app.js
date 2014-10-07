@@ -103,8 +103,7 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var avail = request.getProbe('avail'),
             candidates,
-            rtt,
-            rtt_candidates,
+            candidate_aliases,
             all_reasons,
             decision_provider,
             decision_reasons = [],
@@ -167,18 +166,18 @@ function OpenmixApplication(settings) {
 
         if (!decision_provider) {
             // Join the rtt scores with the list of viable candidates
-            rtt = join_objects(request.getProbe('http_rtt'), candidates, 'avail');
-            rtt_candidates = Object.keys(rtt);
+            candidates = join_objects(candidates, request.getProbe('http_rtt'), 'http_rtt');
+            candidate_aliases = Object.keys(candidates);
 
-            if (rtt_candidates.length === 1) {
-                decision_provider = rtt_candidates[0];
+            if (candidate_aliases.length === 1) {
+                decision_provider = candidate_aliases[0];
                 decision_reasons.push(all_reasons.optimum_server_chosen);
                 decision_ttl = decision_ttl || settings.default_ttl;
             }
-            else if (rtt_candidates.length !== 0) {
+            else if (candidate_aliases.length !== 0) {
                 // Apply padding to rtt scores
-                add_rtt_padding(rtt);
-                decision_provider = get_lowest(rtt, 'http_rtt');
+                add_rtt_padding(candidates);
+                decision_provider = get_lowest(candidates, 'http_rtt');
                 decision_reasons.push(all_reasons.optimum_server_chosen);
                 decision_ttl = decision_ttl || settings.default_ttl;
             }

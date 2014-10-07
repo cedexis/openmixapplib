@@ -44,6 +44,16 @@ function OpenmixApplication(settings) {
     }
 
     /**
+     * @param {Object} candidate
+     */
+    function filter_empty(candidate) {
+        for (var key in candidate) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param {Object} source
      * @param {String} property
      */
