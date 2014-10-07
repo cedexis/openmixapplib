@@ -13,23 +13,20 @@
     'use strict';
 
     var default_settings = {
-        providers: [
-            {
-                alias: 'foo',
+        providers: {
+            'foo': {
                 cname: 'www.foo.com',
                 base_padding: 50
             },
-            {
-                alias: 'bar',
+            'bar': {
                 cname: 'www.bar.com',
                 base_padding: 0
             },
-            {
-                alias: 'baz',
+            'baz': {
                 cname: 'www.baz.com',
                 base_padding: 0
             }
-        ],
+        },
         burstable_cdns: {
             'foo': {
                 bandwidth: [
@@ -81,9 +78,9 @@
         setup: function() { return; },
         verify: function(i) {
             equal(i.config.requireProvider.callCount, 3, 'Verifying requireProvider call count');
-            equal(i.config.requireProvider.args[0][0], 'foo', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[2][0], 'foo', 'Verirying provider alias');
             equal(i.config.requireProvider.args[1][0], 'bar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[2][0], 'baz', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[0][0], 'baz', 'Verirying provider alias');
         }
     }));
 
@@ -92,6 +89,9 @@
     function test_handle_request(i) {
         return function() {
             var sut,
+                config = {
+                    requireProvider: this.stub()
+                },
                 request = {
                     getData: this.stub(),
                     getProbe: this.stub()
@@ -104,7 +104,10 @@
                 test_stuff;
 
             sut = new OpenmixApplication(i.settings || default_settings);
-            this.stub(sut, 'get_random');
+            sut.do_init(config);
+
+            this.stub(Math, 'random');
+            Math.random.returns(0);
 
             test_stuff = {
                 request: request,
@@ -341,7 +344,6 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -397,7 +399,6 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -455,7 +456,6 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -508,7 +508,6 @@
                     }),
                     "bar": ""
                 });
-            i.sut.get_random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
