@@ -2,20 +2,17 @@ var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced
     // `alias` is the Openmix alias set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
-    providers: [
-        {
-            alias: 'foo',
+    providers: {
+        'foo': {
             cname: 'www.foo.com'
         },
-        {
-            alias: 'bar',
+        'bar': {
             cname: 'www.bar.com'
         },
-        {
-            alias: 'baz',
+        'baz': {
             cname: 'www.baz.com'
         }
-    ],
+    },
     // A mapping of ISO 3166-1 country codes to provider aliases
     //country_overrides: { 'UK': 'bar', 'ES': 'baz' },
     country_overrides: {},
