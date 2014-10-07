@@ -1,235 +1,26 @@
-
-var handler;
-
-/** @constructor */
-function OpenmixApplication(settings) {
-    'use strict';
-
-    /**
-     * @param {OpenmixConfiguration} config
-     */
-    this.do_init = function(config) {
-        var i;
-        for (i = 0; i < settings.providers.length; i += 1) {
-            config.requireProvider(settings.providers[i].alias);
-        }
-    };
-
-    /**
-     * @param {OpenmixRequest} request
-     * @param {OpenmixResponse} response
-     */
-    this.handle_request = function(request, response) {
-        var avail,
-            candidates,
-            rtt,
-            all_reasons,
-            decision_provider,
-            decision_reasons = [],
-            decision_ttl,
-            override_cname;
-
-        function provider_from_alias(alias) {
-            var i;
-            for (i = 0; i < settings.providers.length; i += 1) {
-                if (alias === settings.providers[i].alias) {
-                    return settings.providers[i];
-                }
-            }
-            return null;
-        }
-
-        function flatten(obj, property) {
-            var result = {}, i;
-            for (i in obj) {
-                if (obj.hasOwnProperty(i)) {
-                    if (obj[i].hasOwnProperty(property) && obj[i][property]) {
-                        result[i] = obj[i][property];
-                    }
-                }
-            }
-            return result;
-        }
-
-        function properties_array(container, fun) {
-            var i, result = [];
-            for (i in container) {
-                if (container.hasOwnProperty(i)) {
-                    if (fun.call(null, i)) {
-                        result.push(i);
-                    }
-                }
-            }
-            return result;
-        }
-
-        function add_rtt_padding(data) {
-            var i, provider;
-            for (i in data) {
-                if (data.hasOwnProperty(i)) {
-                    //console.log(data[i]);
-                    provider = provider_from_alias(i);
-                    data[i] = data[i] * (1 + provider.padding / 100);
-                }
-            }
-            return data;
-        }
-
-        function object_to_tuples_array(container) {
-            var i, result = [];
-            for (i in container) {
-                if (container.hasOwnProperty(i)) {
-                    result.push([i, container[i]]);
-                }
-            }
-            return result;
-        }
-
-        all_reasons = {
-            optimum_server_chosen: 'A',
-            no_available_servers: 'B',
-            geo_override_on_country: 'C',
-            geo_override_on_market: 'D',
-            geo_override_not_available_country: 'E',
-            geo_override_not_available_market: 'H',
-            geo_default_on_country: 'F',
-            geo_default_on_market: 'G'
-        };
-
-        avail = flatten(request.getProbe('avail'), 'avail');
-        //console.log('avail: ' + JSON.stringify(avail));
-
-        // First figure out the available platforms
-        candidates = properties_array(avail, function(i) {
-            var provider = provider_from_alias(i);
-            // Considered only in the provider countries
-            if (provider.countries && (0 > provider.countries.indexOf(request.country))) {
-                return false;
-            }
-            // Considered only in the provider markets
-            if (provider.markets && (0 > provider.markets.indexOf(request.market))) {
-                return false;
-            }
-            return (avail[i] && (settings.availability_threshold <= avail[i]));
-        });
-        //console.log('available candidates: ' + JSON.stringify(candidates));
-
-        if (settings.geo_override) {
-            if (settings.country_to_provider[request.country]) {
-                if (-1 < candidates.indexOf(settings.country_to_provider[request.country])) {
-                    // Override based on the request country
-                    decision_provider = provider_from_alias(settings.country_to_provider[request.country]);
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reasons.push(all_reasons.geo_override_on_country);
-                } else {
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_override_not_available_country);
-                }
-            }
-
-            if (!decision_provider) {
-                if (settings.market_to_provider[request.market]) {
-                    if (-1 < candidates.indexOf(settings.market_to_provider[request.market])) {
-                        // Override based on the request market
-                        decision_provider = provider_from_alias(settings.market_to_provider[request.market]);
-                        decision_ttl = decision_ttl || settings.default_ttl;
-                        decision_reasons.push(all_reasons.geo_override_on_market);
-                    } else {
-                        decision_ttl = decision_ttl || settings.error_ttl;
-                        decision_reasons.push(all_reasons.geo_override_not_available_market);
-                    }
-                }
-            }
-        }
-
-        if (!decision_provider) {
-            // Get the RTT scores, transformed and filtered for use
-            rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
-            // rtt now maps provider alias to round-trip time
-            rtt = add_rtt_padding(rtt);
-            // rtt now contains scores with penalties/bonuses applied
-            rtt = object_to_tuples_array(rtt);
-            // rtt is now a multi-dimensional array; [ [alias, score], [alias, score] ]
-            rtt = rtt.filter(function(tuple) {
-                return -1 < candidates.indexOf(tuple[0]);
-            });
-            // rtt now only contains those providers that meet the availability threshold
-            rtt.sort(function(left, right) {
-                if (left[1] < right[1]) {
-                    return -1;
-                }
-                if (left[1] > right[1]) {
-                    return 1;
-                }
-                return 0;
-            });
-            // rtt is now sorted in ascending order of round-trip time
-            //console.log('rtt: ' + JSON.stringify(rtt));
-
-            if (0 < rtt.length) {
-                decision_provider = provider_from_alias(rtt[0][0]);
-                decision_reasons.push(all_reasons.optimum_server_chosen);
-                decision_ttl = decision_ttl || settings.default_ttl;
-            } else if (settings.geo_default) {
-                if (settings.country_to_provider[request.country]) {
-                    // Default based on the request country
-                    decision_provider = provider_from_alias(settings.country_to_provider[request.country]);
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_default_on_country);
-                } else if (settings.market_to_provider[request.market]) {
-                    // Default based on the request market
-                    decision_provider = provider_from_alias(settings.market_to_provider[request.market]);
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_default_on_market);
-                }
-            }
-        }
-
-        if (!decision_provider) {
-            decision_provider = provider_from_alias(settings.default_provider);
-            decision_ttl = decision_ttl || settings.error_ttl;
-            decision_reasons.push(all_reasons.no_available_servers);
-        }
-
-        if (settings.conditional_hostname && settings.conditional_hostname[request.hostname_prefix]) {
-            // Confirm and translate the ISO country code to the numeric identifier
-            // and append to the front of the provider cname
-            override_cname = settings.conditional_hostname[request.hostname_prefix] + '.' +  decision_provider.cname;
-        }
-
-        response.respond(decision_provider.alias, override_cname || decision_provider.cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reasons.join(','));
-    };
-}
-
-handler = new OpenmixApplication({
+var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced
-    // `alias` is the Openmix alias set in the Portal
+    // keys are the Openmix aliases set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
     // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
-    providers: [
-        {
-            alias: 'foo',
+    providers: {
+        'foo': {
             cname: 'www.foo.com',
             padding: 0
         },
-        {
-            alias: 'bar',
+        'bar': {
             cname: 'www.bar.com',
             padding: 0
         },
-        {
-            alias: 'baz',
+        'baz': {
             cname: 'www.baz.com',
             padding: 0
         },
-        {
-            alias: 'qux',
+        'qux': {
             cname: 'www.qux.com',
             padding: 0
         }
-    ],
+    },
     // The minimum availability score that providers must have in order to be considered available
     availability_threshold: 90,
     // A mapping of ISO 3166-1 country codes to provider aliases
@@ -277,4 +68,248 @@ function init(config) {
 function onRequest(request, response) {
     'use strict';
     handler.handle_request(request, response);
+}
+
+/** @constructor */
+function OpenmixApplication(settings) {
+    'use strict';
+
+    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+
+    /**
+     * @param {OpenmixConfiguration} config
+     */
+    this.do_init = function(config) {
+        var i = aliases.length,
+            keys,
+            j;
+
+        while (i --) {
+            config.requireProvider(aliases[i]);
+
+            if (typeof settings.providers[aliases[i]].countries !== 'undefined') {
+                settings.providers[aliases[i]].countries = array_to_keys(settings.providers[aliases[i]].countries);
+            }
+            if (typeof settings.providers[aliases[i]].markets !== 'undefined') {
+                settings.providers[aliases[i]].markets = array_to_keys(settings.providers[aliases[i]].markets);
+            }
+        }
+    };
+
+    /**
+     * @param {OpenmixRequest} request
+     * @param {OpenmixResponse} response
+     */
+    this.handle_request = function(request, response) {
+        var avail = request.getProbe('avail'),
+            candidates,
+            rtt,
+            rtt_candidates,
+            all_reasons,
+            decision_provider,
+            decision_reasons = [],
+            decision_ttl,
+            override_cname = '';
+
+        all_reasons = {
+            optimum_server_chosen: 'A',
+            no_available_servers: 'B',
+            geo_override_on_country: 'C',
+            geo_override_on_market: 'D',
+            geo_override_not_available_country: 'E',
+            geo_override_not_available_market: 'H',
+            geo_default_on_country: 'F',
+            geo_default_on_market: 'G'
+        };
+
+        function filter_candidates(candidate, alias) {
+            var provider = settings.providers[alias];
+            // Considered only in the provider countries
+            if (typeof provider.countries !== 'undefined' && typeof provider.countries[request.country] === 'undefined') {
+                return false;
+            }
+            // Considered only in the provider markets
+            if (typeof provider.markets !== 'undefined' && typeof provider.markets[request.market] === 'undefined') {
+                return false;
+            }
+            return candidate.avail >= settings.availability_threshold;
+        }
+
+        // First figure out the available platforms
+        candidates = filter_object(avail, filter_candidates);
+        //console.log('available candidates: ' + JSON.stringify(candidates));
+
+        if (settings.geo_override) {
+            if (settings.country_to_provider[request.country]) {
+                if (typeof candidates[settings.country_to_provider[request.country]] !== 'undefined') {
+                    // Override based on the request country
+                    decision_provider = settings.country_to_provider[request.country];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(all_reasons.geo_override_on_country);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_override_not_available_country);
+                }
+            }
+
+            if (!decision_provider && typeof settings.market_to_provider[request.market] !== 'undefined') {
+                if (typeof candidates[settings.market_to_provider[request.market]] !== 'undefined') {
+                    // Override based on the request market
+                    decision_provider = settings.market_to_provider[request.market];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(all_reasons.geo_override_on_market);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_override_not_available_market);
+                }
+            }
+        }
+
+        if (!decision_provider) {
+            // Join the rtt scores with the list of viable candidates
+            rtt = join_objects(request.getProbe('http_rtt'), candidates, 'avail');
+            rtt_candidates = Object.keys(rtt);
+
+            if (rtt_candidates.length === 1) {
+                decision_provider = rtt_candidates[0];
+                decision_reasons.push(all_reasons.optimum_server_chosen);
+                decision_ttl = decision_ttl || settings.default_ttl;
+            }
+            else if (rtt_candidates.length !== 0) {
+                // Apply padding to rtt scores
+                add_rtt_padding(rtt);
+                decision_provider = get_lowest(rtt, 'http_rtt');
+                decision_reasons.push(all_reasons.optimum_server_chosen);
+                decision_ttl = decision_ttl || settings.default_ttl;
+            }
+            else if (settings.geo_default) {
+                if (typeof settings.country_to_provider[request.country] !== 'undefined') {
+                    // Default based on request country
+                    decision_provider = settings.country_to_provider[request.country];
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_default_on_country);
+                }
+                else if (typeof settings.market_to_provider[request.market] !== 'undefined') {
+                    // Default based on request market
+                    decision_provider = settings.market_to_provider[request.market];
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(all_reasons.geo_default_on_market);
+                }
+            }
+        }
+
+        if (!decision_provider) {
+            decision_provider = settings.default_provider;
+            decision_ttl = decision_ttl || settings.error_ttl;
+            decision_reasons.push(all_reasons.no_available_servers);
+        }
+
+        if (typeof settings.conditional_hostname !== 'undefined' && typeof settings.conditional_hostname[request.hostname_prefix] !== 'undefined') {
+            // Confirm and translate the ISO country code to the numeric identifier
+            // and format it as a prefix to the cname
+            override_cname = settings.conditional_hostname[request.hostname_prefix] + '.';
+        }
+
+        response.respond(decision_provider, override_cname + settings.providers[decision_provider].cname);
+        response.setTTL(decision_ttl);
+        response.setReasonCode(decision_reasons.join(','));
+    };
+
+    /**
+     * @param {Object} object
+     * @param {Function} filter
+     */
+    function filter_object(object, filter) {
+        var keys = Object.keys(object),
+            i = keys.length,
+            key;
+
+        while (i --) {
+            key = keys[i];
+
+            if (!filter(object[key], key)) {
+                delete object[key];
+            }
+        }
+
+        return object;
+    }
+
+    /**
+     * @param {Object} source
+     * @param {string} property
+     */
+    function get_lowest(source, property) {
+        var keys = Object.keys(source),
+            i = keys.length,
+            key,
+            candidate,
+            min = Infinity,
+            value;
+
+        while (i --) {
+            key = keys[i];
+            value = source[key][property];
+
+            if (value < min) {
+                candidate = key;
+                min = value;
+            }
+        }
+
+        return candidate;
+    }
+
+    /**
+     * @param {Object} target
+     * @param {Object} source
+     * @param {string} property
+     */
+    function join_objects(target, source, property) {
+        var keys = Object.keys(target),
+            i = keys.length,
+            key;
+
+        while (i --) {
+            key = keys[i];
+
+            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+                target[key][property] = source[key][property];
+            }
+            else {
+                delete target[key];
+            }
+        }
+
+        return target;
+    }
+
+    /**
+     * @param {Object} data
+     */
+    function add_rtt_padding(data) {
+        var keys = Object.keys(data),
+            i = keys.length,
+            key;
+
+        while (i --) {
+            key = keys[i];
+            data[key].http_rtt *= 1 + settings.providers[key].padding / 100;
+        }
+        return data;
+    }
+
+    /**
+     * @param {Array} array
+     */
+    function array_to_keys(array) {
+        var object = {},
+            i = array.length;
+
+        while (i --) {
+            object[array[i]] = true;
+        }
+
+        return object;
+    }
 }

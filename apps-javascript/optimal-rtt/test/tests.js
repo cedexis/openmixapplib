@@ -37,18 +37,16 @@
 
     test('basic', test_init({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ]
+            }
         },
         setup: function() {
             return;
@@ -56,8 +54,8 @@
         verify: function(i) {
             console.log(i);
             equal(i.requireProvider.callCount, 2);
-            equal(i.requireProvider.args[0][0], 'foo');
-            equal(i.requireProvider.args[1][0], 'bar');
+            equal(i.requireProvider.args[1][0], 'foo');
+            equal(i.requireProvider.args[0][0], 'bar');
         }
     }));
 
@@ -66,9 +64,14 @@
     function test_handle_request(i) {
         return function() {
             var sut = new OpenmixApplication(i.settings),
+                config = {
+                    requireProvider: function() { return; }
+                },
                 request,
                 response,
                 test_stuff;
+
+            sut.do_init(config);
 
             request = {
                 getProbe: function() { return; }
@@ -99,18 +102,16 @@
 
     test('foo fastest', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -147,18 +148,16 @@
 
     test('foo fastest conditional hostname', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -201,18 +200,17 @@
 
     test('foo fastest after padding', test_handle_request({
         settings: {
-            providers: [
-                {
+            providers: {
+                'foo': {
                     alias: 'foo',
                     cname: 'www.foo.com',
                     padding: 10
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 20
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -249,18 +247,16 @@
 
     test('none available', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -297,18 +293,16 @@
 
     test('geo override on market', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {
                 'NA': 'bar'
@@ -345,18 +339,16 @@
 
     test('geo override on country', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {
                 'NA': 'bar'
@@ -395,18 +387,16 @@
 
     test('country override provider not available', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             country_to_provider: {
                 'US': 'foo'
@@ -447,18 +437,16 @@
 
     test('country and market override provider both not available', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             country_to_provider: {
                 'US': 'foo'
@@ -501,28 +489,24 @@
 
     test('country and market override provider both not available; blah faster than baz', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0
                 },
-                {
-                    alias: 'blah',
+                'blah': {
                     cname: 'www.blah.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             country_to_provider: {
                 'US': 'foo'
@@ -569,18 +553,16 @@
 
     test('geo default on market', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {
                 'NA': 'bar'
@@ -621,18 +603,16 @@
 
     test('geo default on country', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {
                 'NA': 'bar'
@@ -675,28 +655,24 @@
 
     test('boost bar with padding', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: -70
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             country_to_provider: {},
             market_to_provider: {},
@@ -739,30 +715,26 @@
 
     test('avoid by geo country (request from CN)', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
                     padding: 0,
                     // Considered only in the following countries
                     countries: [ 'CN' ]
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -804,30 +776,26 @@
 
     test('avoid by geo country (request from US)', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
                     padding: 0,
                     // Considered only in the following countries
                     countries: [ 'CN' ]
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -869,30 +837,28 @@
 
     test('avoid by geo market (request from NA)', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0,
                     // Considered only in the following markets
                     markets: [ 'NA', 'SA' ]
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
-                    padding: 0
+                    padding: 0,
+                    // Considered only in the following countries
+                    countries: [ 'CN' ]
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -934,30 +900,28 @@
 
     test('avoid by geo market (request from SA)', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0,
                     // Considered only in the following markets
                     markets: [ 'NA', 'SA' ]
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
-                    padding: 0
+                    padding: 0,
+                    // Considered only in the following countries
+                    countries: [ 'CN' ]
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
@@ -999,30 +963,26 @@
 
     test('avoid by geo market (request from AS)', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com',
                     padding: 0
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com',
                     padding: 0
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com',
                     padding: 0,
                     // Considered only in the following markets
                     markets: [ 'NA', 'SA' ]
                 },
-                {
-                    alias: 'qux',
+                'qux': {
                     cname: 'www.qux.com',
                     padding: 0
                 }
-            ],
+            },
             availability_threshold: 90,
             market_to_provider: {},
             country_to_provider: {},
