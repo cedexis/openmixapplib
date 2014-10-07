@@ -13,28 +13,25 @@
     'use strict';
 
     var default_settings = {
-        providers: [
-            {
-                alias: 'cdn1',
+        providers: {
+            'foo': {
                 cname: 'www.foo.com',
-                padding: 0
+                base_padding: 0
             },
-            {
-                alias: 'cdn2',
+            'bar': {
                 cname: 'www.bar.com',
-                padding: 0
+                base_padding: 0
             },
-            {
-                alias: 'cdn3',
+            'baz': {
                 cname: 'www.baz.com',
-                padding: 0
+                base_padding: 0
             }
-        ],
-        fallback: { alias: 'cdn1', cname: 'provider1.example.com' },
+        },
         availability_threshold: 90,
         min_valid_rtt_score: 5,
         default_ttl: 20,
-        error_ttl: 10
+        error_ttl: 10,
+        fallback: { alias: 'foo', cname: 'provider1.example.com' }
     };
 
     module('do_init');
@@ -66,9 +63,9 @@
         setup: function() { return; },
         verify: function(i) {
             equal(i.config.requireProvider.callCount, 3, 'Verifying requireProvider call count');
-            equal(i.config.requireProvider.args[0][0], 'cdn1', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[1][0], 'cdn2', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[2][0], 'cdn3', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[2][0], 'foo', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[1][0], 'bar', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[0][0], 'baz', 'Verirying provider alias');
         }
     }));
 
@@ -77,6 +74,9 @@
     function test_handle_request(i) {
         return function() {
             var sut,
+                config = {
+                    requireProvider: this.stub()
+                },
                 request = {
                     getData: this.stub(),
                     getProbe: this.stub()
@@ -89,6 +89,10 @@
                 test_stuff;
 
             sut = new OpenmixApplication(i.settings || default_settings);
+            sut.do_init(config);
+
+            this.stub(Math, 'random');
+            Math.random.returns(0);
 
             test_stuff = {
                 request: request,
@@ -112,13 +116,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -126,20 +130,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 203
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -148,7 +152,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'd2ksyxg0rursd3.cdn1.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
@@ -161,13 +165,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -175,20 +179,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 202
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 201
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 202
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -197,7 +201,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn2', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'wpc.50C7.cdn2.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
@@ -210,13 +214,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -224,20 +228,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 202
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 171
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -246,7 +250,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn3', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'foo.edgesuite.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
@@ -259,13 +263,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 79
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -273,20 +277,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 203
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site2';
         },
         verify: function(i) {
@@ -295,7 +299,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn2', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'wpc.50A2.cdn2.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
@@ -308,13 +312,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 79
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 69
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 59
                     }
                 });
@@ -322,20 +326,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 202
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -344,7 +348,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'd2ksyxg0rursd3.cdn1.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
@@ -357,13 +361,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -371,13 +375,13 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 202
                     }
                 });
@@ -393,7 +397,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A,C', 'Verifying setReasonCode');
@@ -410,20 +414,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 202
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -432,10 +436,10 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'd2ksyxg0rursd3.cdn1.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
         }
     }));
 
@@ -445,13 +449,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -462,7 +466,7 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -471,10 +475,10 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'd2ksyxg0rursd3.cdn1.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
         }
     }));
 
@@ -484,13 +488,13 @@
                 .getProbe
                 .onCall(0)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "avail": 100
                     },
-                    "cdn2": {
+                    "bar": {
                         "avail": 100
                     },
-                    "cdn3": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -498,20 +502,20 @@
                 .getProbe
                 .onCall(1)
                 .returns({
-                    "cdn1": {
+                    "foo": {
                         "http_rtt": 201
                     },
-                    "cdn2": {
+                    "bar": {
                         "http_rtt": 202
                     },
-                    "cdn3": {
+                    "baz": {
                         "http_rtt": 202
                     }
                 });
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,cdn1,cdn2,cdn3\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
             i.request.hostname_prefix = 'site4';
         },
         verify: function(i) {
@@ -520,7 +524,7 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'cdn1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A,C', 'Verifying setReasonCode');

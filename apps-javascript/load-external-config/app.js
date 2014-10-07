@@ -1,203 +1,22 @@
-
-var handler;
-
-/** @constructor */
-function OpenmixApplication(settings) {
-    'use strict';
-
-    /**
-     * @param {OpenmixConfiguration} config
-     */
-    this.do_init = function(config) {
-        var i;
-        for (i = 0; i < settings.providers.length; i += 1) {
-            config.requireProvider(settings.providers[i].alias);
-        }
-    };
-
-    /**
-     * @param {OpenmixRequest} request
-     * @param {OpenmixResponse} response
-     */
-    this.handle_request = function(request, response) {
-        var avail,
-            fusion,
-            hostname,
-            candidates,
-            rtt,
-            all_reasons,
-            decision_provider,
-            decision_reasons = [],
-            decision_ttl,
-            override_cname;
-
-        function parse_fusion_data(source) {
-            var result = {}, i, j, lines, headers, current_line, tmp_result;
-            lines = source.split("\n");
-            headers = lines[0].split(",");
-
-            for (i = 1; i < lines.length; i += 1) {
-                current_line = lines[i].split(",");
-                tmp_result = {};
-
-                for (j = 1; j < headers.length; j += 1) {
-                    tmp_result[headers[j]] = current_line[j];
-                }
-                result[current_line[0]] = tmp_result;
-            }
-            return result;
-        }
-
-        function provider_from_alias(alias) {
-            var i;
-            for (i = 0; i < settings.providers.length; i += 1) {
-                if (alias === settings.providers[i].alias) {
-                    return settings.providers[i];
-                }
-            }
-            return null;
-        }
-
-        function flatten(obj, property) {
-            var result = {}, i;
-            for (i in obj) {
-                if (obj.hasOwnProperty(i)) {
-                    if (obj[i].hasOwnProperty(property) && obj[i][property]) {
-                        result[i] = obj[i][property];
-                    }
-                }
-            }
-            return result;
-        }
-
-        function properties_array(container, fun) {
-            var i, result = [];
-            for (i in container) {
-                if (container.hasOwnProperty(i)) {
-                    if (fun.call(null, i)) {
-                        result.push(i);
-                    }
-                }
-            }
-            return result;
-        }
-
-        function add_rtt_padding(data) {
-            var i, provider;
-            for (i in data) {
-                if (data.hasOwnProperty(i)) {
-                    //console.log(data[i]);
-                    provider = provider_from_alias(i);
-                    data[i] = data[i] * (1 + provider.padding / 100);
-                }
-            }
-            return data;
-        }
-
-        function object_to_tuples_array(container) {
-            var i, result = [];
-            for (i in container) {
-                if (container.hasOwnProperty(i)) {
-                    result.push([i, container[i]]);
-                }
-            }
-            return result;
-        }
-
-        all_reasons = {
-            optimum_server_chosen: 'A',
-            no_available_servers: 'B',
-            missing_fusion_data: 'C'
-        };
-
-        avail = flatten(request.getProbe('avail'), 'avail');
-        fusion = parse_fusion_data(request.getData('fusion'));
-        hostname = request.hostname_prefix;
-
-        // First figure out the available platforms
-        candidates = properties_array(avail, function(i) {
-            return (avail[i] && (settings.availability_threshold <= avail[i]));
-        });
-        //console.log('available candidates: ' + JSON.stringify(candidates));
-
-        // Get the RTT scores, transformed and filtered for use
-        rtt = flatten(request.getProbe('http_rtt'), 'http_rtt');
-        // rtt now maps provider alias to round-trip time
-        rtt = add_rtt_padding(rtt);
-        // rtt now contains scores with penalties/bonuses applied
-        rtt = object_to_tuples_array(rtt);
-        // rtt is now a multi-dimensional array; [ [alias, score], [alias, score] ]
-        rtt = rtt.filter(function(tuple) {
-            return -1 < candidates.indexOf(tuple[0]);
-        });
-        // rtt now only contains those providers that meet the availability threshold
-        rtt.sort(function(left, right) {
-            if (left[1] < right[1]) {
-                return -1;
-            }
-            if (left[1] > right[1]) {
-                return 1;
-            }
-            return 0;
-        });
-        // rtt is now sorted in ascending order of round-trip time
-        //console.log('rtt: ' + JSON.stringify(rtt));
-
-        if (0 < rtt.length) {
-            decision_provider = provider_from_alias(rtt[0][0]);
-            decision_reasons.push(all_reasons.optimum_server_chosen);
-            decision_ttl = decision_ttl || settings.default_ttl;
-        } else {
-            decision_provider = settings.fallback;
-            decision_ttl = decision_ttl || settings.error_ttl;
-            decision_reasons.push(all_reasons.no_available_servers);
-        }
-
-        if (fusion[hostname] && fusion[hostname][decision_provider.alias]) {
-            override_cname = fusion[hostname][decision_provider.alias];
-        } else {
-            decision_reasons.push(all_reasons.missing_fusion_data);
-        }
-
-        response.respond(decision_provider.alias, override_cname || decision_provider.cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reasons.join(','));
-    };
-}
-
-handler = new OpenmixApplication({
-    // `providers` contains a list of the providers to be load-balanced
-    // `alias` is the Openmix alias set in the Portal
-    // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
-    // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
-    providers: [
-        {
-            alias: 'cdn1',
-            cname: 'tobeoverwritten',
-            padding: 0
+var handler = new OpenmixApplication({
+    providers: {
+        'foo': {
+            cname: 'www.foo.com',
+            base_padding: 0
         },
-        {
-            alias: 'cdn2',
-            cname: 'tobeoverwritten',
-            padding: 0
+        'bar': {
+            cname: 'www.bar.com',
+            base_padding: 0
         },
-        {
-            alias: 'cdn3',
-            cname: 'tobeoverwritten',
-            padding: 0
+        'baz': {
+            cname: 'www.baz.com',
+            base_padding: 0
         }
-    ],
-    // The minimum availability score that providers must have in order to be considered available
+    },
     availability_threshold: 90,
     min_valid_rtt_score: 5,
-    // The TTL to be set when the application chooses an optimal provider, including geo override.
     default_ttl: 20,
-    // The TTL to be set when the application chooses a potentially non-optimal provider, e.g. default or geo default.
     error_ttl: 20,
-    // Openmix is sometimes unable to calculate a response
-    // Generally fewer than 0.01% of responses over a month are fallback
-    // We need one CDN that can return content from any site, based on the HTTP HOST HEADER
-    // the browser passes through, though we can also append the subdomain if that helps
     fallback: { alias: 'cdn1', cname: 'provider1.example.com' }
 });
 
@@ -209,4 +28,197 @@ function init(config) {
 function onRequest(request, response) {
     'use strict';
     handler.handle_request(request, response);
+}
+
+/** @constructor */
+function OpenmixApplication(settings) {
+    'use strict';
+
+    var reasons = {
+        best_performing: 'A',
+        all_providers_eliminated: 'B',
+        missing_fusion_data: 'C',
+        radar_data_sparse: 'D'
+    };
+
+    var aliases = Object.keys(settings.providers);
+
+    /**
+     * @param {OpenmixConfiguration} config
+     */
+    this.do_init = function(config) {
+        var i = aliases.length;
+        while (i --) {
+            config.requireProvider(aliases[i]);
+        }
+    };
+
+    /**
+     * @param {OpenmixRequest} request
+     * @param {OpenmixResponse} response
+     */
+    this.handle_request = function(request, response) {
+        var data_avail = filter_object(request.getProbe('avail'), filter_empty),
+            data_rtt = filter_object(request.getProbe('http_rtt'), filter_invalid_rtt_scores),
+            data_fusion = parse_fusion_data(request.getData('fusion')),
+            hostname = request.hostname_prefix,
+            decision_provider,
+            decision_ttl = settings.default_ttl,
+            decision_reasons = [],
+            candidates,
+            override_cname;
+
+        function add_rtt_padding(data) {
+            var aliases = Object.keys(data),
+                i = aliases.length,
+                alias,
+                provider,
+                base_padding;
+            while (i --) {
+                alias = aliases[i];
+                provider = settings.providers[alias];
+                base_padding = typeof provider.base_padding === 'undefined' ? 0 : provider.base_padding;
+                data[alias].http_rtt = base_padding + data[alias].http_rtt;
+            }
+            return data;
+        }
+
+        function select_random_provider(reason) {
+            decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
+            decision_reasons.push(reason);
+            decision_ttl = settings.error_ttl;
+        }
+
+        if (Object.keys(data_rtt).length !== aliases.length || Object.keys(data_avail).length !== aliases.length) {
+            select_random_provider(reasons.radar_data_sparse);
+        }
+        else {
+            data_avail = filter_object(data_avail, filter_availability);
+            candidates = Object.keys(data_avail);
+            if (candidates.length === 0) {
+                select_random_provider(reasons.all_providers_eliminated);
+            }
+            else if (candidates.length === 1) {
+                decision_provider = candidates[0];
+                decision_reasons.push(reasons.best_performing);
+            }
+            else {
+                data_rtt = add_rtt_padding(join_objects(data_rtt, data_avail, 'avail'));
+                decision_provider = get_lowest(data_rtt, 'http_rtt');
+                decision_reasons.push(reasons.best_performing);
+            }
+        }
+
+        if (data_fusion[hostname] && data_fusion[hostname][decision_provider]) {
+            override_cname = data_fusion[hostname][decision_provider];
+        } else {
+            decision_reasons.push(reasons.missing_fusion_data);
+        }
+
+        response.respond(decision_provider, override_cname || settings.providers[decision_provider].cname);
+        response.setTTL(decision_ttl);
+        response.setReasonCode(decision_reasons.join(','));
+
+    };
+
+    /**
+     * @param {Object} object
+     * @param {Function} filter
+     */
+    function filter_object(object, filter) {
+        var keys = Object.keys(object),
+            i = keys.length,
+            key;
+        while (i --) {
+            key = keys[i];
+            if (!filter(object[key], key)) {
+                delete object[key];
+            }
+        }
+        return object;
+    }
+    /**
+     * @param {Object} candidate
+     */
+    function filter_invalid_rtt_scores(candidate) {
+        return candidate.http_rtt >= settings.min_valid_rtt_score;
+    }
+    /**
+     * @param {Object} candidate
+     */
+    function filter_availability(candidate) {
+        return candidate.avail >= settings.availability_threshold;
+    }
+    /**
+     * @param {Object} candidate
+     */
+    function filter_empty(candidate) {
+        for (var key in candidate) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * @param {Object} source
+     * @param {string} property
+     */
+    function get_lowest(source, property) {
+        var keys = Object.keys(source),
+            i = keys.length,
+            key,
+            candidate,
+            min = Infinity,
+            value;
+        while (i --) {
+            key = keys[i];
+            value = source[key][property];
+            if (value < min) {
+                candidate = key;
+                min = value;
+            }
+        }
+        return candidate;
+    }
+    /**
+     * @param {Object} target
+     * @param {Object} source
+     * @param {string} property
+     */
+    function join_objects(target, source, property) {
+        var keys = Object.keys(target),
+            i = keys.length,
+            key;
+        while (i --) {
+            key = keys[i];
+            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+                target[key][property] = source[key][property];
+            }
+            else {
+                delete target[key];
+            }
+        }
+        return target;
+    }
+    /**
+     * @param {string} data
+     */
+    function parse_fusion_data(data) {
+        var lines = data.split("\n"),
+            headers = lines[0].split(","),
+            j = headers.length,
+            i = lines.length,
+            result = {},
+            tmp_result,
+            c_line;
+        while (i --) {
+            c_line = lines[i].split(",");
+            tmp_result = {};
+            while (j --){
+                tmp_result[headers[j]] = c_line[j];
+            }
+            result[c_line[0]] = tmp_result;
+            j = headers.length;
+        }
+        return result;
+    }
 }
