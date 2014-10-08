@@ -3,6 +3,7 @@
 
 var handler;
 
+/** @constructor */
 function OpenmixApplication() {
     'use strict';
 

@@ -13,6 +13,8 @@ function OpenmixRequest() {
     this.country = 'some country';
     /** @type {number} */
     this.asn = 1234;
+    /** @type {string} */
+    this.hostname_prefix = 'some hostname prefix';
 }
 
 /** @param {string} probe_type */
