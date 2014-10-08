@@ -108,21 +108,20 @@ function OpenmixApplication(settings) {
             decision_reasons = [],
             candidates;
 
-        function get_padding_percent(alias, type, error_reason) {
+        function get_padding_percent(alias, metric, error_reason) {
             var value,
                 thresholds,
                 j,
                 len;
 
             if (typeof settings.burstable_cdns[alias] !== 'undefined'
-                && typeof settings.burstable_cdns[alias][type] !== 'undefined') {
+                && typeof settings.burstable_cdns[alias][metric] !== 'undefined') {
                 if (typeof data_fusion[alias] !== 'undefined'
-                    && typeof data_fusion[alias][type] !== 'undefined'
-                    && typeof data_fusion[alias][type].value !== 'undefined'
-                    && typeof settings.burstable_cdns[alias][type] !== 'undefined') {
+                    && typeof data_fusion[alias][metric] !== 'undefined'
+                    && typeof data_fusion[alias][metric].value !== 'undefined') {
 
-                    value = parseFloat(data_fusion[alias][type].value);
-                    thresholds = settings.burstable_cdns[alias][type];
+                    value = parseFloat(data_fusion[alias][metric].value);
+                    thresholds = settings.burstable_cdns[alias][metric];
 
                     for (j = 0, len = thresholds.length; j < len; j ++) {
                         if (value >= thresholds[j].threshold) {
