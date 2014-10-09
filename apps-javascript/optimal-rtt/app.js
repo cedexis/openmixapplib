@@ -81,17 +81,20 @@ function OpenmixApplication(settings) {
      */
     this.do_init = function(config) {
         var i = aliases.length,
-            keys,
-            j;
+            alias;
 
         while (i --) {
-            config.requireProvider(aliases[i]);
+            alias = aliases[i];
 
-            if (typeof settings.providers[aliases[i]].countries !== 'undefined') {
-                settings.providers[aliases[i]].countries = array_to_keys(settings.providers[aliases[i]].countries);
+            config.requireProvider(alias);
+
+            settings.providers[alias].padding = settings.providers[alias].padding || 0;
+
+            if (typeof settings.providers[alias].countries !== 'undefined') {
+                settings.providers[alias].countries = array_to_keys(settings.providers[alias].countries);
             }
-            if (typeof settings.providers[aliases[i]].markets !== 'undefined') {
-                settings.providers[aliases[i]].markets = array_to_keys(settings.providers[aliases[i]].markets);
+            if (typeof settings.providers[alias].markets !== 'undefined') {
+                settings.providers[alias].markets = array_to_keys(settings.providers[alias].markets);
             }
         }
     };
