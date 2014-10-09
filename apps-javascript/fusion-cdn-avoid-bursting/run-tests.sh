@@ -12,7 +12,7 @@ run_test_suite() {
     echo
     echo -e "${yellow}Running $1 unit tests${nocolor}"
     echo
-    ${DIR}/node_modules/karma/bin/karma start $2
+    "${DIR}/node_modules/karma/bin/karma" start "$2"
     LAST=$?
     if [ "$LAST" -ne "0" ]
     then
