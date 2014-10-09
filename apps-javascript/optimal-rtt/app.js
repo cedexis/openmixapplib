@@ -147,14 +147,7 @@ function OpenmixApplication(settings) {
 
         // First figure out the available platforms
         candidates = filter_object(avail, filter_candidates);
-        candidate_aliases = Object.keys(candidates);
         //console.log('available candidates: ' + JSON.stringify(candidates));
-
-        if (candidate_aliases.length === 0) {
-            decision_provider = settings.default_provider;
-            decision_ttl = settings.error_ttl;
-            decision_reasons.push(all_reasons.no_available_servers);
-        }
 
         if (decision_provider === '' && settings.geo_override) {
             select_geo_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
@@ -162,12 +155,6 @@ function OpenmixApplication(settings) {
             if (decision_provider === '') {
                 select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
             }
-        }
-
-        if (decision_provider === '' && candidate_aliases.length === 1) {
-            decision_provider = candidates[0];
-            decision_ttl = decision_ttl || settings.default_ttl;
-            decision_reasons.push(all_reasons.optimum_server_chosen);
         }
 
         if (decision_provider === '') {
