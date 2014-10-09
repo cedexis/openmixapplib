@@ -24,18 +24,24 @@ var handler;
                 test_stuff,
                 stub_requireProvider;
 
-            handler = new OpenmixApplication();
-            handler.providers = i.providers || {
-                'a': {
-                    cname: 'a.com'
+            handler = new OpenmixApplication({
+                providers: {
+                    'a': {
+                        cname: 'a.com'
+                    },
+                    'b': {
+                        cname: 'b.com'
+                    },
+                    'c': {
+                        cname: 'c.example.com'
+                    }
                 },
-                'b': {
-                    cname: 'b.com'
-                },
-                'c': {
-                    cname: 'c.example.com'
-                }
-            };
+                availability_threshold: 90,
+                throughput_tie_threshold: 0.95,
+                default_ttl: 20,
+                error_ttl: 20,
+                min_valid_rtt_score: 5,
+            });
 
             stub_requireProvider = this.stub(config, 'requireProvider');
 
@@ -59,9 +65,9 @@ var handler;
             deepEqual(
                 i.requireProvider.args,
                 [
-                    [ 'a' ],
+                    [ 'c' ],
                     [ 'b' ],
-                    [ 'c' ]
+                    [ 'a' ]
                 ]
             );
         }
@@ -71,7 +77,8 @@ var handler;
 
     function test_onRequest(i) {
         return function() {
-            var request,
+            var config,
+                request,
                 response,
                 test_stuff,
                 stub_getProbe,
@@ -80,6 +87,9 @@ var handler;
                 stub_setReasonCode,
                 stub_get_random;
 
+            config = {
+                requireProvider: function() { return; }
+            };
             request = {
                 getProbe: function() { return; }
             };
@@ -89,28 +99,31 @@ var handler;
                 setReasonCode: function() { return; }
             };
 
-            handler = new OpenmixApplication();
-            handler.providers = i.providers || {
-                'a': {
-                    cname: 'a.com'
+            handler = new OpenmixApplication({
+                providers: {
+                    'a': {
+                        cname: 'a.com'
+                    },
+                    'b': {
+                        cname: 'b.com'
+                    },
+                    'c': {
+                        cname: 'c.com'
+                    }
                 },
-                'b': {
-                    cname: 'b.com'
-                },
-                'c': {
-                    cname: 'c.com'
-                }
-            };
-
-            handler.avail_threshold = i.avail_threshold || 90;
-            handler.tie_threshold = i.tie_threshold || 0.95;
-            handler.ttl = i.ttl || 20;
+                availability_threshold: 90,
+                throughput_tie_threshold: 0.95,
+                default_ttl: 20,
+                error_ttl: 20,
+                min_valid_rtt_score: 5,
+            });
+            handler.do_init(config);
 
             stub_getProbe = this.stub(request, 'getProbe');
             stub_respond = this.stub(response, 'respond');
             stub_setTTL = this.stub(response, 'setTTL');
             stub_setReasonCode = this.stub(response, 'setReasonCode');
-            stub_get_random = this.stub(handler, 'get_random');
+            stub_get_random = this.stub(Math, 'random');
 
             test_stuff = {
                 getProbe: stub_getProbe,
@@ -263,6 +276,7 @@ var handler;
                     'b': { avail: 89.99998 },
                     'c': { avail: 89.99999 }
                 });
+                i.get_random.returns(0.99);
             },
             verify: function(i) {
                 deepEqual(i.respond.args, [ [ 'c', 'c.com' ] ], 'Verifying respond');
@@ -360,7 +374,7 @@ var handler;
                     'Verifying respond'
                 );
                 deepEqual(i.setTTL.args, [ [ 20 ] ], 'Verifying setTTL');
-                deepEqual(i.setReasonCode.args, [ [ 'C2' ] ], 'Verifying setReasonCode');
+                deepEqual(i.setReasonCode.args, [ [ 'C1' ] ], 'Verifying setReasonCode');
             }
         }
     ));
