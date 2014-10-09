@@ -126,15 +126,10 @@ function OpenmixApplication(settings) {
 
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
-            // Considered only in the provider countries
-            if (typeof provider.countries !== 'undefined' && typeof provider.countries[request.country] === 'undefined') {
-                return false;
-            }
-            // Considered only in the provider markets
-            if (typeof provider.markets !== 'undefined' && typeof provider.markets[request.market] === 'undefined') {
-                return false;
-            }
-            return candidate.avail >= settings.availability_threshold;
+            // Considered only available providers in the provider countries/markets
+            return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
+                && (typeof provider.countries === 'undefined' || provider.countries[request.country])
+                && (typeof provider.markets === 'undefined' || provider.markets[request.market]);
         }
 
         function select_geo_override(providers, region, reason, error_reason) {
@@ -159,11 +154,6 @@ function OpenmixApplication(settings) {
             decision_ttl = settings.error_ttl;
             decision_reasons.push(all_reasons.no_available_servers);
         }
-        else if (candidates.length === 1) {
-            decision_provider = candidates[0];
-            decision_ttl = settings.default_ttl;
-            decision_reasons.push(all_reasons.optimum_server_chosen);
-        }
 
         if (decision_provider === '' && settings.geo_override) {
             select_geo_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
@@ -171,6 +161,12 @@ function OpenmixApplication(settings) {
             if (decision_provider === '') {
                 select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
             }
+        }
+
+        if (decision_provider === '' && candidates.length === 1) {
+            decision_provider = candidates[0];
+            decision_ttl = decision_ttl || settings.default_ttl;
+            decision_reasons.push(all_reasons.optimum_server_chosen);
         }
 
         if (decision_provider === '') {
