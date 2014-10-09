@@ -108,7 +108,7 @@ function OpenmixApplication(settings) {
             candidates,
             candidate_aliases,
             all_reasons,
-            decision_provider,
+            decision_provider = '',
             decision_reasons = [],
             decision_ttl,
             override_cname = '';
@@ -137,37 +137,43 @@ function OpenmixApplication(settings) {
             return candidate.avail >= settings.availability_threshold;
         }
 
-        // First figure out the available platforms
-        candidates = filter_object(avail, filter_candidates);
-        //console.log('available candidates: ' + JSON.stringify(candidates));
-
-        if (settings.geo_override) {
-            if (typeof settings.country_to_provider[request.country] !== 'undefined') {
-                if (typeof candidates[settings.country_to_provider[request.country]] !== 'undefined') {
-                    // Override based on the request country
-                    decision_provider = settings.country_to_provider[request.country];
+        function select_geo_override(providers, region, reason, error_reason) {
+            if (typeof providers[region] !== 'undefined') {
+                if (typeof candidates[providers[region]] !== 'undefined') {
+                    decision_provider = providers[region];
                     decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reasons.push(all_reasons.geo_override_on_country);
+                    decision_reasons.push(reason);
                 } else {
                     decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_override_not_available_country);
-                }
-            }
-
-            if (!decision_provider && typeof settings.market_to_provider[request.market] !== 'undefined') {
-                if (typeof candidates[settings.market_to_provider[request.market]] !== 'undefined') {
-                    // Override based on the request market
-                    decision_provider = settings.market_to_provider[request.market];
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reasons.push(all_reasons.geo_override_on_market);
-                } else {
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_override_not_available_market);
+                    decision_reasons.push(error_reason);
                 }
             }
         }
 
-        if (!decision_provider) {
+        // First figure out the available platforms
+        candidates = filter_object(avail, filter_candidates);
+        //console.log('available candidates: ' + JSON.stringify(candidates));
+
+        if (candidates.length === 0) {
+            decision_provider = settings.default_provider;
+            decision_ttl = settings.error_ttl;
+            decision_reasons.push(all_reasons.no_available_servers);
+        }
+        else if (candidates.length === 1) {
+            decision_provider = candidates[0];
+            decision_ttl = settings.default_ttl;
+            decision_reasons.push(all_reasons.optimum_server_chosen);
+        }
+
+        if (decision_provider === '' && settings.geo_override) {
+            select_geo_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
+
+            if (decision_provider === '') {
+                select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
+            }
+        }
+
+        if (decision_provider === '') {
             // Join the rtt scores with the list of viable candidates
             candidates = join_objects(candidates, request.getProbe('http_rtt'), 'http_rtt');
             candidate_aliases = Object.keys(candidates);
@@ -200,7 +206,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (!decision_provider) {
+        if (decision_provider === '') {
             decision_provider = settings.default_provider;
             decision_ttl = decision_ttl || settings.error_ttl;
             decision_reasons.push(all_reasons.no_available_servers);
