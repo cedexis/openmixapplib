@@ -139,7 +139,7 @@ function OpenmixApplication(settings) {
         //console.log('available candidates: ' + JSON.stringify(candidates));
 
         if (settings.geo_override) {
-            if (settings.country_to_provider[request.country]) {
+            if (typeof settings.country_to_provider[request.country] !== 'undefined') {
                 if (typeof candidates[settings.country_to_provider[request.country]] !== 'undefined') {
                     // Override based on the request country
                     decision_provider = settings.country_to_provider[request.country];

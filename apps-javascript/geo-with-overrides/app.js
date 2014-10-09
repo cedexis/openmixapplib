@@ -14,8 +14,8 @@ var handler = new OpenmixApplication({
         }
     },
     // A mapping of ISO 3166-1 country codes to provider aliases
-    //country_overrides: { 'UK': 'bar', 'ES': 'baz' },
-    country_overrides: {},
+    //country_to_provider: { 'UK': 'bar', 'ES': 'baz' },
+    country_to_provider: {},
     // A mapping of market codes to provider aliases
     //market_to_provider: { 'EG': 'foo' }
     market_to_provider: {},
@@ -70,26 +70,21 @@ function OpenmixApplication(settings) {
             unexpected_market: 'C'
         };
 
-        if (settings.country_overrides) {
-            if (settings.country_overrides[request.country]) {
-                // Override based on the request country
-                decision_provider = settings.country_overrides[request.country];
-                decision_ttl = decision_ttl || settings.default_ttl;
-                decision_reason = all_reasons.geo_override_on_country;
-            }
+        if (typeof settings.country_to_provider !== 'undefined'
+            && typeof settings.country_to_provider[request.country] !== 'undefined') {
+            // Override based on the request country
+            decision_provider = settings.country_to_provider[request.country];
+            decision_ttl = decision_ttl || settings.default_ttl;
+            decision_reason = all_reasons.geo_override_on_country;
         }
-
-        if (!decision_provider) {
-            if (settings.market_to_provider[request.market]) {
-                // Override based on the request market
-                decision_provider = settings.market_to_provider[request.market];
-                decision_ttl = decision_ttl || settings.default_ttl;
-                decision_reason = all_reasons.got_expected_market;
-            }
+        else if (typeof settings.market_to_provider !== 'undefined'
+            && typeof settings.market_to_provider[request.market] !== 'undefined') {
+            // Override based on the request market
+            decision_provider = settings.market_to_provider[request.market];
+            decision_ttl = decision_ttl || settings.default_ttl;
+            decision_reason = all_reasons.got_expected_market;
         }
-
-
-        if (!decision_provider) {
+        else {
             decision_provider = settings.default_provider;
             decision_ttl = decision_ttl || settings.error_ttl;
             decision_reason = all_reasons.unexpected_market;

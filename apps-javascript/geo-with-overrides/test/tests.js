@@ -111,7 +111,7 @@
                 }
             },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
             default_ttl: 20,
@@ -149,7 +149,7 @@
                 }
             },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
             default_ttl: 20,
@@ -187,7 +187,7 @@
                 }
             },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
             default_ttl: 20,
