@@ -111,7 +111,7 @@ function OpenmixApplication(settings) {
         function get_padding_percent(alias, metric, error_reason) {
             var value,
                 thresholds,
-                j,
+                i,
                 len;
 
             if (typeof settings.burstable_cdns[alias] !== 'undefined'
@@ -123,10 +123,10 @@ function OpenmixApplication(settings) {
                     value = parseFloat(data_fusion[alias][metric].value);
                     thresholds = settings.burstable_cdns[alias][metric];
 
-                    for (j = 0, len = thresholds.length; j < len; j ++) {
-                        if (value >= thresholds[j].threshold) {
-                            //console.log('hit threshold: ' + JSON.stringify(thresholds[j]));
-                            return (value / thresholds[j].threshold - 1) * thresholds[j].multiplier;
+                    for (i = 0, len = thresholds.length; i < len; i ++) {
+                        if (value >= thresholds[i].threshold) {
+                            //console.log('hit threshold: ' + JSON.stringify(thresholds[i]));
+                            return (value / thresholds[i].threshold - 1) * thresholds[i].multiplier;
                         }
                     }
                 }
