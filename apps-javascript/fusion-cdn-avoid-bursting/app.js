@@ -151,7 +151,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 alias = aliases[i];
                 provider = settings.providers[alias];
-                base_padding = typeof provider.base_padding === 'undefined' ? 0 : provider.base_padding
+                base_padding = typeof provider.base_padding === 'undefined' ? 0 : provider.base_padding;
                 padding_pct = get_padding_percent(alias, 'bandwidth', reasons.missing_bandwidth_data)
                     + get_padding_percent(alias, 'usage', reasons.missing_usage_data);
                 data[alias].http_rtt = base_padding + ((1 + padding_pct) * data[alias].http_rtt);
