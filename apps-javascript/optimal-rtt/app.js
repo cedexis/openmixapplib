@@ -3,14 +3,18 @@ var handler = new OpenmixApplication({
     // keys are the Openmix aliases set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
     // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
+    // `countries` is a list of countries where the provider can be used
+    // `markets` is a list of markets where the provider can be used
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            padding: 0
+            padding: 0,
+            countries: ['CN']
         },
         'bar': {
             cname: 'www.bar.com',
-            padding: 0
+            padding: 0,
+            markets: ['NA', 'EU']
         },
         'baz': {
             cname: 'www.baz.com',
