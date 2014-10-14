@@ -70,6 +70,7 @@ function OpenmixApplication(settings) {
             unexpected_market: 'C'
         };
 
+        /* jshint laxbreak:true */
         if (typeof settings.country_to_provider !== 'undefined'
             && typeof settings.country_to_provider[request.country] !== 'undefined') {
             // Override based on the request country
@@ -89,6 +90,7 @@ function OpenmixApplication(settings) {
             decision_ttl = decision_ttl || settings.error_ttl;
             decision_reason = all_reasons.unexpected_market;
         }
+        /* jshint laxbreak:false */
 
         response.respond(decision_provider, settings.providers[decision_provider].cname);
         response.setTTL(decision_ttl);
