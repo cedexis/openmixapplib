@@ -60,12 +60,10 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var data_fusion = request.getData('fusion'),
+        var data_fusion = parse_fusion_data(request.getData('fusion')),
             decision_provider,
             decision_reason,
             decision_ttl;
-
-        data_fusion =  parse_fusion_data(data_fusion);
 
         function select_random_provider() {
             decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
