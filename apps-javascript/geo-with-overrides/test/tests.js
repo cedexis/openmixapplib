@@ -37,20 +37,17 @@
 
     test('basic', test_init({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com'
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com'
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com'
                 }
-            ]
+            }
         },
         setup: function() {
             return;
@@ -58,9 +55,9 @@
         verify: function(i) {
             console.log(i);
             equal(i.requireProvider.callCount, 3);
-            equal(i.requireProvider.args[0][0], 'foo');
+            equal(i.requireProvider.args[2][0], 'foo');
             equal(i.requireProvider.args[1][0], 'bar');
-            equal(i.requireProvider.args[2][0], 'baz');
+            equal(i.requireProvider.args[0][0], 'baz');
         }
     }));
 
@@ -102,22 +99,19 @@
 
     test('geo country overrides', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com'
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com'
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com'
                 }
-            ],
+            },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
             default_ttl: 20,
@@ -143,22 +137,19 @@
 
     test('geo markets', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com'
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com'
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com'
                 }
-            ],
+            },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
             default_ttl: 20,
@@ -184,22 +175,19 @@
 
     test('unexpected market', test_handle_request({
         settings: {
-            providers: [
-                {
-                    alias: 'foo',
+            providers: {
+                'foo': {
                     cname: 'www.foo.com'
                 },
-                {
-                    alias: 'bar',
+                'bar': {
                     cname: 'www.bar.com'
                 },
-                {
-                    alias: 'baz',
+                'baz': {
                     cname: 'www.baz.com'
                 }
-            ],
+            },
             availability_threshold: 90,
-            country_overrides: { 'UK': 'bar' },
+            country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
             default_ttl: 20,
