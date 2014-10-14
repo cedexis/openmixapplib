@@ -138,7 +138,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -165,7 +165,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {string} data
+     * @param {!Object} data
      */
     function parse_sonar_data(data) {
         var keys = Object.keys(data),

@@ -57,6 +57,7 @@ copy_deps_js optimal-rtt
 copy_deps_js thruput-with-rtt
 copy_deps_js load-external-config
 copy_deps_js new-relic
+copy_deps_js round-robin-failover
 
 echo
 copy_package_json diagnostics
@@ -67,6 +68,7 @@ copy_package_json optimal-rtt
 copy_package_json thruput-with-rtt
 copy_package_json load-external-config
 copy_package_json new-relic
+copy_package_json round-robin-failover
 
 echo
 copy_jshintConfig diagnostics
@@ -77,6 +79,7 @@ copy_jshintConfig optimal-rtt
 copy_jshintConfig thruput-with-rtt
 copy_jshintConfig load-external-config
 copy_jshintConfig new-relic
+copy_jshintConfig round-robin-failover
 
 echo
 copy_jshintConfigTests diagnostics
@@ -87,6 +90,7 @@ copy_jshintConfigTests optimal-rtt
 copy_jshintConfigTests thruput-with-rtt
 copy_jshintConfigTests load-external-config
 copy_jshintConfigTests new-relic
+copy_jshintConfigTests round-robin-failover
 
 echo
 copy_validate_js_sh diagnostics
@@ -97,6 +101,7 @@ copy_validate_js_sh optimal-rtt
 copy_validate_js_sh thruput-with-rtt
 copy_validate_js_sh load-external-config
 copy_validate_js_sh new-relic
+copy_validate_js_sh round-robin-failover
 
 echo
 run_npm_and_execute_validate_js_and_tests diagnostics
@@ -107,3 +112,4 @@ run_npm_and_execute_validate_js_and_tests optimal-rtt
 run_npm_and_execute_validate_js_and_tests thruput-with-rtt
 run_npm_and_execute_validate_js_and_tests load-external-config
 run_npm_and_execute_validate_js_and_tests new-relic
+run_npm_and_execute_validate_js_and_tests round-robin-failover
