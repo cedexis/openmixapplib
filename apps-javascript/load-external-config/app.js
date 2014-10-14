@@ -13,6 +13,7 @@ var handler = new OpenmixApplication({
             base_padding: 0
         }
     },
+    fusion_provider: 'foo',
     availability_threshold: 90,
     min_valid_rtt_score: 5,
     default_ttl: 20,
@@ -59,7 +60,8 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var data_avail = filter_object(request.getProbe('avail'), filter_empty),
             data_rtt = filter_object(request.getProbe('http_rtt'), filter_invalid_rtt_scores),
-            data_fusion = parse_fusion_data(request.getData('fusion')),
+            data_fusion_raw = request.getData('fusion'),
+            data_fusion = parse_fusion_data(data_fusion_raw[settings.fusion_provider]),
             hostname = request.hostname_prefix,
             decision_provider,
             decision_ttl = settings.default_ttl,
@@ -121,7 +123,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -143,7 +145,7 @@ function OpenmixApplication(settings) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;
     }
     /**
-     * @param {Object} candidate
+     * @param {{avail:number}} candidate
      */
     function filter_availability(candidate) {
         return candidate.avail >= settings.availability_threshold;
@@ -152,13 +154,14 @@ function OpenmixApplication(settings) {
      * @param {Object} candidate
      */
     function filter_empty(candidate) {
-        for (var key in candidate) {
+        var key;
+        for (key in candidate) {
             return true;
         }
         return false;
     }
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -179,7 +182,7 @@ function OpenmixApplication(settings) {
         return candidate;
     }
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */

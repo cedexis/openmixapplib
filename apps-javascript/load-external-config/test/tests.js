@@ -1,13 +1,3 @@
-/*global
-    module,
-    test,
-    equal,
-    deepEqual,
-    OpenmixApplication,
-    init,
-    onRequest,
-    console,
-*/
 
 (function() {
     'use strict';
@@ -27,6 +17,7 @@
                 base_padding: 0
             }
         },
+        fusion_provider: 'foo',
         availability_threshold: 90,
         min_valid_rtt_score: 5,
         default_ttl: 20,
@@ -142,7 +133,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -191,7 +184,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -240,7 +235,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -289,7 +286,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site2';
         },
         verify: function(i) {
@@ -338,7 +337,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -387,7 +388,7 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("");
+                .returns({ foo: "" });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -426,7 +427,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -465,7 +468,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site1';
         },
         verify: function(i) {
@@ -514,7 +519,9 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns("#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net");
+                .returns({
+                    foo: "#customer,foo,bar,baz\nsite1,d2ksyxg0rursd3.cdn1.net,wpc.50C7.cdn2.net,foo.edgesuite.net\nsite2,d2ksyxg0rurg4r.cdn1.net,wpc.50A2.cdn2.net,bar.edgesuite.net"
+                });
             i.request.hostname_prefix = 'site4';
         },
         verify: function(i) {

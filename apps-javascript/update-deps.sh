@@ -55,6 +55,7 @@ copy_deps_js fusion-cdn-avoid-bursting-gb
 copy_deps_js geo-with-overrides
 copy_deps_js optimal-rtt
 copy_deps_js thruput-with-rtt
+copy_deps_js load-external-config
 
 echo
 copy_package_json diagnostics
@@ -63,6 +64,7 @@ copy_package_json fusion-cdn-avoid-bursting-gb
 copy_package_json geo-with-overrides
 copy_package_json optimal-rtt
 copy_package_json thruput-with-rtt
+copy_package_json load-external-config
 
 echo
 copy_jshintConfig diagnostics
@@ -71,6 +73,7 @@ copy_jshintConfig fusion-cdn-avoid-bursting-gb
 copy_jshintConfig geo-with-overrides
 copy_jshintConfig optimal-rtt
 copy_jshintConfig thruput-with-rtt
+copy_jshintConfig load-external-config
 
 echo
 copy_jshintConfigTests diagnostics
@@ -79,6 +82,7 @@ copy_jshintConfigTests fusion-cdn-avoid-bursting-gb
 copy_jshintConfigTests geo-with-overrides
 copy_jshintConfigTests optimal-rtt
 copy_jshintConfigTests thruput-with-rtt
+copy_jshintConfigTests load-external-config
 
 echo
 copy_validate_js_sh diagnostics
@@ -87,6 +91,7 @@ copy_validate_js_sh fusion-cdn-avoid-bursting-gb
 copy_validate_js_sh geo-with-overrides
 copy_validate_js_sh optimal-rtt
 copy_validate_js_sh thruput-with-rtt
+copy_validate_js_sh load-external-config
 
 echo
 run_npm_and_execute_validate_js_and_tests diagnostics
@@ -95,3 +100,4 @@ run_npm_and_execute_validate_js_and_tests fusion-cdn-avoid-bursting-gb
 run_npm_and_execute_validate_js_and_tests geo-with-overrides
 run_npm_and_execute_validate_js_and_tests optimal-rtt
 run_npm_and_execute_validate_js_and_tests thruput-with-rtt
+run_npm_and_execute_validate_js_and_tests load-external-config
