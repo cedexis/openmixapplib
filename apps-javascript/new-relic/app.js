@@ -87,7 +87,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {string} data
+     * @param {!Object} data
      */
     function parse_fusion_data(data) {
         var keys = Object.keys(data),
