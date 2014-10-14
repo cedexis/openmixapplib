@@ -30,8 +30,7 @@
         availability_threshold: 90,
         min_valid_rtt_score: 5,
         default_ttl: 20,
-        error_ttl: 10,
-        fallback: { alias: 'foo', cname: 'provider1.example.com' }
+        error_ttl: 10
     };
 
     module('do_init');

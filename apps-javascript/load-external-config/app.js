@@ -16,8 +16,7 @@ var handler = new OpenmixApplication({
     availability_threshold: 90,
     min_valid_rtt_score: 5,
     default_ttl: 20,
-    error_ttl: 20,
-    fallback: { alias: 'cdn1', cname: 'provider1.example.com' }
+    error_ttl: 20
 });
 
 function init(config) {
