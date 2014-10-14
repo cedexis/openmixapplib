@@ -56,6 +56,7 @@ copy_deps_js geo-with-overrides
 copy_deps_js optimal-rtt
 copy_deps_js thruput-with-rtt
 copy_deps_js load-external-config
+copy_deps_js new-relic
 
 echo
 copy_package_json diagnostics
@@ -65,6 +66,7 @@ copy_package_json geo-with-overrides
 copy_package_json optimal-rtt
 copy_package_json thruput-with-rtt
 copy_package_json load-external-config
+copy_package_json new-relic
 
 echo
 copy_jshintConfig diagnostics
@@ -74,6 +76,7 @@ copy_jshintConfig geo-with-overrides
 copy_jshintConfig optimal-rtt
 copy_jshintConfig thruput-with-rtt
 copy_jshintConfig load-external-config
+copy_jshintConfig new-relic
 
 echo
 copy_jshintConfigTests diagnostics
@@ -83,6 +86,7 @@ copy_jshintConfigTests geo-with-overrides
 copy_jshintConfigTests optimal-rtt
 copy_jshintConfigTests thruput-with-rtt
 copy_jshintConfigTests load-external-config
+copy_jshintConfigTests new-relic
 
 echo
 copy_validate_js_sh diagnostics
@@ -92,6 +96,7 @@ copy_validate_js_sh geo-with-overrides
 copy_validate_js_sh optimal-rtt
 copy_validate_js_sh thruput-with-rtt
 copy_validate_js_sh load-external-config
+copy_validate_js_sh new-relic
 
 echo
 run_npm_and_execute_validate_js_and_tests diagnostics
@@ -101,3 +106,4 @@ run_npm_and_execute_validate_js_and_tests geo-with-overrides
 run_npm_and_execute_validate_js_and_tests optimal-rtt
 run_npm_and_execute_validate_js_and_tests thruput-with-rtt
 run_npm_and_execute_validate_js_and_tests load-external-config
+run_npm_and_execute_validate_js_and_tests new-relic
