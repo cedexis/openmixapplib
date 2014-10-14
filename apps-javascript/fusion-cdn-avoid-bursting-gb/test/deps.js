@@ -17,10 +17,16 @@ function OpenmixRequest() {
     this.hostname_prefix = 'some hostname prefix';
 }
 
-/** @param {string} probe_type */
+/**
+ * @param {string} probe_type
+ * @return {!Object.<string,!Object.<string,number>>}
+ */
 OpenmixRequest.prototype.getProbe = function(probe_type) {};
 
-/** @param {string} feed_name */
+/**
+ * @param {string} feed_name
+ * @return {!Object.<string,string>}
+ */
 OpenmixRequest.prototype.getData = function(feed_name) {};
 
 /** @constructor */
