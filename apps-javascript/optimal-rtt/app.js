@@ -128,6 +128,7 @@ function OpenmixApplication(settings) {
             geo_default_on_market: 'G'
         };
 
+        /* jslint laxbreak:true */
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets
@@ -212,7 +213,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -232,7 +233,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -257,7 +258,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
@@ -281,7 +282,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} data
+     * @param {!Object.<string,{ http_rtt: number }>} data
      */
     function add_rtt_padding(data) {
         var keys = Object.keys(data),

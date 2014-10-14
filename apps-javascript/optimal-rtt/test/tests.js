@@ -1,12 +1,3 @@
-/*global
-    module,
-    test,
-    equal,
-    deepEqual,
-    OpenmixApplication,
-    console,
-*/
-
 (function() {
     'use strict';
 
