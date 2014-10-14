@@ -3,14 +3,18 @@ var handler = new OpenmixApplication({
     // keys are the Openmix aliases set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
     // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
+    // `countries` is a list of countries where the provider can be used
+    // `markets` is a list of markets where the provider can be used
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            padding: 0
+            padding: 0,
+            countries: ['CN']
         },
         'bar': {
             cname: 'www.bar.com',
-            padding: 0
+            padding: 0,
+            markets: ['NA', 'EU']
         },
         'baz': {
             cname: 'www.baz.com',
@@ -124,6 +128,7 @@ function OpenmixApplication(settings) {
             geo_default_on_market: 'G'
         };
 
+        /* jslint laxbreak:true */
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets
@@ -208,7 +213,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -228,7 +233,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -253,7 +258,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
@@ -277,7 +282,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} data
+     * @param {!Object.<string,{ http_rtt: number }>} data
      */
     function add_rtt_padding(data) {
         var keys = Object.keys(data),

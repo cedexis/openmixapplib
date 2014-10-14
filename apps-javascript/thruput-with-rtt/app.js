@@ -13,7 +13,8 @@ var handler = new OpenmixApplication({
     availability_threshold: 90,
     throughput_tie_threshold: 0.95,
     min_valid_rtt_score: 5,
-    default_ttl: 20
+    default_ttl: 20,
+    error_ttl: 20
 });
 
 function init(config) {
@@ -55,7 +56,9 @@ function OpenmixApplication(settings) {
 
     this.handle_request = function(request, response) {
         var data_avail,
+            /** @type {Object.<string,{http_kbps:number}>} */
             data_kbps,
+            /** @type {Object.<string,{http_rtt:number}>} */
             data_rtt,
             decision_provider,
             decision_reasons = [],
@@ -84,7 +87,7 @@ function OpenmixApplication(settings) {
         }
 
         function select_random_provider(reason) {
-            console.log('random', Math.random());
+            //console.log('random', Math.random());
             decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
             decision_reasons.push(reason);
             decision_ttl = settings.error_ttl;
@@ -153,7 +156,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -180,31 +183,33 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} candidate
+     * @param {{avail:number}} candidate
      */
     function filter_availability(candidate) {
         return candidate.avail >= settings.availability_threshold;
     }
 
     /**
-     * @param {Object} candidate
+     * @param {!Object} candidate
      */
     function filter_empty(candidate) {
         return !is_empty(candidate);
     }
 
     /**
-     * @param {Object} candidate
+     * @param {!Object} object
+     * jshint unused:false
      */
     function is_empty(object) {
-        for (var key in object) {
+        var key;
+        for (key in object) {
             return false;
         }
         return true;
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -229,7 +234,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_highest(source, property) {
@@ -254,7 +259,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
