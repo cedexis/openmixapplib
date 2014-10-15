@@ -42,7 +42,9 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-    var failover_aliases = typeof settings.failover_providers === 'undefined' ? [] : Object.keys(settings.failover_providers);
+    var failoverAliases = typeof settings.failover_providers === 'undefined' ? [] : Object.keys(settings.failover_providers);
+    var lastAliasIndex = 0;
+    var lastFailoverAliasIndex = 0;
 
     /**
      * @param {OpenmixConfiguration} config
@@ -54,10 +56,10 @@ function OpenmixApplication(settings) {
             config.requireProvider(aliases[i]);
         }
 
-        i = failover_aliases.length;
+        i = failoverAliases.length;
 
         while (i --) {
-            config.requireProvider(failover_aliases[i]);
+            config.requireProvider(failoverAliases[i]);
         }
 
     };
@@ -67,81 +69,85 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var data_sonar  = parse_sonar_data(request.getData('sonar')),
-            all_reasons,
-            decision_provider,
-            decision_ttl,
+        var dataSonar  = parseSonarData(request.getData('sonar')),
+            allReasons,
+            decisionProvider,
+            decisionTtl,
             candidates,
-            candidate_aliases,
-            reason_code,
-            decision_cname;
+            candidateAliases,
+            reasonCode,
+            decisionCname;
 
-        all_reasons = {
+        allReasons = {
             primary_selected: 'A',
             failover_selected: 'B',
             default_selected: 'C'
         };
 
-        function filter_primary_candidates(candidate, alias) {
+        function filterPrimaryCandidates(candidate, alias) {
             return (candidate >= settings.sonar_threshold)
                 && (typeof settings.providers[alias] !== 'undefined');
         }
 
-        function filter_failover_candidates(candidate, alias) {
+        function filterFailoverCandidates(candidate, alias) {
             return (candidate >= settings.sonar_threshold)
                 && (typeof settings.failover_providers[alias] !== 'undefined');
         }
 
-        function select_random_provider(aliases, reason) {
-            decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
-            reason_code = reason;
-            decision_ttl = settings.default_ttl;
+        function selectProvider(aliases, reason, index) {
+            if (index >= aliases.length) {
+                index = 0;
+            }
+            decisionProvider = aliases[index];
+            reasonCode = reason;
+            decisionTtl = settings.default_ttl;
+            return index+1;
         }
 
-        candidates = filter_object(data_sonar, filter_primary_candidates);
+        candidates = filterObject(dataSonar, filterPrimaryCandidates);
 
-        candidate_aliases = Object.keys(candidates);
+        candidateAliases = Object.keys(candidates);
 
-        if (candidate_aliases.length === 1) {
-            decision_provider = candidate_aliases[0];
-            reason_code = all_reasons.primary_selected;
-            decision_ttl = decision_ttl || settings.default_ttl;
-        } else if (candidate_aliases.length !== 0) {
-            select_random_provider(aliases, all_reasons.primary_selected);
+        if (candidateAliases.length === 1) {
+            decisionProvider = candidateAliases[0];
+            reasonCode = allReasons.primary_selected;
+            decisionTtl = decisionTtl || settings.default_ttl;
+        } else if (candidateAliases.length !== 0) {
+            lastAliasIndex = selectProvider(aliases, allReasons.primary_selected, lastAliasIndex);
         }
 
-        if (!decision_provider) {
-            candidates = filter_object(data_sonar, filter_failover_candidates);
+        if (!decisionProvider) {
+            candidates = filterObject(dataSonar, filterFailoverCandidates);
 
-            candidate_aliases = Object.keys(candidates);
+            candidateAliases = Object.keys(candidates);
 
-            if (candidate_aliases.length === 1) {
-                decision_provider = candidate_aliases[0];
-                decision_cname = settings.failover_providers[decision_provider].cname;
-                reason_code = all_reasons.failover_selected;
-                decision_ttl = decision_ttl || settings.default_ttl;
-            } else if (candidate_aliases.length !== 0) {
-                select_random_provider(failover_aliases, all_reasons.failover_selected);
-                decision_cname = settings.failover_providers[decision_provider].cname;
+            if (candidateAliases.length === 1) {
+                decisionProvider = candidateAliases[0];
+                decisionCname = settings.failover_providers[decisionProvider].cname;
+                reasonCode = allReasons.failover_selected;
+                decisionTtl = decisionTtl || settings.default_ttl;
+            } else if (candidateAliases.length !== 0) {
+                lastFailoverAliasIndex = selectProvider(failoverAliases, allReasons.failover_selected, lastFailoverAliasIndex);
+                decisionCname = settings.failover_providers[decisionProvider].cname;
             }
         }
 
-        if (!decision_provider) {
-            decision_provider = settings.default_provider;
-            reason_code = all_reasons.default_selected;
-            decision_ttl = decision_ttl || settings.default_ttl;
+        if (!decisionProvider) {
+            decisionProvider = settings.default_provider;
+            reasonCode = allReasons.default_selected;
+            decisionTtl = decisionTtl || settings.default_ttl;
         }
 
-        response.respond(decision_provider, decision_cname || settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(reason_code);
+        response.respond(decisionProvider, decisionCname || settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(reasonCode);
     };
 
     /**
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filter_object(object, filter) {
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key,
@@ -153,21 +159,15 @@ function OpenmixApplication(settings) {
             if (filter(object[key], key)) {
                 data[key] = (object[key]);
             }
-            /*
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-            */
         }
 
-        //return object;
         return data;
     }
 
     /**
      * @param {!Object} data
      */
-    function parse_sonar_data(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
