@@ -123,6 +123,7 @@
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+            equal(i.sut.lastAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -198,6 +199,7 @@
             equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.sut.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -273,6 +275,33 @@
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+        }
+    }));
+
+    test('Failover; alias reset', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getData
+                .onCall(0)
+                .returns({
+                    "foo": 89,
+                    "bar": 89,
+                    "foo_f": 100,
+                    "bar_f": 100
+                });
+            i.sut.lastFailoverAliasIndex = 2;
+        },
+        verify: function(i) {
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.sut.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 

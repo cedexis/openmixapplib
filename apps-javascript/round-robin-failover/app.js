@@ -43,8 +43,8 @@ function OpenmixApplication(settings) {
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
     var failoverAliases = typeof settings.failover_providers === 'undefined' ? [] : Object.keys(settings.failover_providers);
-    var lastAliasIndex = 0;
-    var lastFailoverAliasIndex = 0;
+    this.lastAliasIndex = -1;
+    this.lastFailoverAliasIndex = -1;
 
     /**
      * @param {OpenmixConfiguration} config
@@ -94,14 +94,14 @@ function OpenmixApplication(settings) {
                 && (typeof settings.failover_providers[alias] !== 'undefined');
         }
 
-        function selectProvider(aliases, reason, index) {
-            if (index >= aliases.length) {
-                index = 0;
+        function selectProvider(aliases, reason, lastIndex) {
+            if (lastIndex >= aliases.length) {
+                lastIndex = -1;
             }
-            decisionProvider = aliases[index];
+            decisionProvider = aliases[++lastIndex];
             reasonCode = reason;
             decisionTtl = settings.default_ttl;
-            return index+1;
+            return lastIndex;
         }
 
         candidates = filterObject(dataSonar, filterPrimaryCandidates);
@@ -113,7 +113,7 @@ function OpenmixApplication(settings) {
             reasonCode = allReasons.primary_selected;
             decisionTtl = decisionTtl || settings.default_ttl;
         } else if (candidateAliases.length !== 0) {
-            lastAliasIndex = selectProvider(aliases, allReasons.primary_selected, lastAliasIndex);
+            this.lastAliasIndex = selectProvider(aliases, allReasons.primary_selected, this.lastAliasIndex);
         }
 
         if (!decisionProvider) {
@@ -127,7 +127,7 @@ function OpenmixApplication(settings) {
                 reasonCode = allReasons.failover_selected;
                 decisionTtl = decisionTtl || settings.default_ttl;
             } else if (candidateAliases.length !== 0) {
-                lastFailoverAliasIndex = selectProvider(failoverAliases, allReasons.failover_selected, lastFailoverAliasIndex);
+                this.lastFailoverAliasIndex = selectProvider(failoverAliases, allReasons.failover_selected, this.lastFailoverAliasIndex);
                 decisionCname = settings.failover_providers[decisionProvider].cname;
             }
         }
