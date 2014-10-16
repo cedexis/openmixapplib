@@ -9,10 +9,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Breaking these into multiple functions in order to support custom versions of
 # these files in some templates
 
-copy_deps_js() {
+copy_openmix_externs_js() {
     cd "${DIR}"
-    echo -e "${yellow}Updating deps.js in template: ${1}${no_color}"
-    cp template/test/deps.js ${1}/test/deps.js
+    echo -e "${yellow}Updating openmix-externs.js in template: ${1}${no_color}"
+    cp template/test/openmix-externs.js ${1}/test/openmix-externs.js
 }
 
 copy_package_json() {
@@ -49,15 +49,15 @@ run_npm_and_execute_validate_js_and_tests() {
 }
 
 echo
-copy_deps_js diagnostics
-copy_deps_js fusion-cdn-avoid-bursting
-copy_deps_js fusion-cdn-avoid-bursting-gb
-copy_deps_js geo-with-overrides
-copy_deps_js optimal-rtt
-copy_deps_js thruput-with-rtt
-copy_deps_js load-external-config
-copy_deps_js new-relic
-copy_deps_js round-robin-failover
+copy_openmix_externs_js diagnostics
+copy_openmix_externs_js fusion-cdn-avoid-bursting
+copy_openmix_externs_js fusion-cdn-avoid-bursting-gb
+copy_openmix_externs_js geo-with-overrides
+copy_openmix_externs_js optimal-rtt
+copy_openmix_externs_js thruput-with-rtt
+copy_openmix_externs_js load-external-config
+copy_openmix_externs_js new-relic
+copy_openmix_externs_js round-robin-failover
 
 echo
 copy_package_json diagnostics
