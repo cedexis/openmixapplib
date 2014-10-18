@@ -126,8 +126,8 @@ function OpenmixApplication(settings) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets
             return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
-                && (typeof provider.countries === 'undefined' || ~provider.countries.indexOf(request.country))
-                && (typeof provider.markets === 'undefined' || ~provider.markets.indexOf(request.market));
+                && (typeof provider.countries === 'undefined' || provider.countries.indexOf(request.country) !== -1)
+                && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1);
         }
 
         function select_geo_override(providers, region, reason, error_reason) {
