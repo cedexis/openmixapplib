@@ -93,13 +93,6 @@ function OpenmixApplication(settings) {
             config.requireProvider(alias);
 
             settings.providers[alias].padding = settings.providers[alias].padding || 0;
-
-            if (typeof settings.providers[alias].countries !== 'undefined') {
-                settings.providers[alias].countries = array_to_keys(settings.providers[alias].countries);
-            }
-            if (typeof settings.providers[alias].markets !== 'undefined') {
-                settings.providers[alias].markets = array_to_keys(settings.providers[alias].markets);
-            }
         }
     };
 
@@ -132,8 +125,8 @@ function OpenmixApplication(settings) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets
             return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
-                && (typeof provider.countries === 'undefined' || provider.countries[request.country])
-                && (typeof provider.markets === 'undefined' || provider.markets[request.market]);
+                && (typeof provider.countries === 'undefined' || ~provider.countries.indexOf(request.country))
+                && (typeof provider.markets === 'undefined' || ~provider.markets.indexOf(request.market));
         }
 
         function select_geo_override(providers, region, reason, error_reason) {
@@ -212,7 +205,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -232,7 +225,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -257,7 +250,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
@@ -281,7 +274,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} data
+     * @param {!Object} data
      */
     function add_rtt_padding(data) {
         var keys = Object.keys(data),
@@ -293,19 +286,5 @@ function OpenmixApplication(settings) {
             data[key].http_rtt *= 1 + settings.providers[key].padding / 100;
         }
         return data;
-    }
-
-    /**
-     * @param {Array} array
-     */
-    function array_to_keys(array) {
-        var object = {},
-            i = array.length;
-
-        while (i --) {
-            object[array[i]] = true;
-        }
-
-        return object;
     }
 }
