@@ -1,15 +1,3 @@
-/*global
-    module,
-    test,
-    equal,
-    deepEqual,
-    OpenmixApplication,
-    init,
-    onRequest,
-*/
-
-var handler;
-
 (function() {
     'use strict';
 
@@ -18,13 +6,14 @@ var handler;
     function test_init(i) {
         return function() {
 
-            var config = {
+            var sut,
+                config = {
                     requireProvider: function() { return; }
                 },
                 test_stuff,
                 stub_requireProvider;
 
-            handler = new OpenmixApplication({
+            sut = new OpenmixApplication({
                 providers: {
                     'a': {
                         cname: 'a.com'
@@ -52,7 +41,7 @@ var handler;
             i.setup(test_stuff);
 
             // Test
-            init(config);
+            sut.do_init(config);
 
             // Assert
             i.verify(test_stuff);
@@ -77,7 +66,8 @@ var handler;
 
     function test_onRequest(i) {
         return function() {
-            var config,
+            var sut,
+                config,
                 request,
                 response,
                 test_stuff,
@@ -99,7 +89,7 @@ var handler;
                 setReasonCode: function() { return; }
             };
 
-            handler = new OpenmixApplication({
+            sut = new OpenmixApplication({
                 providers: {
                     'a': {
                         cname: 'a.com'
@@ -117,7 +107,7 @@ var handler;
                 error_ttl: 20,
                 min_valid_rtt_score: 5,
             });
-            handler.do_init(config);
+            sut.do_init(config);
 
             stub_getProbe = this.stub(request, 'getProbe');
             stub_respond = this.stub(response, 'respond');
@@ -136,7 +126,7 @@ var handler;
             i.setup(test_stuff);
 
             // Test
-            onRequest(request, response);
+            sut.handle_request(request, response);
 
             // Assert
             i.verify(test_stuff);

@@ -121,6 +121,7 @@ function OpenmixApplication(settings) {
             geo_default_on_market: 'G'
         };
 
+        /* jslint laxbreak:true */
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets
@@ -274,7 +275,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {!Object} data
+     * @param {!Object.<string,{ http_rtt: number }>} data
      */
     function add_rtt_padding(data) {
         var keys = Object.keys(data),

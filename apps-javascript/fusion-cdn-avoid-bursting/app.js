@@ -108,6 +108,7 @@ function OpenmixApplication(settings) {
             decision_reasons = [],
             candidates;
 
+        /* jshint laxbreak:true */
         function get_padding_percent(alias, metric, error_reason) {
             var value,
                 thresholds,
@@ -195,7 +196,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -222,7 +223,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} candidate
+     * @param {{avail: number}} candidate
      */
     function filter_availability(candidate) {
         return candidate.avail >= settings.availability_threshold;
@@ -232,14 +233,15 @@ function OpenmixApplication(settings) {
      * @param {Object} candidate
      */
     function filter_empty(candidate) {
-        for (var key in candidate) {
+        var key;
+        for (key in candidate) {
             return true;
         }
         return false;
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -264,7 +266,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
@@ -288,7 +290,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {string} data
+     * @param {!Object} data
      */
     function parse_fusion_data(data) {
         var keys = Object.keys(data),
