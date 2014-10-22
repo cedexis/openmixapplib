@@ -1013,4 +1013,132 @@
         }
     }));
 
+    test('asn_override 1', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                'bar': {
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                'baz': {
+                    cname: 'www.baz.com',
+                    padding: 0
+                },
+                'qux': {
+                    cname: 'www.qux.com',
+                    padding: 0
+                }
+            },
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            asn_to_provider: {
+                123: 'baz',
+                124: 'bar'
+            },
+            conditional_hostname: {},
+            geo_override: false,
+            asn_override: true,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 100 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 200 },
+                qux: { http_rtt: 200 }
+            });
+            i.request.asn = '123';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'baz', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'H', 'Verifying reason code');
+        }
+    }));
+
+    test('asn_override_not_available', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com',
+                    padding: 0
+                },
+                'bar': {
+                    cname: 'www.bar.com',
+                    padding: 0
+                },
+                'baz': {
+                    cname: 'www.baz.com',
+                    padding: 0
+                },
+                'qux': {
+                    cname: 'www.qux.com',
+                    padding: 0
+                }
+            },
+            availability_threshold: 90,
+            market_to_provider: {},
+            country_to_provider: {},
+            asn_to_provider: {
+                123: 'baz',
+                124: 'bar'
+            },
+            conditional_hostname: {},
+            geo_override: false,
+            asn_override: true,
+            geo_default: false,
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.getProbe.onCall(0).returns({
+                foo: { avail: 100 },
+                bar: { avail: 80 },
+                baz: { avail: 100 },
+                qux: { avail: 100 }
+            });
+            i.getProbe.onCall(1).returns({
+                foo: { http_rtt: 201 },
+                bar: { http_rtt: 201 },
+                baz: { http_rtt: 200 },
+                qux: { http_rtt: 201 }
+            });
+            i.request.asn = '124';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'baz', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'I,A', 'Verifying reason code');
+        }
+    }));
+
 }());

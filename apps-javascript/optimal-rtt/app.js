@@ -29,6 +29,8 @@ var handler = new OpenmixApplication({
     availability_threshold: 90,
     // A mapping of ISO 3166-1 country codes to provider aliases
     country_to_provider: {},
+    // A mapping of ASN codes to provider aliases:  asn_to_provider: { 123: 'baz', 124: 'bar' }
+    asn_to_provider: {},
     // A mapping of market codes to provider aliases
     market_to_provider: {},
     // A mapping of ISO 3166-1 country to identifier (hostname prefix)
@@ -52,6 +54,8 @@ var handler = new OpenmixApplication({
      * },
      */
     conditional_hostname: {},
+    // Set to `true` to enable the asn override feature
+    asn_override: false,
     // Set to `true` to enable the geo override feature
     geo_override: false,
     // Set to `true` to enable the geo default feature
@@ -118,7 +122,9 @@ function OpenmixApplication(settings) {
             geo_override_not_available_country: 'E',
             geo_override_not_available_market: 'H',
             geo_default_on_country: 'F',
-            geo_default_on_market: 'G'
+            geo_default_on_market: 'G',
+            asn_override: 'H',
+            asn_override_not_available: 'I'
         };
 
         /* jslint laxbreak:true */
@@ -143,6 +149,19 @@ function OpenmixApplication(settings) {
             }
         }
 
+        function select_asn_override(providers, asn, reason, error_reason) {
+            if (typeof providers[asn] !== 'undefined') {
+                if (typeof candidates[providers[asn]] !== 'undefined') {
+                    decision_provider = providers[asn];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(reason);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(error_reason);
+                }
+            }
+        }
+
         // First figure out the available platforms
         candidates = filter_object(avail, filter_candidates);
         //console.log('available candidates: ' + JSON.stringify(candidates));
@@ -153,6 +172,10 @@ function OpenmixApplication(settings) {
             if (decision_provider === '') {
                 select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
             }
+        }
+
+        if (decision_provider === '' && settings.asn_override) {
+            select_asn_override(settings.asn_to_provider, request.asn, all_reasons.asn_override, all_reasons.asn_override_not_available);
         }
 
         if (decision_provider === '') {
