@@ -449,13 +449,4 @@ test('geo country fails sonar, select next available sonar provider', test_handl
         }
     }));
 
-
-
-
-
-
-
-
-
-
 }());
