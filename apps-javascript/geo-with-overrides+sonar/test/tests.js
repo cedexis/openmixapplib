@@ -234,7 +234,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            sonar_threshold: .9
+            sonar_threshold: 0.9
         },
         setup: function(i) {
             console.log(i);
@@ -244,8 +244,8 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": .89,
-                    "bar": .95
+                    "foo": 0.89,
+                    "bar": 0.95
                 });
         },
         verify: function(i) {
@@ -280,7 +280,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            sonar_threshold: .9
+            sonar_threshold: 0.9
         },
         setup: function(i) {
             console.log(i);
@@ -290,9 +290,9 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": .95,
-                    "bar": .89,
-                    "baz": .70
+                    "foo": 0.95,
+                    "bar": 0.89,
+                    "baz": 0.70
                 });
         },
         verify: function(i) {
@@ -327,7 +327,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            sonar_threshold: .9
+            sonar_threshold: 0.9
         },
         setup: function(i) {
             console.log(i);
@@ -337,9 +337,9 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": .89,
-                    "bar": .89,
-                    "baz": .70
+                    "foo": 0.89,
+                    "bar": 0.89,
+                    "baz": 0.70
                 });
         },
         verify: function(i) {
@@ -374,7 +374,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            sonar_threshold: .9
+            sonar_threshold: 0.9
         },
         setup: function(i) {
             console.log(i);
@@ -384,9 +384,9 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": .90,
-                    "bar": .90,
-                    "baz": .90
+                    "foo": 0.90,
+                    "bar": 0.90,
+                    "baz": 0.90
                 });
         },
         verify: function(i) {
@@ -421,7 +421,7 @@ test('geo country fails sonar, select next available sonar provider', test_handl
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            sonar_threshold: .9
+            sonar_threshold: 0.9
         },
         setup: function(i) {
             console.log(i);
@@ -431,9 +431,9 @@ test('geo country fails sonar, select next available sonar provider', test_handl
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": .90,
-                    "bar": .70,
-                    "baz": .90
+                    "foo": 0.90,
+                    "bar": 0.70,
+                    "baz": 0.90
                 });
         },
         verify: function(i) {

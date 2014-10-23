@@ -27,7 +27,7 @@ var handler = new OpenmixApplication({
     error_ttl: 20,
 
     // sonar values are between 0 - 1
-    sonar_threshold: .9,
+    sonar_threshold: 0.9
 
 });
 
