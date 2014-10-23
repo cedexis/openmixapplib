@@ -19,6 +19,7 @@ var OpenmixRequest;
 /**
  * @typedef {{
  *      addCName:function(string),
+ *      addARecord:function(string),
  *      respond:function(string,string),
  *      setTTL:function(number),
  *      setReasonCode:function(string)
