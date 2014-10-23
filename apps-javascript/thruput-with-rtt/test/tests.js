@@ -396,6 +396,7 @@
             geo_override: true,
             asn_override: false,
             asn_to_provider: {},
+            market_to_provider: {},
             country_to_provider: {
                 'US': 'b'
             }
@@ -452,6 +453,7 @@
             geo_override: true,
             asn_override: false,
             asn_to_provider: {},
+            market_to_provider: {},
             country_to_provider: {
                 'US': 'b'
             }
@@ -598,6 +600,120 @@
             equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
             equal(i.setReasonCode.args[0][0], 'H,A2', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_on_market ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            country_to_provider: {},
+            market_to_provider: {
+                'M1': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.market = 'M1';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'I', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_not_available_market ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            country_to_provider: {},
+            market_to_provider: {
+                'M1': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 89 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.market = 'M1';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'c', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'J,A2', 'Verifying reason code');
         }
     }));
 
