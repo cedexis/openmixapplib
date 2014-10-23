@@ -13,6 +13,8 @@ var handler = new OpenmixApplication({
     availability_threshold: 90,
     // A mapping of ISO 3166-1 country codes to provider aliases
     country_to_provider: {},
+    // A mapping of market codes to provider aliases
+    market_to_provider: {},
     // A mapping of ASN codes to provider aliases:  asn_to_provider: { 123: 'baz', 124: 'bar' }
     asn_to_provider: {},
     throughput_tie_threshold: 0.95,
@@ -50,7 +52,9 @@ function OpenmixApplication(settings) {
         geo_override_on_country: 'E',
         geo_override_not_available_country: 'F',
         asn_override: 'G',
-        asn_override_not_available: 'H'
+        asn_override_not_available: 'H',
+        geo_override_on_market: 'I',
+        geo_override_not_available_market: 'J'
     };
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
@@ -140,6 +144,10 @@ function OpenmixApplication(settings) {
 
         if (settings.geo_override) {
             select_geo_override(settings.country_to_provider, request.country, reasons.geo_override_on_country, reasons.geo_override_not_available_country);
+
+            if (decision_provider_override === '') {
+                select_geo_override(settings.market_to_provider, request.market, reasons.geo_override_on_market, reasons.geo_override_not_available_market);
+            }
         }
 
         if (settings.asn_override) {
