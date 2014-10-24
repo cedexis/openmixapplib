@@ -26,7 +26,8 @@
         },
         default_provider: 'foo',
         default_ttl: 20,
-        min_valid_rtt_score: 5
+        min_valid_rtt_score: 5,
+        no_health_score_ok: false
     };
 
     module('do_init');
@@ -386,4 +387,111 @@
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
         }
     }));
+
+test('test fusion health scores not required, return best rtt', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            default_provider: 'foo',
+            default_ttl: 20,
+            min_valid_rtt_score: 5,
+            no_health_score_ok: true
+        },
+        setup: function(i) {
+            i.request.no_health_score_ok = true;
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 150
+                    },
+                    "bar": {
+                        "http_rtt": 100
+                    },
+                    "baz": {
+                        "http_rtt": 120
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({});
+        },
+        verify: function(i) {
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+        }
+    }));
+
+   test('missing fusion data but flag says OK, return available provider with best rtt', test_handle_request({
+            settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            default_provider: 'foo',
+            default_ttl: 20,
+            min_valid_rtt_score: 5,
+            no_health_score_ok: true
+        },
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 190
+                    },
+                    "bar": {
+                        "http_rtt": 170
+                    },
+                    "baz": {
+                        "http_rtt": 100
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": "5"
+                        }
+                    }),
+                    "bar": JSON.stringify({
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": "5"
+                        }
+                    })
+                });
+        },
+        verify: function(i) {
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+        }
+    }));
+
 }());

@@ -12,7 +12,10 @@ var handler = new OpenmixApplication({
     },
     default_provider: 'foo',
     default_ttl: 90,
-    min_valid_rtt_score: 5
+    min_valid_rtt_score: 5,
+
+    // when set to false, all providers must have fusion data.  when set to true, fusion data is optional
+    no_health_score_ok: false
 });
 
 function init(config) {
@@ -68,9 +71,9 @@ function OpenmixApplication(settings) {
             data_rtt = filter_object(request.getProbe('http_rtt'), filter_empty);
 
         function fusion_health_score_ok(provider) {
-            // if we don't have fusion data for the provider, we can't tell if the provider is available
+            // let the flag determine if the provider is available when we don't have fusion data for the provider
             if( typeof data_fusion[provider] === 'undefined') {
-                return false;
+                return settings.no_health_score_ok;
             }
 
             // normally, the fusion recipe returns a health score of 3 or greater when the server is available
@@ -105,8 +108,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        // if we don't have fusion data for all providers, return any fusion available provider
-        if (Object.keys(data_fusion).length !== aliases.length){
+        if (Object.keys(data_fusion).length !== aliases.length && !settings.no_health_score_ok){
             select_any_provider(reasons.fusion_data_not_robust);
         }
         // if we don't have rtt, return any fusion available provider
