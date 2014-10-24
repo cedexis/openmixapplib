@@ -136,23 +136,10 @@ function OpenmixApplication(settings) {
                 && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1);
         }
 
-        function select_geo_override(providers, region, reason, error_reason) {
-            if (typeof providers[region] !== 'undefined') {
-                if (typeof candidates[providers[region]] !== 'undefined') {
-                    decision_provider = providers[region];
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reasons.push(reason);
-                } else {
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(error_reason);
-                }
-            }
-        }
-
-        function select_asn_override(providers, asn, reason, error_reason) {
-            if (typeof providers[asn] !== 'undefined') {
-                if (typeof candidates[providers[asn]] !== 'undefined') {
-                    decision_provider = providers[asn];
+        function select_override(providers, locale, reason, error_reason) {
+            if (typeof providers[locale] !== 'undefined') {
+                if (typeof candidates[providers[locale]] !== 'undefined') {
+                    decision_provider = providers[locale];
                     decision_ttl = decision_ttl || settings.default_ttl;
                     decision_reasons.push(reason);
                 } else {
@@ -167,15 +154,15 @@ function OpenmixApplication(settings) {
         //console.log('available candidates: ' + JSON.stringify(candidates));
 
         if (decision_provider === '' && settings.geo_override) {
-            select_geo_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
+            select_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
 
             if (decision_provider === '') {
-                select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
+                select_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
             }
         }
 
         if (decision_provider === '' && settings.asn_override) {
-            select_asn_override(settings.asn_to_provider, request.asn, all_reasons.asn_override, all_reasons.asn_override_not_available);
+            select_override(settings.asn_to_provider, request.asn, all_reasons.asn_override, all_reasons.asn_override_not_available);
         }
 
         if (decision_provider === '') {
