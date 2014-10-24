@@ -89,7 +89,7 @@
         };
     }
 
-    test('geo country overrides', test_handle_request({
+    test('geo country overrides, no sonar data', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -102,7 +102,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
@@ -131,7 +130,7 @@
         }
     }));
 
-    test('geo markets', test_handle_request({
+    test('geo markets overrides, no sonar data', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -144,7 +143,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'foo',
@@ -173,7 +171,7 @@
         }
     }));
 
-    test('unexpected market', test_handle_request({
+    test('unexpected market, no sonar data', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -186,7 +184,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
@@ -228,7 +225,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
@@ -274,7 +270,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
@@ -304,7 +299,7 @@
             equal(i.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+            equal(i.setReasonCode.args[0][0], 'DC', 'Verifying reason code');
         }
     }));
 
@@ -321,7 +316,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
@@ -368,7 +362,6 @@
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
             default_provider: 'baz',
@@ -415,7 +408,6 @@ test('geo country fails sonar, select next available sonar provider', test_handl
                     cname: 'www.baz.com'
                 }
             },
-            availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'US': 'foo' },
             default_provider: 'baz',
@@ -445,7 +437,52 @@ test('geo country fails sonar, select next available sonar provider', test_handl
             notEqual(i.respond.args[0][0], 'bar', 'Verifying selected alias');
             notEqual(i.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+            equal(i.setReasonCode.args[0][0], 'DC', 'Verifying reason code');
+        }
+    }));
+
+test('test sonar_data_required flag returns only available platform', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            country_to_provider: { 'UK': 'bar' },
+            market_to_provider: { 'US': 'foo' },
+            default_provider: 'baz',
+            default_ttl: 20,
+            error_ttl: 10,
+            sonar_threshold: 0.9,
+            require_sonar_data: true
+        },
+        setup: function(i) {
+            console.log(i);
+            i.request.country = 'UK';
+            i.request.market = 'EG';
+            i.request
+                .getData
+                .onCall(0)
+                .returns({
+                    "foo": 0.90
+                });
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 10, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'DC', 'Verifying reason code');
         }
     }));
 

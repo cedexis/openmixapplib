@@ -27,7 +27,10 @@ var handler = new OpenmixApplication({
     error_ttl: 20,
 
     // sonar values are between 0 - 1
-    sonar_threshold: 0.9
+    sonar_threshold: 0.9,
+
+    // flip to true if the platform will be considered unavailable if it does not have sonar data
+    require_sonar_data: false
 
 });
 
@@ -79,16 +82,21 @@ function OpenmixApplication(settings) {
         };
 
         // determine which providers have a sonar value below threshold
-        function belowSonarThreshold(sonarValue, alias) {
-            if( dataSonar[alias] !== 'undefined') {
-                return (sonarValue < settings.sonar_threshold)
-                    && (typeof settings.providers[alias] !== 'undefined');
+        function belowSonarThreshold(alias) {
+            if( typeof dataSonar[alias] !== 'undefined') {
+                return (dataSonar[alias] < settings.sonar_threshold);
             }
+            return settings.require_sonar_data;
+        }
+
+        
+        function isEmpty(obj) {
+            return Object.keys(obj).length === 0;
         }
 
         // used for reason code logging
         function failedGeoLocation() {
-            if( failedCandidates.length > 0) {
+            if( !isEmpty(failedCandidates)) {
                 if (typeof settings.country_to_provider !== 'undefined'
                     && typeof settings.country_to_provider[request.country] !== 'undefined' 
                     && failedCandidates[settings.country_to_provider[request.country]] !== 'undefined') {
@@ -107,7 +115,7 @@ function OpenmixApplication(settings) {
 
         function getDefaultProvider() {   
             // the default provider is good, use it          
-            if( failedCandidates.length === 0 || typeof failedCandidates[settings.default_provider] === 'undefined') {
+            if( isEmpty(failedCandidates) || typeof failedCandidates[settings.default_provider] === 'undefined') {
                 return settings.default_provider;
             }
 
@@ -130,7 +138,7 @@ function OpenmixApplication(settings) {
 
         }
 
-        failedCandidates = filterObject(dataSonar, belowSonarThreshold);
+        failedCandidates = filterObject(settings.providers, belowSonarThreshold);
 
         /* jshint laxbreak:true */
         if (typeof settings.country_to_provider !== 'undefined'
@@ -153,10 +161,12 @@ function OpenmixApplication(settings) {
 
             decision_provider = getDefaultProvider();
             decision_ttl = decision_ttl || settings.error_ttl;
-            if( failedGeoLocation() ) {
-                decision_reason = all_reasons.geo_sonar_failed + all_reasons.unexpected_market;
-            }else if(typeof decision_reason === 'undefined') {
-                decision_reason = all_reasons.unexpected_market;
+            if( typeof decision_reason === 'undefined'|| decision_reason.indexOf(all_reasons.no_available_provider) === -1 ) {
+                if( failedGeoLocation() ) {
+                    decision_reason = all_reasons.geo_sonar_failed + all_reasons.unexpected_market;
+                }else if(typeof decision_reason === 'undefined') {
+                    decision_reason = all_reasons.unexpected_market;
+                }
             }
         }
         /* jshint laxbreak:false */
@@ -175,7 +185,7 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (filter(object[key], key)) {
+            if (filter(key)) {
                 data[key] = (object[key]);
             }
         }
