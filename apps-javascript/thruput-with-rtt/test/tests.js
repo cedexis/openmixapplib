@@ -589,7 +589,7 @@
                 'c': { http_rtt: 200 }
             });
             i.get_random.returns(0.0101);
-            i.request.asn = '123';
+            i.request.asn = 123;
         },
         verify: function(i) {
             equal(i.respond.callCount, 1, 'Verifying respond call count');
