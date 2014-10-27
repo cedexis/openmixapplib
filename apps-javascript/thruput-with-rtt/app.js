@@ -1,4 +1,5 @@
 var handler = new OpenmixApplication({
+    // `asns` is a list of asns where the provider can be used
     providers: {
         'cdn1': {
             cname: 'cdn1.com'
@@ -7,7 +8,8 @@ var handler = new OpenmixApplication({
             cname: 'cdn2.com'
         },
         'origin': {
-            cname: 'origin.example.com'
+            cname: 'origin.example.com',
+            asns: [123, 321]
         }
     },
     availability_threshold: 90,
@@ -81,6 +83,15 @@ function OpenmixApplication(settings) {
             decision_ttl = settings.default_ttl,
             candidates,
             decision_provider_override = '';
+
+        /**
+         * @param {{avail:number}} candidate
+         */
+        function filter_availability(candidate, alias) {
+            var provider = settings.providers[alias];
+            return candidate.avail >= settings.availability_threshold
+                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
+        }
 
         function get_kbps_filter(data) {
             var aliases = Object.keys(data),
@@ -239,13 +250,6 @@ function OpenmixApplication(settings) {
      */
     function filter_invalid_rtt_scores(candidate) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;
-    }
-
-    /**
-     * @param {{avail:number}} candidate
-     */
-    function filter_availability(candidate) {
-        return candidate.avail >= settings.availability_threshold;
     }
 
     /**

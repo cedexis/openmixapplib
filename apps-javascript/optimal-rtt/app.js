@@ -5,6 +5,7 @@ var handler = new OpenmixApplication({
     // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
     // `countries` is a list of countries where the provider can be used
     // `markets` is a list of markets where the provider can be used
+    // `asns` is a list of asns where the provider can be used
     providers: {
         'foo': {
             cname: 'www.foo.com',
@@ -18,7 +19,8 @@ var handler = new OpenmixApplication({
         },
         'baz': {
             cname: 'www.baz.com',
-            padding: 0
+            padding: 0,
+            asns: [123, 321]
         },
         'qux': {
             cname: 'www.qux.com',
@@ -130,10 +132,11 @@ function OpenmixApplication(settings) {
         /* jslint laxbreak:true */
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
-            // Considered only available providers in the provider countries/markets
+            // Considered only available providers in the provider countries/markets/asn
             return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
                 && (typeof provider.countries === 'undefined' || provider.countries.indexOf(request.country) !== -1)
-                && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1);
+                && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1)
+                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
         }
 
         function select_override(providers, locale, reason, error_reason) {

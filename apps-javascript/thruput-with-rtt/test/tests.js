@@ -532,7 +532,7 @@
                 'c': { http_rtt: 200 }
             });
             i.get_random.returns(0.0101);
-            i.request.asn = '123';
+            i.request.asn = 123;
         },
         verify: function(i) {
             equal(i.respond.callCount, 1, 'Verifying respond call count');
@@ -714,6 +714,118 @@
             equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
             equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
             equal(i.setReasonCode.args[0][0], 'J,A2', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo asn (request from 123)', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com',
+                    asns: [123]
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': { http_kbps: 4000 },
+                'b': { http_kbps: 4000 },
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 201 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 202 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 123;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'B1', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo asn (request from 124)', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com',
+                    asns: [123]
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': { http_kbps: 4000 },
+                'b': { http_kbps: 4000 },
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 201 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 202 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 124;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'a', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'a.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'B1', 'Verifying reason code');
         }
     }));
 
