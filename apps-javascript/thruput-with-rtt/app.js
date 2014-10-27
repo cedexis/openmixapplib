@@ -1,4 +1,5 @@
 var handler = new OpenmixApplication({
+    // `asns` is a list of asns where the provider can be used
     providers: {
         'cdn1': {
             cname: 'cdn1.com'
@@ -7,13 +8,25 @@ var handler = new OpenmixApplication({
             cname: 'cdn2.com'
         },
         'origin': {
-            cname: 'origin.example.com'
+            cname: 'origin.example.com',
+            asns: [123, 321]
         }
     },
     availability_threshold: 90,
+    // A mapping of ISO 3166-1 country codes to provider aliases
+    country_to_provider: {},
+    // A mapping of market codes to provider aliases
+    market_to_provider: {},
+    // A mapping of ASN codes to provider aliases:  asn_to_provider: { 123: 'baz', 124: 'bar' }
+    asn_to_provider: {},
     throughput_tie_threshold: 0.95,
     min_valid_rtt_score: 5,
-    default_ttl: 20
+    // Set to `true` to enable the asn override feature
+    asn_override: false,
+    // Set to `true` to enable the geo override feature
+    geo_override: false,
+    default_ttl: 20,
+    error_ttl: 20
 });
 
 function init(config) {
@@ -37,7 +50,13 @@ function OpenmixApplication(settings) {
         best_rtt: 'B2',
         missing_data: 'C1',
         best_avail: 'D1',
-        missing_avail: 'D2'
+        missing_avail: 'D2',
+        geo_override_on_country: 'E',
+        geo_override_not_available_country: 'F',
+        asn_override: 'G',
+        asn_override_not_available: 'H',
+        geo_override_on_market: 'I',
+        geo_override_not_available_market: 'J'
     };
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
@@ -55,12 +74,24 @@ function OpenmixApplication(settings) {
 
     this.handle_request = function(request, response) {
         var data_avail,
+            /** @type {Object.<string,{http_kbps:number}>} */
             data_kbps,
+            /** @type {Object.<string,{http_rtt:number}>} */
             data_rtt,
             decision_provider,
             decision_reasons = [],
             decision_ttl = settings.default_ttl,
-            candidates;
+            candidates,
+            decision_provider_override = '';
+
+        /**
+         * @param {{avail:number}} candidate
+         */
+        function filter_availability(candidate, alias) {
+            var provider = settings.providers[alias];
+            return candidate.avail >= settings.availability_threshold
+                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
+        }
 
         function get_kbps_filter(data) {
             var aliases = Object.keys(data),
@@ -84,10 +115,36 @@ function OpenmixApplication(settings) {
         }
 
         function select_random_provider(reason) {
-            console.log('random', Math.random());
+            //console.log('random', Math.random());
             decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
             decision_reasons.push(reason);
             decision_ttl = settings.error_ttl;
+        }
+
+        function select_geo_override(providers, region, reason, error_reason) {
+            if (typeof providers[region] !== 'undefined') {
+                if (typeof data_avail[providers[region]] !== 'undefined') {
+                    decision_provider_override = providers[region];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(reason);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(error_reason);
+                }
+            }
+        }
+
+        function select_asn_override(providers, asn, reason, error_reason) {
+            if (typeof providers[asn] !== 'undefined') {
+                if (typeof data_avail[providers[asn]] !== 'undefined') {
+                    decision_provider_override = providers[asn];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reasons.push(reason);
+                } else {
+                    decision_ttl = decision_ttl || settings.error_ttl;
+                    decision_reasons.push(error_reason);
+                }
+            }
         }
 
         data_avail = request.getProbe('avail');
@@ -96,55 +153,71 @@ function OpenmixApplication(settings) {
         candidates = Object.keys(data_avail);
         //console.log('Available candidates: ' + JSON.stringify(candidates));
 
-        if (candidates.length === 0) {
-            if (typeof decision_provider === 'undefined') {
-                select_random_provider(reasons.missing_avail);
-            }
-            else {
-                decision_reasons.push(reasons.best_avail);
+        if (settings.geo_override) {
+            select_geo_override(settings.country_to_provider, request.country, reasons.geo_override_on_country, reasons.geo_override_not_available_country);
+
+            if (decision_provider_override === '') {
+                select_geo_override(settings.market_to_provider, request.market, reasons.geo_override_on_market, reasons.geo_override_not_available_market);
             }
         }
-        else if (candidates.length === 1) {
-            decision_provider = candidates[0];
-            decision_reasons.push(reasons.best_avail);
+
+        if (settings.asn_override) {
+            select_asn_override(settings.asn_to_provider, request.asn, reasons.asn_override, reasons.asn_override_not_available);
         }
-        else {
-            data_kbps = join_objects(filter_object(request.getProbe('http_kbps'), filter_empty), data_avail, 'avail');
-            data_rtt = join_objects(filter_object(request.getProbe('http_rtt'), filter_invalid_rtt_scores), data_avail, 'avail');
 
-            if (!is_empty(data_kbps)) {
-                candidates = Object.keys(data_kbps);
-
-                if (candidates.length === 1) {
-                    decision_provider = candidates[0];
-                    decision_reasons.push(reasons.sparse_throughput_data);
+        if (decision_provider_override === '') {
+            if (candidates.length === 0) {
+                if (typeof decision_provider === 'undefined') {
+                    select_random_provider(reasons.missing_avail);
                 }
                 else {
-                    filter_object(data_kbps, get_kbps_filter(data_kbps));
-                    join_objects(data_rtt, data_kbps, 'http_kbps');
-                    candidates = Object.keys(data_rtt);
-
-                    if (candidates.length === 0) {
-                        decision_provider = get_highest(data_kbps, 'http_kbps');
-                        decision_reasons.push(reasons.best_throughput);
-                    }
-                    else if (candidates.length === 1) {
-                        decision_provider = candidates[0];
-                        decision_reasons.push(reasons.best_throughput);
-                    }
-                    else {
-                        decision_provider = get_lowest(data_rtt, 'http_rtt');
-                        decision_reasons.push(reasons.best_rtt_with_throughput);
-                    }
+                    decision_reasons.push(reasons.best_avail);
                 }
             }
-            else if (!is_empty(data_rtt)) {
-                decision_provider = get_lowest(data_rtt, 'http_rtt');
-                decision_reasons.push(reasons.best_rtt);
+            else if (candidates.length === 1) {
+                decision_provider = candidates[0];
+                decision_reasons.push(reasons.best_avail);
             }
             else {
-                select_random_provider(reasons.missing_data);
+                data_kbps = join_objects(filter_object(request.getProbe('http_kbps'), filter_empty), data_avail, 'avail');
+                data_rtt = join_objects(filter_object(request.getProbe('http_rtt'), filter_invalid_rtt_scores), data_avail, 'avail');
+
+                if (!is_empty(data_kbps)) {
+                    candidates = Object.keys(data_kbps);
+
+                    if (candidates.length === 1) {
+                        decision_provider = candidates[0];
+                        decision_reasons.push(reasons.sparse_throughput_data);
+                    }
+                    else {
+                        filter_object(data_kbps, get_kbps_filter(data_kbps));
+                        join_objects(data_rtt, data_kbps, 'http_kbps');
+                        candidates = Object.keys(data_rtt);
+
+                        if (candidates.length === 0) {
+                            decision_provider = get_highest(data_kbps, 'http_kbps');
+                            decision_reasons.push(reasons.best_throughput);
+                        }
+                        else if (candidates.length === 1) {
+                            decision_provider = candidates[0];
+                            decision_reasons.push(reasons.best_throughput);
+                        }
+                        else {
+                            decision_provider = get_lowest(data_rtt, 'http_rtt');
+                            decision_reasons.push(reasons.best_rtt_with_throughput);
+                        }
+                    }
+                }
+                else if (!is_empty(data_rtt)) {
+                    decision_provider = get_lowest(data_rtt, 'http_rtt');
+                    decision_reasons.push(reasons.best_rtt);
+                }
+                else {
+                    select_random_provider(reasons.missing_data);
+                }
             }
+        } else {
+            decision_provider = decision_provider_override;
         }
 
         response.respond(decision_provider, settings.providers[decision_provider].cname);
@@ -153,7 +226,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -180,31 +253,26 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} candidate
-     */
-    function filter_availability(candidate) {
-        return candidate.avail >= settings.availability_threshold;
-    }
-
-    /**
-     * @param {Object} candidate
+     * @param {!Object} candidate
      */
     function filter_empty(candidate) {
         return !is_empty(candidate);
     }
 
     /**
-     * @param {Object} candidate
+     * @param {!Object} object
+     * jshint unused:false
      */
     function is_empty(object) {
-        for (var key in object) {
+        var key;
+        for (key in object) {
             return false;
         }
         return true;
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -229,7 +297,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_highest(source, property) {
@@ -254,7 +322,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */

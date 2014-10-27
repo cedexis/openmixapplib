@@ -1,15 +1,3 @@
-/*global
-    module,
-    test,
-    equal,
-    deepEqual,
-    OpenmixApplication,
-    init,
-    onRequest,
-*/
-
-var handler;
-
 (function() {
     'use strict';
 
@@ -18,13 +6,14 @@ var handler;
     function test_init(i) {
         return function() {
 
-            var config = {
+            var sut,
+                config = {
                     requireProvider: function() { return; }
                 },
                 test_stuff,
                 stub_requireProvider;
 
-            handler = new OpenmixApplication({
+            sut = new OpenmixApplication({
                 providers: {
                     'a': {
                         cname: 'a.com'
@@ -40,7 +29,7 @@ var handler;
                 throughput_tie_threshold: 0.95,
                 default_ttl: 20,
                 error_ttl: 20,
-                min_valid_rtt_score: 5,
+                min_valid_rtt_score: 5
             });
 
             stub_requireProvider = this.stub(config, 'requireProvider');
@@ -52,7 +41,7 @@ var handler;
             i.setup(test_stuff);
 
             // Test
-            init(config);
+            sut.do_init(config);
 
             // Assert
             i.verify(test_stuff);
@@ -77,7 +66,8 @@ var handler;
 
     function test_onRequest(i) {
         return function() {
-            var config,
+            var sut,
+                config,
                 request,
                 response,
                 test_stuff,
@@ -99,25 +89,30 @@ var handler;
                 setReasonCode: function() { return; }
             };
 
-            handler = new OpenmixApplication({
-                providers: {
-                    'a': {
-                        cname: 'a.com'
+            if (typeof i.settings === 'undefined') {
+                sut = new OpenmixApplication({
+                    providers: {
+                        'a': {
+                            cname: 'a.com'
+                        },
+                        'b': {
+                            cname: 'b.com'
+                        },
+                        'c': {
+                            cname: 'c.com'
+                        }
                     },
-                    'b': {
-                        cname: 'b.com'
-                    },
-                    'c': {
-                        cname: 'c.com'
-                    }
-                },
-                availability_threshold: 90,
-                throughput_tie_threshold: 0.95,
-                default_ttl: 20,
-                error_ttl: 20,
-                min_valid_rtt_score: 5,
-            });
-            handler.do_init(config);
+                    availability_threshold: 90,
+                    throughput_tie_threshold: 0.95,
+                    default_ttl: 20,
+                    error_ttl: 20,
+                    min_valid_rtt_score: 5
+                });
+            } else {
+                sut = new OpenmixApplication(i.settings);
+            }
+
+            sut.do_init(config);
 
             stub_getProbe = this.stub(request, 'getProbe');
             stub_respond = this.stub(response, 'respond');
@@ -128,6 +123,7 @@ var handler;
             test_stuff = {
                 getProbe: stub_getProbe,
                 respond: stub_respond,
+                request: request,
                 setTTL: stub_setTTL,
                 setReasonCode: stub_setReasonCode,
                 get_random: stub_get_random
@@ -136,7 +132,7 @@ var handler;
             i.setup(test_stuff);
 
             // Test
-            onRequest(request, response);
+            sut.handle_request(request, response);
 
             // Assert
             i.verify(test_stuff);
@@ -378,5 +374,459 @@ var handler;
             }
         }
     ));
+
+    test('geo_override_on_country ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {
+                'US': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.country = 'US';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'E', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_not_available_country ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {
+                'US': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 89 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.country = 'US';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'c', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'F,A2', 'Verifying reason code');
+        }
+    }));
+
+    test('asn_override ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: true,
+            asn_to_provider: {
+                123: 'b',
+                124: 'c'
+            },
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 123;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'G', 'Verifying reason code');
+        }
+    }));
+
+    test('asn_override_not_available', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: true,
+            asn_to_provider: {
+                123: 'b',
+                124: 'c'
+            },
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 80 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 123;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'c', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'H,A2', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_on_market ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            country_to_provider: {},
+            market_to_provider: {
+                'M1': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.market = 'M1';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'I', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_not_available_market ', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com'
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: true,
+            asn_override: false,
+            asn_to_provider: {},
+            country_to_provider: {},
+            market_to_provider: {
+                'M1': 'b'
+            }
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 89 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': {},
+                'b': {},
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 200 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 200 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.market = 'M1';
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'c', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'c.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'J,A2', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo asn (request from 123)', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com',
+                    asns: [123]
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': { http_kbps: 4000 },
+                'b': { http_kbps: 4000 },
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 201 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 202 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 123;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'b', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'b.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'B1', 'Verifying reason code');
+        }
+    }));
+
+    test('avoid by geo asn (request from 124)', test_onRequest({
+        settings: {
+            providers: {
+                'a': {
+                    cname: 'a.com'
+                },
+                'b': {
+                    cname: 'b.com',
+                    asns: [123]
+                },
+                'c': {
+                    cname: 'c.com'
+                }
+            },
+            availability_threshold: 90,
+            throughput_tie_threshold: 0.95,
+            default_ttl: 20,
+            error_ttl: 20,
+            min_valid_rtt_score: 5,
+            geo_override: false,
+            asn_override: false,
+            asn_to_provider: {},
+            market_to_provider: {},
+            country_to_provider: {}
+        },
+        setup: function(i) {
+            i.getProbe.withArgs('avail').returns({
+                'a': { avail: 90 },
+                'b': { avail: 90 },
+                'c': { avail: 90 }
+            });
+            i.getProbe.withArgs('http_kbps').returns({
+                'a': { http_kbps: 4000 },
+                'b': { http_kbps: 4000 },
+                'c': { http_kbps: 4000 }
+            });
+            i.getProbe.withArgs('http_rtt').returns({
+                'a': { http_rtt: 201 },
+                'b': { http_rtt: 200 },
+                'c': { http_rtt: 202 }
+            });
+            i.get_random.returns(0.0101);
+            i.request.asn = 124;
+        },
+        verify: function(i) {
+            equal(i.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.respond.args[0][0], 'a', 'Verifying selected alias');
+            equal(i.respond.args[0][1], 'a.com', 'Verifying CNAME');
+            equal(i.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.setReasonCode.args[0][0], 'B1', 'Verifying reason code');
+        }
+    }));
 
 }());

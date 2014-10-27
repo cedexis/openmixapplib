@@ -5,6 +5,7 @@ var handler = new OpenmixApplication({
     // `padding` is a penalty (or bonus) to be applied as in percentage of the actual score, e.g. 10 = 10% slower (score * 1.1)
     // `countries` is a list of countries where the provider can be used
     // `markets` is a list of markets where the provider can be used
+    // `asns` is a list of asns where the provider can be used
     providers: {
         'foo': {
             cname: 'www.foo.com',
@@ -18,7 +19,8 @@ var handler = new OpenmixApplication({
         },
         'baz': {
             cname: 'www.baz.com',
-            padding: 0
+            padding: 0,
+            asns: [123, 321]
         },
         'qux': {
             cname: 'www.qux.com',
@@ -29,6 +31,8 @@ var handler = new OpenmixApplication({
     availability_threshold: 90,
     // A mapping of ISO 3166-1 country codes to provider aliases
     country_to_provider: {},
+    // A mapping of ASN codes to provider aliases:  asn_to_provider: { 123: 'baz', 124: 'bar' }
+    asn_to_provider: {},
     // A mapping of market codes to provider aliases
     market_to_provider: {},
     // A mapping of ISO 3166-1 country to identifier (hostname prefix)
@@ -52,6 +56,8 @@ var handler = new OpenmixApplication({
      * },
      */
     conditional_hostname: {},
+    // Set to `true` to enable the asn override feature
+    asn_override: false,
     // Set to `true` to enable the geo override feature
     geo_override: false,
     // Set to `true` to enable the geo default feature
@@ -93,13 +99,6 @@ function OpenmixApplication(settings) {
             config.requireProvider(alias);
 
             settings.providers[alias].padding = settings.providers[alias].padding || 0;
-
-            if (typeof settings.providers[alias].countries !== 'undefined') {
-                settings.providers[alias].countries = array_to_keys(settings.providers[alias].countries);
-            }
-            if (typeof settings.providers[alias].markets !== 'undefined') {
-                settings.providers[alias].markets = array_to_keys(settings.providers[alias].markets);
-            }
         }
     };
 
@@ -125,21 +124,25 @@ function OpenmixApplication(settings) {
             geo_override_not_available_country: 'E',
             geo_override_not_available_market: 'H',
             geo_default_on_country: 'F',
-            geo_default_on_market: 'G'
+            geo_default_on_market: 'G',
+            asn_override: 'H',
+            asn_override_not_available: 'I'
         };
 
+        /* jslint laxbreak:true */
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
-            // Considered only available providers in the provider countries/markets
+            // Considered only available providers in the provider countries/markets/asn
             return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
-                && (typeof provider.countries === 'undefined' || provider.countries[request.country])
-                && (typeof provider.markets === 'undefined' || provider.markets[request.market]);
+                && (typeof provider.countries === 'undefined' || provider.countries.indexOf(request.country) !== -1)
+                && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1)
+                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
         }
 
-        function select_geo_override(providers, region, reason, error_reason) {
-            if (typeof providers[region] !== 'undefined') {
-                if (typeof candidates[providers[region]] !== 'undefined') {
-                    decision_provider = providers[region];
+        function select_override(providers, locale, reason, error_reason) {
+            if (typeof providers[locale] !== 'undefined') {
+                if (typeof candidates[providers[locale]] !== 'undefined') {
+                    decision_provider = providers[locale];
                     decision_ttl = decision_ttl || settings.default_ttl;
                     decision_reasons.push(reason);
                 } else {
@@ -154,11 +157,15 @@ function OpenmixApplication(settings) {
         //console.log('available candidates: ' + JSON.stringify(candidates));
 
         if (decision_provider === '' && settings.geo_override) {
-            select_geo_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
+            select_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
 
             if (decision_provider === '') {
-                select_geo_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
+                select_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
             }
+        }
+
+        if (decision_provider === '' && settings.asn_override) {
+            select_override(settings.asn_to_provider, request.asn, all_reasons.asn_override, all_reasons.asn_override_not_available);
         }
 
         if (decision_provider === '') {
@@ -212,7 +219,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -232,7 +239,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {string} property
      */
     function get_lowest(source, property) {
@@ -257,7 +264,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} target
+     * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
@@ -281,7 +288,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} data
+     * @param {!Object.<string,{ http_rtt: number }>} data
      */
     function add_rtt_padding(data) {
         var keys = Object.keys(data),
@@ -293,19 +300,5 @@ function OpenmixApplication(settings) {
             data[key].http_rtt *= 1 + settings.providers[key].padding / 100;
         }
         return data;
-    }
-
-    /**
-     * @param {Array} array
-     */
-    function array_to_keys(array) {
-        var object = {},
-            i = array.length;
-
-        while (i --) {
-            object[array[i]] = true;
-        }
-
-        return object;
     }
 }

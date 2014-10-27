@@ -44,7 +44,7 @@ function OpenmixApplication(settings) {
     };
 
     /**
-     * @param {Object} object
+     * @param {!Object} object
      * @param {Function} filter
      */
     function filter_object(object, filter) {
@@ -74,7 +74,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} source
+     * @param {!Object} source
      * @param {String} property
      */
     function get_lowest(source, property) {
