@@ -29,17 +29,16 @@
     function test_do_init(i) {
         return function() {
 
-            var sut,
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
                     requireProvider: this.stub()
                 },
                 test_stuff = {
+                    instance: sut,
                     config: config
                 };
 
             i.setup(test_stuff);
-
-            sut = new OpenmixApplication(i.settings || default_settings);
 
             // Test
             sut.do_init(config);
@@ -64,10 +63,7 @@
 
     function test_handle_request(i) {
         return function() {
-            var sut,
-                config = {
-                    requireProvider: this.stub()
-                },
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 request = {
                     getData: this.stub(),
                     getProbe: this.stub()
@@ -77,19 +73,11 @@
                     setTTL: this.stub(),
                     setReasonCode: this.stub()
                 },
-                test_stuff;
-
-            sut = new OpenmixApplication(i.settings || default_settings);
-            sut.do_init(config);
-
-            this.stub(Math, 'random');
-            Math.random.returns(0);
-
-            test_stuff = {
-                request: request,
-                response: response,
-                sut: sut
-            };
+                test_stuff = {
+                    instance: sut,
+                    request: request,
+                    response: response
+                };
 
             i.setup(test_stuff);
 
@@ -123,7 +111,7 @@
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.sut.lastAliasIndex, 0, 'Verifying alias index');
+            equal(i.instance.lastAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -199,7 +187,7 @@
             equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.sut.lastFailoverAliasIndex, 0, 'Verifying alias index');
+            equal(i.instance.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -289,7 +277,7 @@
                     "foo_f": 100,
                     "bar_f": 100
                 });
-            i.sut.lastFailoverAliasIndex = 2;
+            i.instance.lastFailoverAliasIndex = 2;
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -301,7 +289,7 @@
             equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.sut.lastFailoverAliasIndex, 0, 'Verifying alias index');
+            equal(i.instance.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 

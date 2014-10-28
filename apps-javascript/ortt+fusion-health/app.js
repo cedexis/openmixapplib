@@ -67,6 +67,11 @@ function OpenmixApplication(settings) {
             candidates,
             candidate_aliases,
             reason_code,
+            /**
+             * A data object to store data from Fusion
+             *
+             * @type { !Object.<string, { health_score: { value:string } }> }
+             */
             data_fusion = parse_fusion_data(request.getData('fusion')),
             data_rtt = filter_object(request.getProbe('http_rtt'), filter_empty);
 
@@ -160,7 +165,8 @@ function OpenmixApplication(settings) {
      * @param {Object} candidate
      */
     function filter_empty(candidate) {
-        for (var key in candidate) {
+        var key;
+        for (key in candidate) {
             return true;
         }
         return false;
@@ -210,12 +216,14 @@ function OpenmixApplication(settings) {
         else {
             json_cache_index[key] = json;
 
+            /*jshint boss:true*/
             try {
                 return json_cache[key] = JSON.parse(json);
             }
             catch (e) {
                 return json_cache[key] = false;
             }
+            /*jshint boss:false*/
         }
     }
 }

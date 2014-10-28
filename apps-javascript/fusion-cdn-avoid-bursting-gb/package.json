@@ -5,5 +5,9 @@
         "karma-phantomjs-launcher": "0.1.x",
         "karma-junit-reporter": "0.2.x",
         "jshint": "2.5.x"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://code.example.com/git/example.git"
     }
 }

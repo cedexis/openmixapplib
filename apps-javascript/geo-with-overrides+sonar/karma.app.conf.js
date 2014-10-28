@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'test/resources/sinon-1.10.3.js',
+        'test/resources/sinon-1.11.1.js',
         'test/resources/sinon-qunit-1.0.0.js',
         'app.js',
         'test/tests.js'
