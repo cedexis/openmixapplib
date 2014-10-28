@@ -103,7 +103,7 @@ function OpenmixApplication(settings) {
                 selected_provider = candidates[0];
                 reason_code = reason;
             }else {
-                selected_provider = get_highest(candidates);
+                selected_provider = get_highest(data_fusion);
                 reason_code = reason;
             }
         }
@@ -196,17 +196,17 @@ function OpenmixApplication(settings) {
         return candidate;
     }
     // used for determining the provider with the best fusion health score
-    function get_highest(candidates) {
-        var keys = Object.keys(candidates),
+    function get_highest(source) {
+        var keys = Object.keys(source),
             i = keys.length,
             key,
             candidate,
-            max = Infinity,
+            max = -1,
             value;
 
         while (i --) {
             key = keys[i];
-            value = candidates[key];
+            value = source[key];
 
             if (value > max) {
                 candidate = key;
