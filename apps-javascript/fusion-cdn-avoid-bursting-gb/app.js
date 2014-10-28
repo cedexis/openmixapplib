@@ -35,12 +35,8 @@ function OpenmixApplication(settings) {
     }());
     //console.log(JSON.stringify(settings.burstable_cdns));
 
-    this.get_random = function() {
-        return Math.random();
-    };
-
     this.get_random_int = function(min, max) {
-        return Math.floor(this.get_random() * (max - min)) + min;
+        return Math.floor(Math.random() * (max - min)) + min;
     };
 
     this.select_random_provider = function() {

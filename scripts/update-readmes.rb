@@ -23,6 +23,7 @@ base_readme = base_readme.split("\n## Directories")[0]
 Find.find(relative_to_base("apps")) do |f|
     if f.match(/\.yaml\Z/)
         # Pull out the App name and description
+        puts f
         app_info = YAML::load(File.read(f))
         app_name = app_info["name"]
         app_description = app_info["description"]

@@ -44,17 +44,16 @@
     function test_do_init(i) {
         return function() {
 
-            var sut,
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
                     requireProvider: this.stub()
                 },
                 test_stuff = {
+                    instance: sut,
                     config: config
                 };
 
             i.setup(test_stuff);
-
-            sut = new OpenmixApplication(i.settings || default_settings);
 
             // Test
             sut.do_init(config);
@@ -78,10 +77,7 @@
 
     function test_handle_request(i) {
         return function() {
-            var sut,
-                config = {
-                    requireProvider: this.stub()
-                },
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 request = {
                     getData: this.stub(),
                     getProbe: this.stub()
@@ -91,19 +87,13 @@
                     setTTL: this.stub(),
                     setReasonCode: this.stub()
                 },
-                test_stuff;
-
-            sut = new OpenmixApplication(i.settings || default_settings);
-            sut.do_init(config);
+                test_stuff = {
+                    instance: sut,
+                    request: request,
+                    response: response
+                };
 
             this.stub(Math, 'random');
-            Math.random.returns(0);
-
-            test_stuff = {
-                request: request,
-                response: response,
-                sut: sut
-            };
 
             i.setup(test_stuff);
 
@@ -162,6 +152,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -223,6 +214,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
@@ -279,6 +271,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -334,6 +327,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -389,6 +383,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -446,6 +441,7 @@
                         }
                     })
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -498,6 +494,7 @@
                     }),
                     "bar": ""
                 });
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');

@@ -46,17 +46,16 @@
     function test_do_init(i) {
         return function() {
 
-            var sut,
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
                     requireProvider: this.stub()
                 },
                 test_stuff = {
+                    instance: sut,
                     config: config
                 };
 
             i.setup(test_stuff);
-
-            sut = new OpenmixApplication(i.settings || default_settings);
 
             // Test
             sut.do_init(config);
@@ -80,7 +79,7 @@
 
     function test_handle_request(i) {
         return function() {
-            var sut,
+            var sut = new OpenmixApplication(i.settings || default_settings),
                 request = {
                     getData: this.stub(),
                     getProbe: this.stub()
@@ -90,16 +89,13 @@
                     setTTL: this.stub(),
                     setReasonCode: this.stub()
                 },
-                test_stuff;
+                test_stuff = {
+                    instance: sut,
+                    request: request,
+                    response: response
+                };
 
-            sut = new OpenmixApplication(i.settings || default_settings);
-            this.stub(sut, 'get_random');
-
-            test_stuff = {
-                request: request,
-                response: response,
-                sut: sut
-            };
+            this.stub(Math, 'random');
 
             i.setup(test_stuff);
 
@@ -330,7 +326,7 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -386,7 +382,7 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -444,7 +440,7 @@
                         }
                     })
                 });
-            i.sut.get_random.returns(0);
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
@@ -497,7 +493,7 @@
                     }),
                     "bar": ""
                 });
-            i.sut.get_random.returns(0);
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');

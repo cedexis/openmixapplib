@@ -13,15 +13,14 @@
     function test_do_init(i) {
         return function() {
 
-            var sut,
+            var sut = new OpenmixApplication(default_settings),
                 config = {
                     requireProvider: this.stub()
                 },
                 test_stuff = {
+                    instance: sut,
                     config: config
                 };
-
-            sut = new OpenmixApplication(default_settings);
 
             i.setup(test_stuff);
 
@@ -50,7 +49,7 @@
 
     function test_handle_request(i) {
         return function() {
-            var sut,
+            var sut = new OpenmixApplication(default_settings),
                 request = {
                     getProbe: this.stub(),
                     getData: this.stub()
@@ -60,11 +59,10 @@
                     setTTL: this.stub()
                 },
                 test_stuff = {
+                    instance: sut,
                     request: request,
                     response: response
                 };
-
-            sut = new OpenmixApplication(default_settings);
 
             i.setup(test_stuff);
 
