@@ -33,6 +33,9 @@ update() {
     echo -e "${yellow}Updating validate-js.sh in template: ${1}${no_color}"
     cp template/validate-js.sh ${1}/validate-js.sh
 
+    echo -e "${yellow}Updating .gitignore in template: ${1}${no_color}"
+    cp template/.gitignore ${1}/
+
     echo -e "${yellow}Executing validate-js.sh in template: ${1}${no_color}"
     cd "${1}"
     npm install
