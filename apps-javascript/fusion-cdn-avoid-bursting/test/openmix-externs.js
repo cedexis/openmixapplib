@@ -9,6 +9,7 @@ var OpenmixConfiguration;
  *      market:string,
  *      country:string,
  *      asn:number,
+ *      ip_address:string,
  *      hostname_prefix:string,
  *      getProbe:function(string):!Object.<string,!Object.<string,number>>,
  *      getData:function(string):!Object.<string,string>
@@ -21,6 +22,7 @@ var OpenmixRequest;
  *      addCName:function(string),
  *      addARecord:function(string),
  *      respond:function(string,string),
+ *      setProvider:function(string),
  *      setTTL:function(number),
  *      setReasonCode:function(string)
  * }}
