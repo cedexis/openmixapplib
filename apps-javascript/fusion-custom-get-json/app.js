@@ -41,14 +41,13 @@ function OpenmixApplication(settings) {
         best_provider_selected: 'C',
         fusion_data_not_robust: 'D',
         no_available_fusion_providers: 'E',
-        fusion_data_error: 'F'
+        fusion_data_error: 'F',
+        radar_rtt_not_robust: 'G'
     };
 
     var aliases = Object.keys(settings.providers);
-
-    // we cache the fusion json data to reduce calls to the expensive JSON.parse(...)
-    var json_cache = {},
-        json_cache_index = {};
+    var json_cache = {};
+    var json_cache_index = {};
 
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
@@ -72,7 +71,7 @@ function OpenmixApplication(settings) {
             data_fusion = parse_fusion_data(request.getData('fusion')),
             data_rtt = filter_object(request.getProbe('http_rtt'), filter_empty);
 
-        // determine if the provider has fusion data and if the fusion data health_score is good 
+        // determine if the provider has fusion data and if the fusion data health_score is good
         function fusion_health_score_ok(provider) {
             // if fusion data is not required and we don't have fusion data for the provider, the candidate is considered 'available'
             if( typeof data_fusion[provider] === 'undefined') {
@@ -99,10 +98,10 @@ function OpenmixApplication(settings) {
             if (n === 0) {
                 selected_provider = settings.default_provider;
                 reason_code = reasons.no_available_fusion_providers + reasons.default_provider;
-            }else if (n === 1) {
+            } else if (n === 1) {
                 selected_provider = candidates[0];
                 reason_code = reason;
-            }else {
+            } else {
                 selected_provider = get_highest(data_fusion);
                 reason_code = reason;
             }
@@ -110,20 +109,19 @@ function OpenmixApplication(settings) {
 
         // Main request processing logic below
 
-        // if we had a JSON.parse exception, log and bail with default_provider 
-        if( typeof data_fusion !== 'undefined' && typeof data_fusion['bad_json_data'] !== 'undefined') {
+        // if we had a  exception, log and bail with default_provider
+        if ( typeof data_fusion !== 'undefined' && typeof data_fusion.bad_json_data !== 'undefined') {
             selected_provider = settings.default_provider;
             reason_code = reasons.fusion_data_error;
 
-        // check if fusion data is required for all providers    
-        }else if (Object.keys(data_fusion).length !== aliases.length && settings.fusion_data_required) {
+        // check if fusion data is required for all providers
+        } else if (Object.keys(data_fusion).length !== aliases.length && settings.fusion_data_required) {
             select_any_provider(reasons.fusion_data_not_robust);
         }
-        // TODO, this template uses rtt probe in conjunction with fusion custom data.  However, you can use any radar probe or no probes at all.  
+        // TODO, this template uses rtt probe in conjunction with fusion custom data.  However, you can use any radar probe or no probes at all.
         else if (Object.keys(data_rtt).length !== aliases.length) {
             select_any_provider(reasons.radar_rtt_not_robust);
-        }
-        else {
+        } else {
             // we've got radar and fusion data for all providers, filter out any unavailable fusion providers
             candidates = filter_object(data_rtt, fusion_health_score_ok);
             candidate_aliases = Object.keys(candidates);
@@ -134,9 +132,8 @@ function OpenmixApplication(settings) {
             else if (candidate_aliases.length === 1) {
                 selected_provider = candidate_aliases[0];
                 reason_code = reasons.one_acceptable_provider;
-            }
-            else {
-                // TODO we've got more than 1 available provider, this template app routes on best rtt.  
+            } else {
+                // TODO we've got more than 1 available provider, this template app routes on best rtt.
                 // Change here if you want to insert additional logic such as rtt handicap based on fusion custom data score
                 selected_provider = get_lowest(candidates, 'http_rtt');
                 reason_code = reasons.best_provider_selected;
@@ -168,7 +165,8 @@ function OpenmixApplication(settings) {
      * @param {Object} candidate
      */
     function filter_empty(candidate) {
-        for (var key in candidate) {
+        var key;
+        for (key in candidate) {
             return true;
         }
         return false;
@@ -214,41 +212,37 @@ function OpenmixApplication(settings) {
             }
         }
 
-        return candidate
+        return candidate;
     }
 
     /**
      * Replace the customer provided fusion data with the calculated health_score
-     * 
-     * @param {String} key - the provider alias
-     * @param {Object} data - the customer's fusion data feed keyed on provider alias
+     *
+     * @param {!string} key - the provider alias
+     * @param {!Object.<string,{loadpercentage:number}|number>} data - the customer's fusion data feed keyed on provider alias
      */
     // TODO add the logic to convert the customer json feed to a health score value
     function convert_to_health_score(key, data) {
 
         // this is a contrived example to illustrate converting to a health score based on the fusion custom data we get in the test script
-        // In this logic, whatever provider has a value above settings.failed_health_score will be considered  'available' 
+        // In this logic, whatever provider has a value above settings.failed_health_score will be considered  'available'
         if( typeof data[key] !== 'undefined' && typeof data[key].loadpercentage !== 'undefined') {
             if(data[key].loadpercentage <= 50 ){
                 data[key] = 5;
-            }else if(data[key].loadpercentage < 60) {
+            } else if(data[key].loadpercentage < 60) {
                 data[key] = 4;
-            }else if(data[key].loadpercentage < 70) {
+            } else if(data[key].loadpercentage < 70) {
                 data[key] = 3;
-            }else if(data[key].loadpercentage < 80) {
+            } else if(data[key].loadpercentage < 80) {
                 data[key] = 2;
-            }else {
+            } else {
                 data[key] = settings.failed_health_score;
             }
-        }else {
+        } else {
             data[key] = settings.failed_health_score;
         }
     }
 
-    /**
-     * @param {String} data - the customer's json data feed in raw string format
-     * @return {Object} - the coverted object of provider_alias and health score
-     */
     function parse_fusion_data(data) {
         try {
             var keys = Object.keys(data),
@@ -260,13 +254,13 @@ function OpenmixApplication(settings) {
 
                 if (!(data[key] = json_parse(key, data[key]))) {
                     delete data[key];
-                }else {
-                    convert_to_health_score(key, data)
+                } else {
+                    convert_to_health_score(key, data);
                 }
             }
             // example data object:  { provider_alise1:5, provider_alias2:4, provider_alias3: 0}
             return data;
-        }catch(e) {
+        } catch(e) {
             return {bad_json_data: true};
         }
     }
@@ -277,7 +271,15 @@ function OpenmixApplication(settings) {
         }
         else {
             json_cache_index[key] = json;
-            return json_cache[key] = JSON.parse(json);
+
+            /*jshint boss:true*/
+            try {
+                return json_cache[key] = JSON.parse(json);
+            }
+            catch (e) {
+                return json_cache[key] = false;
+            }
+            /*jshint boss:false*/
         }
     }
 }
