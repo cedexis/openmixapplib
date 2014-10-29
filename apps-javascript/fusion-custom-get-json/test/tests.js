@@ -251,7 +251,6 @@
         }
     }));
 
-
     test('bad fusion health scores for all providers, return default provider', test_handle_request({
         settings: {
             providers: {
@@ -444,7 +443,59 @@
         }
     }));
 
-
+    test('radar_rtt_not_robust reason code set when missing provider rtt scores', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            default_provider: 'foo',
+            default_ttl: 20,
+            min_valid_rtt_score: 5,
+            fusion_data_required: false,
+            failed_health_score: 1
+        },
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 180
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "loadpercentage": 70,
+                        "unixTime": 1414433762,
+                        "date": "2014-10-27T19:16:02.8706589+01:00",
+                        "DCID": "EQX"
+                    }),
+                    "bar": JSON.stringify({
+                        "loadpercentage": 90,
+                        "unixTime": 1414433762,
+                        "date": "2014-10-27T19:16:02.8706589+01:00",
+                        "DCID": "EQX"
+                    })
+                });
+        },
+        verify: function(i) {
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+            equal(i.response.setReasonCode.args[0][0], 'G', 'Verifying setReasonCode');
+        }
+    }));
 
     test('bad fusion data, fusion data error and default provider', test_handle_request({
         settings: {
@@ -492,8 +543,5 @@
             equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying setReasonCode');
         }
     }));
-
-
-
 
 }());
