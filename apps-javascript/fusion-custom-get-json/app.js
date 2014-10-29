@@ -265,6 +265,15 @@ function OpenmixApplication(settings) {
         }
     }
 
+    /**
+     * A function that parses incoming raw JSON and returns the parsed object.
+     * It maintains a cache to avoid extraneous calls to JSON.parse
+     *
+     * @param  {string} key
+     * @param  {string} json
+     *
+     * @return {{loadpercentage:number}|boolean}
+     */
     function json_parse(key, json) {
         if (json_cache_index[key] === json) {
             return json_cache[key];
