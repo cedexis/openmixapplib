@@ -19,16 +19,16 @@ update() {
     cp template/karma.app.conf.js ${1}/
 
     echo -e "${yellow}Updating openmix-externs.js in template: ${1}${no_color}"
-    cp template/test/openmix-externs.js ${1}/test/openmix-externs.js
+    cp template/test/openmix-externs.js ${1}/test/
 
     echo -e "${yellow}Updating package.json in template: ${1}${no_color}"
-    cp template/package.json ${1}/package.json
+    cp template/package.json ${1}/
 
     echo -e "${yellow}Updating jshintConfig.json in template: ${1}${no_color}"
-    cp template/jshintConfig.json ${1}/jshintConfig.json
+    cp template/jshintConfig.json ${1}/
 
     echo -e "${yellow}Updating test/jshintConfigTests.json in template: ${1}${no_color}"
-    cp template/test/jshintConfigTests.json ${1}/test/jshintConfigTests.json
+    cp template/test/jshintConfigTests.json ${1}/test/
 
     echo -e "${yellow}Updating validate-js.sh in template: ${1}${no_color}"
     cp template/validate-js.sh ${1}/validate-js.sh
