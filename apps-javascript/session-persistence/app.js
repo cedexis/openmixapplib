@@ -15,7 +15,9 @@ var handler = new OpenmixApplication({
     default_ttl: 20,
     sonar_threshold: 95,
     availability_threshold: 85,
-    rtt_variance:0.75
+    rtt_variance:0.75,
+    identifier: 0,
+    replicas: 20
 });
 
 function init(config) {
@@ -33,11 +35,11 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-    var failoverAliases = typeof settings.failover_providers === 'undefined' ? [] : Object.keys(settings.failover_providers);
 
     // For use in the hash lookup
-    this.target_buckets = [];
-    this.sorted_hashes = [];
+    this.targetBuckets = [];
+    this.sortedHashes = [];
+    this.identifier = 0;
 
     /**
      * @param {OpenmixConfiguration} config
@@ -48,13 +50,6 @@ function OpenmixApplication(settings) {
         while (i --) {
             config.requireProvider(aliases[i]);
         }
-
-        i = failoverAliases.length;
-
-        while (i --) {
-            config.requireProvider(failoverAliases[i]);
-        }
-
     };
 
     /**
@@ -62,7 +57,7 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var dataSonar  = filterObject(parseSonarData(request.getData('sonar')), filterSonar),
+        var dataSonar  = parseSonarData(request.getData('sonar')),
             avail = request.getProbe('avail'),
             dataRtt = request.getProbe('http_rtt'),
             allReasons,
@@ -73,8 +68,9 @@ function OpenmixApplication(settings) {
             reasonCode,
             decisionCname,
             bestScore,
-            target = [],
-            targetAliases;
+            targets = [],
+            targetAliases,
+            index;
 
         allReasons = {
             best_performing_rtt: 'A',
@@ -84,12 +80,10 @@ function OpenmixApplication(settings) {
             default_selected: 'E'
         };
 
-        function filterAvailability(candidate) {
-            return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold);
-        }
-
-        function filterSonar(candidate) {
-            return (candidate >= settings.sonar_threshold);
+        function filterAvailability(candidate, alias) {
+            return (typeof candidate.avail !== 'undefined'
+                && candidate.avail >= settings.availability_threshold
+                && typeof dataSonar[alias] !== 'undefined' && dataSonar[alias] >= settings.sonar_threshold);
         }
 
         function filterRttVariance(candidates, bestScore) {
@@ -109,12 +103,44 @@ function OpenmixApplication(settings) {
             return data;
         }
 
+        function search(key, sortedHashes) {
+            var hash = fnv(key),
+                left = 0,
+                right = sortedHashes.length - 1,
+                mid;
+
+            while (left < right) {
+                mid = (right + left) >> 1;
+                if (sortedHashes[mid] < hash) {
+                    left = mid + 1;
+                } else {
+                    right = mid;
+                }
+            }
+            return left;
+        }
+
+        function updateSortedHashes(targetBuckets) {
+            var keys = Object.keys(targetBuckets);
+            return keys.sort();
+        }
+
+        function addTargets(targets, targetBuckets) {
+            var i = settings.replicas,
+                j = Object.keys(targets).length,
+                target,
+                keys = Object.keys(targets);
+            while (j --) {
+                target = targets[keys[j]];
+                while (i --) {
+                    targetBuckets[fnv(target + settings.identifier + i)] = target;
+                }
+            }
+        }
+
 
         // filter candidates by availability
         candidates = filterObject(avail, filterAvailability);
-
-        // Join the sonar scores with the list of viable candidates
-        candidates = joinObjects(candidates, dataSonar, 'undefined');
 
         candidateAliases = Object.keys(candidates);
 
@@ -129,11 +155,11 @@ function OpenmixApplication(settings) {
             candidates = joinObjects(candidates, dataRtt, 'http_rtt');
             if (Object.keys(candidates).length > 0) {
                 // Get the score of the fastest
-                bestScore = getLowest(candidates, 'http_rtt');
+                bestScore = candidates[getLowest(candidates, 'http_rtt')].http_rtt;
 
                 // Calculate which platforms are ties
-                target = filterRttVariance(candidates, bestScore);
-                targetAliases = Object.keys(target);
+                targets = filterRttVariance(candidates, bestScore);
+                targetAliases = Object.keys(targets);
 
                 if (targetAliases.length == 1) {
                     //print "Clear winner \n";
@@ -144,7 +170,7 @@ function OpenmixApplication(settings) {
             } else {
                 // in the rare case we don't have RTT data
                 // choose consistently from among all candidates
-                target = candidateAliases;
+                targets = candidateAliases;
             }
 
             if (!decisionProvider) {
@@ -154,28 +180,14 @@ function OpenmixApplication(settings) {
                  * for each ASN seen
                  * */
 
-                 /*
-                 foreach ($targets as $target)
-                 {
-                 $this->add_target($target);
-                 }
+                addTargets(targets, this.targetBuckets);
+                this.sortedHashes = updateSortedHashes(this.targetBuckets);
 
-                 //print_r($targets);
+                // Compare the hash of the reqestor key to the hash ring based on the platforms
+                index = search(request.asn, this.sortedHashes);
 
-                 // Compare the hash of the reqestor key to the hash ring based on the platforms
-                 $index = $this->search($request);
-                 //print "index: $index\n";
-
-                 //print_r($this->target_buckets);
-                 //print "$this->sorted_hashes[$index]\n";
-                 //print_r($this->target_buckets[$this->sorted_hashes[$index]]);
-
-                 $response->selectProvider($this->target_buckets[$this->sorted_hashes[$index]]);
-                 $response->setReasonCode($this->reasons['Hash routing']);
-                 return;
-                 */
-                decisionProvider = settings.default_provider;
-                reasonCode = allReasons.default_selected;
+                decisionProvider = this.targetBuckets[this.sortedHashes[index]];
+                reasonCode = allReasons.hash_routing;
                 decisionTtl = decisionTtl || settings.default_ttl;
             }
 
@@ -313,5 +325,20 @@ function OpenmixApplication(settings) {
         }
 
         return candidate;
+    }
+
+    function fnv(str) {
+        var hash = 0x811C9DC5,
+            i,
+            len;
+
+        str = '' + str;
+
+        for (i = 0, len = str.length; i < len; i ++) {
+            hash = hash ^ str.charCodeAt(i);
+            hash += (hash << 24) + (hash << 8) + (hash << 7) + (hash << 4) + (hash << 1);
+        }
+
+        return hash & 0xffffffff;
     }
 }
