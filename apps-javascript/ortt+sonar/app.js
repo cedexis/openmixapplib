@@ -122,7 +122,9 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {Object} candidate
+     * @param {{
+     *     http_rtt:number
+     * }} candidate
      */
     function filterInvalidRttScores(candidate) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;

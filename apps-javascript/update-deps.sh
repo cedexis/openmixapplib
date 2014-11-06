@@ -46,7 +46,6 @@ update() {
 echo
 update diagnostics
 update fusion-cdn-avoid-bursting
-update fusion-cdn-avoid-bursting-gb
 update fusion-custom-get-json
 update geo-with-overrides
 update geo-with-overrides+sonar
@@ -54,5 +53,6 @@ update load-external-config
 update new-relic
 update optimal-rtt
 update ortt+fusion-health
+update ortt+sonar
 update round-robin-failover
 update thruput-with-rtt
