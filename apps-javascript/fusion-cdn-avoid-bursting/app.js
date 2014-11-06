@@ -21,9 +21,9 @@ var handler = new OpenmixApplication({
                 { threshold: 30000, multiplier: 1.5 }
             ],
             bandwidth: [
-                { threshold: 10000, multiplier: 1.2 },
+                { threshold: 5000, multiplier: 1.2 },
                 { threshold: 7500, multiplier: 1.3 },
-                { threshold: 5000, multiplier: 1.5 }
+                { threshold: 10000, multiplier: 1.5 }
             ]
         },
         'bar': {
@@ -33,9 +33,9 @@ var handler = new OpenmixApplication({
                 { threshold: 30000, multiplier: 1.5 }
             ],
             bandwidth: [
-                { threshold: 10000, multiplier: 1.2 },
+                { threshold: 5000, multiplier: 1.2 },
                 { threshold: 7500, multiplier: 1.3 },
-                { threshold: 5000, multiplier: 1.5 }
+                { threshold: 10000, multiplier: 1.5 }
             ]
         }
     },
