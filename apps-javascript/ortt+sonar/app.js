@@ -14,7 +14,7 @@ var handler = new OpenmixApplication({
     default_ttl: 90,
     min_valid_rtt_score: 5,
     // when set to true, sonar data is used
-    use_sonar_data: false,
+    use_sonar_data: true,
     //Set Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 1
     sonar_threshold: 0.95
