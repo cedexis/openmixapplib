@@ -13,8 +13,9 @@ var handler = new OpenmixApplication({
     default_provider: 'foo',
     default_ttl: 90,
     min_valid_rtt_score: 5,
-    // when set to true, sonar data is used
-    use_sonar_data: true,
+    // when set true if one of the provider has not data it will be removed,
+    // when set to false, sonar data is optional, so a provider with no sonar data will be used
+    need_sonar_data: true,
     //Set Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 1
     sonar_threshold: 0.95
@@ -37,7 +38,10 @@ function OpenmixApplication(settings) {
     var reasons = {
         one_acceptable_provider: 'A',
         best_provider_selected: 'B',
-        no_available_providers: 'C'
+        no_available_providers: 'C',
+        default_provider: 'D',
+        sonar_data_not_robust: 'E',
+        radar_rtt_not_robust: 'F'
     };
 
     var aliases = Object.keys(settings.providers);
@@ -59,41 +63,82 @@ function OpenmixApplication(settings) {
         var decisionTtl = settings.default_ttl,
             candidates,
             dataSonar = parseSonarData(request.getData('sonar')),
-            dataRtt = filterObject(request.getProbe('http_rtt'), filterInvalidRttScores),
+            dataRtt = request.getProbe('http_rtt'),
             decisionProvider,
             reasonCode,
             candidateAliases;
 
         /**
-         * @param candidate
+        * @param key
+        */
+        function filterInvalidRttScores(key) {
+            return dataRtt[key].http_rtt >= settings.min_valid_rtt_score;
+        }
+
+        /**
+         * @param key
          */
-        function filterSonar(candidate, key) {
-            return (typeof dataSonar[key] !== 'undefined' && dataSonar[key] >= settings.sonar_threshold);
+        function filterSonar(key) {
+            // let the flag determine if the provider is available when we don't have sonar data for the provider
+            if( typeof dataSonar[key] === 'undefined') {
+                return !settings.need_sonar_data;
+            }
+            return (dataSonar[key] >= settings.sonar_threshold);
         }
 
-        //route based on rtt
-        candidates = dataRtt;
+        /**
+         * @param reason
+         */
+        function selectAnyProvider(reason) {
+            // radar or sonar data not available, select any sonar available provider
+            var i = aliases.length,
+                n = 0,
+                candidates = [];
 
-        if (settings.use_sonar_data) {
-            // filter sonar data
-            candidates = filterObject(candidates, filterSonar);
+            while (i --) {
+                if (filterSonar(aliases[i])) {
+                    candidates[n ++] = aliases[i];
+                }
+            }
+
+            if (n === 0) {
+                decisionProvider = settings.default_provider;
+                reasonCode = reasons.no_available_providers + reasons.default_provider;
+            } else if (n === 1) {
+                decisionProvider = candidates[0];
+                reasonCode = reason;
+            } else {
+                decisionProvider = candidates[(Math.random() * n) >> 0];
+                reasonCode = reason;
+            }
         }
 
-        candidateAliases = Object.keys(candidates);
-
-
-        if (candidateAliases.length === 0) {
-            // if non available / non rtt, return default provider
-            decisionProvider = settings.default_provider;
-            reasonCode = reasons.no_available_providers;
-        } else if (candidateAliases.length === 1) {
-            // if only one available, return available
-            decisionProvider = candidateAliases[0];
-            reasonCode = reasons.one_acceptable_provider;
+        if (Object.keys(dataSonar).length !== aliases.length && settings.need_sonar_data) {
+            selectAnyProvider(reasons.sonar_data_not_robust);
+        } else if (Object.keys(dataRtt).length !== aliases.length) {
+            // if we don't have rtt, return any sonar available provider
+            selectAnyProvider(reasons.radar_rtt_not_robust);
         } else {
-            // we've got more than 1 available / rtt provider, route based on rtt
-            decisionProvider = getLowest(candidates, 'http_rtt');
-            reasonCode = reasons.best_provider_selected;
+            // we've got radar and sonar data for all providers, filter out any unavailable sonar providers
+            candidates = filterObject(dataRtt, filterInvalidRttScores);
+
+            candidates = filterObject(candidates, filterSonar);
+            candidateAliases = Object.keys(candidates);
+
+            if (candidateAliases.length === 0) {
+                // No available providers
+                selectAnyProvider(reasons.no_available_providers);
+            }
+            else if (candidateAliases.length === 1) {
+                // if only one available, return available
+                decisionProvider = candidateAliases[0];
+                reasonCode = reasons.one_acceptable_provider;
+            }
+            else {
+                // we've got more than 1 available / rtt provider, route based on rtt
+                decisionProvider = getLowest(candidates, 'http_rtt');
+                reasonCode = reasons.best_provider_selected;
+            }
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
@@ -113,21 +158,12 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (!filter(object[key], key)) {
+            if (!filter(key)) {
                 delete object[key];
             }
         }
 
         return object;
-    }
-
-    /**
-     * @param {{
-     *     http_rtt:number
-     * }} candidate
-     */
-    function filterInvalidRttScores(candidate) {
-        return candidate.http_rtt >= settings.min_valid_rtt_score;
     }
 
     /**
