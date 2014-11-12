@@ -21,9 +21,6 @@ update() {
     echo -e "${yellow}Updating openmix-externs.js in template: ${1}${no_color}"
     cp template/test/openmix-externs.js ${1}/test/
 
-    echo -e "${yellow}Updating package.json in template: ${1}${no_color}"
-    cp template/package.json ${1}/
-
     echo -e "${yellow}Updating jshintConfig.json in template: ${1}${no_color}"
     cp template/jshintConfig.json ${1}/
 
