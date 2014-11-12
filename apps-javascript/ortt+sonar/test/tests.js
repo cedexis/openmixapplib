@@ -17,7 +17,7 @@
         default_provider: 'foo',
         default_ttl: 90,
         min_valid_rtt_score: 5,
-        use_sonar_data: true,
+        need_sonar_data: true,
         sonar_threshold: 0.95
     };
 
@@ -75,6 +75,7 @@
                     response: response
                 };
 
+            this.stub(Math, 'random');
             i.setup(test_stuff);
 
             // Test
@@ -123,6 +124,81 @@
         }
     }));
 
+    test('sonar_data_not_robust', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 190
+                    },
+                    "bar": {
+                        "http_rtt": 180
+                    },
+                    "baz": {
+                        "http_rtt": 100
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('sonar')
+                .returns({
+                    "bar": "0.80000",
+                    "baz": "1.00000"
+                });
+        },
+        verify: function(i) {
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying reason code');
+        }
+    }));
+
+    test('sonar_data_not_robust_random', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 190
+                    },
+                    "bar": {
+                        "http_rtt": 180
+                    },
+                    "baz": {
+                        "http_rtt": 100
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('sonar')
+                .returns({
+                    "bar": "1.00000",
+                    "baz": "1.00000"
+                });
+            Math.random.returns(0.9);
+        },
+        verify: function(i) {
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying reason code');
+        }
+    }));
+
     test('no_available_providers', test_handle_request({
         setup: function(i) {
             i.request
@@ -157,7 +233,7 @@
             equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'CD', 'Verifying reason code');
         }
     }));
 
@@ -199,7 +275,7 @@
         }
     }));
 
-    test('one_acceptable_provider_no_sonar', test_handle_request({
+    test('radar_rtt_not_robust_no_sonar', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -248,7 +324,7 @@
             equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying reason code');
         }
     }));
 
@@ -294,7 +370,7 @@
             equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'CD', 'Verifying reason code');
         }
     }));
 
@@ -337,8 +413,7 @@
                 .withArgs('sonar')
                 .returns({
                     "foo": "1.00000",
-                    "bar": "1.00000",
-                    "baz": "0.80000"
+                    "bar": "1.00000"
                 });
         },
         verify: function(i) {
@@ -353,6 +428,5 @@
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying reason code');
         }
     }));
-
 
 }());

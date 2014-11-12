@@ -1,10 +1,9 @@
-# Optimized Round Trip Time + Catchpoint Availability
+# ORTT + Sonar
 
 ## Description
 
-Application features:
-
-* Uses Catchpoint Fusion data to detect when the provider is down.
+* User round robin between available sonar providers
+and lowest rtt value if sonar not available
 
 ## Validating the Code
 
