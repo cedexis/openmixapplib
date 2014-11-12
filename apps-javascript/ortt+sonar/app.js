@@ -80,7 +80,7 @@ function OpenmixApplication(settings) {
          */
         function filterSonar(key) {
             // let the flag determine if the provider is available when we don't have sonar data for the provider
-            if( typeof dataSonar[key] === 'undefined') {
+            if (typeof dataSonar[key] === 'undefined') {
                 return !settings.need_sonar_data;
             }
             return (dataSonar[key] >= settings.sonar_threshold);
