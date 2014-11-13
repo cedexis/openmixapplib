@@ -1,14 +1,8 @@
-# FREEMIUM application
+# Weighted round robin with sonar
 
 ## Description
 
-Application features:
-
-*   Uses Geo (market) based mapping and Round robin for unspecified geographies.
-     * Increase TTL to 80 Seconds
-     * Added EDNS for Google OpenDNS accuracy
-     * HK DC Added as a DC Selection
-     * Country Override included - direct country selection based on EDNS and Geo
+Select randomly from a set of weighted providers while taking Sonar scores into account.
 
 ## Validating the Code
 
