@@ -1,14 +1,6 @@
 /**
- *
  * Select randomly from a set of weighted providers while taking Sonar scores
  * into account.
- *
- * FREEMIUM application - NOTE SHOULD ONLY BE USED WITH THE FREEMIUM SERVICES.
- * Uses Geo (market) based mapping and Round robin for unspecified geographies.
- * Increase TTL to 80 Seconds
- * Added EDNS for Google OpenDNS accuracy
- * HK DC Added as a DC Selection
- * Country Override included - direct country selection based on EDNS and Geo
  */
 var handler = new OpenmixApplication({
     // The array of all possible responses. The key, e.g. 'provider1', is the
