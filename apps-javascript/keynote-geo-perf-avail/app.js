@@ -1,16 +1,16 @@
 /*
     Fusion Keynote OM application template - dns decision based on keynote agent geo location performance
-    and availability scores.  
+    and availability scores.
 
-    This app requires fusion Keynote recipe installation and does not use radar data. 
+    This app requires fusion Keynote recipe installation and does not use radar data.
 
-    The app first determines if there are any platforms with keynote fusion data in the requestor country. 
+    The app first determines if there are any platforms with keynote fusion data in the requestor country.
     If so, the app routes to the lowest keynote performance score (rtt in seconds) for that country.
 
     If there are no keynote agent measurements in the requestor country, the app rolls up to market and routes
-    based on market performance scores.  The default provider is selected if no geo match for requestor country 
-    or market is available. 
-    
+    based on market performance scores.  The default provider is selected if no geo match for requestor country
+    or market is available.
+
 */
 var handler = new OpenmixApplication({
     providers: {
@@ -28,7 +28,7 @@ var handler = new OpenmixApplication({
     default_ttl: 20,
 
     // keynote rtt, any performance measurement slower (greater than) this value will not be considered a candidate
-    max_perf_threshold: 15, 
+    max_perf_threshold: 15,
 
     // keynote availability, any availability score less than this value will not be considered a candidate
     min_availability_threshold: 90
@@ -82,7 +82,7 @@ function OpenmixApplication(settings) {
             candidates,
             reason_code,
             market_selected = false,
-            /** @type {Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>>} */ 
+            /** @type {!Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>>} */ 
             data_fusion = parse_fusion_data(request.getData('fusion'));
 
         function candidate_has_perf_avail_scores(alias, node, geo_location) {
@@ -133,7 +133,7 @@ function OpenmixApplication(settings) {
         }
 
         function filter_candidates(alias) {
-            if( candidate_has_perf_avail_scores(alias, 'countries', request.country) || 
+            if( candidate_has_perf_avail_scores(alias, 'countries', request.country) ||
                 candidate_has_perf_avail_scores(alias, 'markets', request.market)) {
                 return true;
             }
@@ -225,7 +225,7 @@ function OpenmixApplication(settings) {
                 if(market_score < market_min) {
                     market_candidate = key;
                     market_min = market_score;
-                } 
+                }
             }
         }
 
