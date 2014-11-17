@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../app.js"></script>
+</head>
+<body>
+<script>
+(function(document) {
+    'use strict';
+
+    var app, i, request, response, start, elapsed, elem, calls;
+
+    app = new OpenmixApplication({
+        providers: [
+            {
+                alias: 'foo',
+                cname: 'www.foo.com'
+            },
+            {
+                alias: 'bar',
+                cname: 'www.bar.com'
+            }
+        ],
+        default_provider: 'foo',
+        default_ttl: 20,
+        min_valid_rtt_score: 5,
+        availability_threshold: 90
+    });
+
+    request = {
+        getData: function() {
+            return {
+                "foo": JSON.stringify({
+                    "health_score": {
+                        "unit": "0-5",
+                        "value": "5"
+                    }
+                }),
+                "bar": JSON.stringify({
+                    "health_score": {
+                        "unit": "0-5",
+                        "value": "5"
+                    }
+                })
+            };
+        },
+        getProbe: function(metric) {
+            if ('avail' === metric) {
+                return {
+                    foo: {
+                        avail: 100
+                    },
+                    bar: {
+                        avail: 100
+                    }
+                }
+            }
+            if ('http_rtt' === metric) {
+                return {
+                    foo: {
+                        http_rtt: 200
+                    },
+                    bar: {
+                        http_rtt: 200
+                    }
+                }
+            }
+        }
+    };
+
+    response = {
+        respond: function() {},
+        setTTL: function() {},
+        setReasonCode: function() {}
+    };
+
+    calls = 10000;
+    start = window.performance.now();
+    for (i = 0; i < calls; i += 1) {
+        app.handle_request(request, response);
+    }
+    elapsed = window.performance.now() - start;
+    elem = document.createElement('p');
+    elem.innerHTML = 'Time elapsed: ' + elapsed + ' ms';
+    document.body.appendChild(elem);
+
+    elem = document.createElement('p');
+    elem.innerHTML = 'Avergage call duration: ' + Math.round(1000 * elapsed / calls) + ' usec';
+    document.body.appendChild(elem);
+
+}(document));
+</script>
+</body>
+</html>
