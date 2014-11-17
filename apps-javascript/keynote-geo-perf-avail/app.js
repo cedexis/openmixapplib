@@ -82,7 +82,7 @@ function OpenmixApplication(settings) {
             candidates,
             reason_code,
             market_selected = false,
-            /** @type {Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>} */ 
+            /** @type {Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>>} */ 
             data_fusion = parse_fusion_data(request.getData('fusion'));
 
         function candidate_has_perf_avail_scores(alias, node, geo_location) {
