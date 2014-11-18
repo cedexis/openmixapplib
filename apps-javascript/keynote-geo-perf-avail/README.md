@@ -1,10 +1,10 @@
-# Optimized Round Trip Time + Catchpoint Availability
+# Keynote Performance and Availability via Geo Location
 
 ## Description
 
 Application features:
 
-* Uses Catchpoint Fusion data to detect when the provider is down.
+* Uses Keynote Fusion data to detect best available platform using Keynote agent availability and performance scores via requestor geo country/market.  
 
 ## Validating the Code
 
