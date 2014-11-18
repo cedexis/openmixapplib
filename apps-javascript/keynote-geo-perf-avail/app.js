@@ -108,7 +108,7 @@ function OpenmixApplication(settings) {
             return candidates;
         }
 
-        // radar data unavailable, return any random provider that passes the fusion test
+        // keynote data unavailable, return any random provider that passes the fusion test
         function select_any_provider(reason) {
             var candidates = find_keynote_candidates('countries', request.country);
 
