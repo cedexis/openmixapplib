@@ -81,8 +81,7 @@ function OpenmixApplication(settings) {
             decision_ttl = settings.default_ttl,
             candidates,
             reason_code,
-            market_selected = false,
-            /** @type {!Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>>} */ 
+            /** @type {!Object.<string, Object.<string, Object.<string, Object.<string, {avail_data:number, perf_data:number}>>>>} */
             data_fusion = parse_fusion_data(request.getData('fusion'));
 
         function candidate_has_perf_avail_scores(alias, node, geo_location) {
@@ -91,8 +90,8 @@ function OpenmixApplication(settings) {
                 && typeof data_fusion[alias][node][geo_location] !== 'undefined'
                 && typeof data_fusion[alias][node][geo_location].perf_data !== 'undefined'
                 && typeof data_fusion[alias][node][geo_location].avail_data !== 'undefined'
-                && data_fusion[alias][node][geo_location].avail_data  > settings.min_availability_threshold
-                && data_fusion[alias][node][geo_location].perf_data  < settings.max_perf_threshold;
+                && data_fusion[alias][node][geo_location].avail_data > settings.min_availability_threshold
+                && data_fusion[alias][node][geo_location].perf_data < settings.max_perf_threshold;
         }
 
         function find_keynote_candidates(node, geo_location) {
@@ -101,7 +100,7 @@ function OpenmixApplication(settings) {
                 candidates = [];
 
             while (i --) {
-                if (candidate_has_perf_avail_scores(aliases[i],node,geo_location)) {
+                if (candidate_has_perf_avail_scores(aliases[i], node, geo_location)) {
                     candidates[n ++] = aliases[i];
                 }
             }
@@ -111,10 +110,9 @@ function OpenmixApplication(settings) {
 
         // radar data unavailable, return any random provider that passes the fusion test
         function select_any_provider(reason) {
-
             var candidates = find_keynote_candidates('countries', request.country);
 
-            if( candidates.length === 0) {
+            if (candidates.length === 0) {
                 candidates = find_keynote_candidates('markets', request.market);
             }
 
@@ -140,8 +138,24 @@ function OpenmixApplication(settings) {
             return false;
         }
 
-        function set_market_selected(value) {
-            market_selected = value;
+        function select_best_performing_provider(node, geo_location) {
+            var aliases = Object.keys(data_fusion),
+                i = aliases.length,
+                alias,
+                min = Infinity,
+                score;
+
+            while (i --) {
+                alias = aliases[i];
+                if (typeof data_fusion[alias][node] !== 'undefined'
+                    && typeof data_fusion[alias][node][geo_location] !== 'undefined') {
+                    score = data_fusion[alias][node][geo_location].perf_data;
+                    if (score < min) {
+                        selected_provider = alias;
+                        min = score;
+                    }
+                }
+            }
         }
 
         // if we don't have fusion data for all providers, randomly select a provider
@@ -161,19 +175,21 @@ function OpenmixApplication(settings) {
             else if (candidates.length === 1) {
                 selected_provider = candidates[0];
                 // log if only one candidate and it was a market rollup
-                if( !candidate_has_perf_avail_scores(selected_provider, 'countries', request.country) &&  candidate_has_perf_avail_scores(selected_provider, 'markets', request.market)) {
+                if (!candidate_has_perf_avail_scores(selected_provider, 'countries', request.country)
+                    && candidate_has_perf_avail_scores(selected_provider, 'markets', request.market)) {
                     reason_code = reasons.no_country_market_selected + reasons.one_aceptable_provider;
-                }else {
+                } else {
                     reason_code = reasons.one_aceptable_provider;
                 }
             }
             else {
-                // we've got more than 1 available provider, route on keynote performance data
-                selected_provider = get_lowest(data_fusion, request.country, request.market, set_market_selected);
-                if( market_selected) {
-                    reason_code = reasons.no_country_market_selected + reasons.best_provider_selected;
-                }else {
+                // we have more than 1 available provider, route on keynote performance data
+                select_best_performing_provider('countries', request.country);
+                if (typeof selected_provider !== 'undefined') {
                     reason_code = reasons.best_provider_selected;
+                } else {
+                    select_best_performing_provider('markets', request.market);
+                    reason_code = reasons.no_country_market_selected + reasons.best_provider_selected;
                 }
             }
         }
@@ -197,43 +213,6 @@ function OpenmixApplication(settings) {
         }
 
         return object;
-    }
-
-    function get_lowest(fusion_data, country, market, market_selected) {
-        var keys = Object.keys(fusion_data),
-            i = keys.length,
-            key,
-            country_candidate,
-            country_min = Infinity,
-            country_score,
-            market_candidate,
-            market_min = Infinity,
-            market_score;
-
-        while (i --) {
-            key = keys[i];
-            if(typeof fusion_data[key]['countries'][country] !== 'undefined') {
-                country_score = fusion_data[key]['countries'][country].perf_data;
-            }
-
-            if (typeof country_score !== 'undefined'  && country_score < country_min) {
-                country_candidate = key;
-                country_min = country_score;
-            }
-            else {
-                market_score = fusion_data[key]['markets'][market].perf_data;
-                if(market_score < market_min) {
-                    market_candidate = key;
-                    market_min = market_score;
-                }
-            }
-        }
-
-        if( typeof country_candidate !== 'undefined') {
-            return country_candidate
-        }
-        market_selected(true);
-        return market_candidate;
     }
 
     function parse_fusion_data(data) {
