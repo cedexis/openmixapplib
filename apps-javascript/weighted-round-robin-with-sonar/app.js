@@ -199,7 +199,7 @@ function OpenmixApplication(settings) {
             i = keys.length,
             key,
             candidate,
-            max = 0,
+            max = -Infinity,
             value;
 
         while (i --) {
