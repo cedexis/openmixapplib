@@ -58,7 +58,11 @@
         }
     }));
 
-    module('handle_request');
+    module('handle_request', {
+        setup: function() {
+            sinon.clock.now = 0;
+        }
+    });
 
     function test_handle_request(i) {
         return function() {
@@ -114,6 +118,7 @@
             i.request.country = 'NA';
             i.request.asn = 123;
             i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            sinon.clock.now = 1416513547123;
         },
         verify: function(i) {
             console.log(i);
