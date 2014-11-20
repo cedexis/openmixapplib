@@ -63,9 +63,6 @@
     function test_handle_request(i) {
         return function() {
             var sut,
-                config = {
-                    requireProvider: this.stub()
-                },
                 request = {
                     getProbe: this.stub()
                 },
