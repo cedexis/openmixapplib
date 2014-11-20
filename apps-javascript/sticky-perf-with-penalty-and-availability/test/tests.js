@@ -63,9 +63,6 @@
     function test_handle_request(i) {
         return function() {
             var sut,
-                config = {
-                    requireProvider: this.stub()
-                },
                 request = {
                     getProbe: this.stub()
                 },
@@ -77,7 +74,6 @@
                 test_stuff;
 
             sut = new OpenmixApplication(i.settings || default_settings);
-            sut.do_init(config);
 
             test_stuff = {
                 request: request,
