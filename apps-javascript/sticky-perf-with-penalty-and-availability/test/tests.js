@@ -316,41 +316,6 @@
         }
     }));
 
-    test('test 7 -unexpected_previous_alias', test_handle_request({
-        setup: function(i) {
-            console.log(i);
-            i.request
-                .getProbe
-                .onCall(0)
-                .returns({
-                    foo: { avail: 40 },
-                    bar: { avail: 50 },
-                    baz: { avail: 35 }
-                });
-            i.request
-                .getProbe
-                .onCall(1)
-                .returns({
-                    foo: { http_rtt: 90 },
-                    bar: { http_rtt: 60 },
-                    baz: { http_rtt: 96 }
-                });
-            i.request.market = 'EG';
-            i.request.country = 'NA';
-            i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'fakeProvider', 'timestamp': 1 };
-        },
-        verify: function(i) {
-            console.log(i);
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.setTTL.args[0][0], 30, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'G', 'Verifying reason code');
-        }
-    }));
-
     test('clean out this.saved', test_handle_request({
         settings: {
             providers: {

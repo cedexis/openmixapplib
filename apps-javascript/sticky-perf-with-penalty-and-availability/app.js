@@ -139,50 +139,44 @@ function OpenmixApplication(settings) {
             previous = this.saved[stickyKey].provider;
         }
 
-        if(previous !== null && typeof settings.providers[previous] === 'undefined'){
-            decisionProvider =  aliases[Math.floor(Math.random() * aliases.length)];
-            decisionReason = allReasons.unexpected_previous_alias;
+        candidates = filterObject(avail, filterCandidates);
+
+        // Join the rtt scores with the list of viable candidates
+        candidates = joinObjects(candidates, rtt, 'http_rtt');
+
+        candidateAliases = Object.keys(candidates);
+
+
+        if (candidateAliases.length !== 0) {
+            addRttPadding(candidates);
+            if (typeof avail[previous] !== 'undefined') {
+                refValue = settings.variance_threshold * avail[previous].http_rtt;
+            }
+            var bestRtt = getLowest(candidates, 'http_rtt');
+            decisionProvider = bestRtt;
+
+            if (bestRtt === previous) {
+                decisionReason = allReasons.best_performing_provider_equal_previous;
+            } else if (typeof refValue === 'undefined' || typeof previous === 'undefined') {
+                decisionReason = allReasons.no_previous;
+                this.saved[stickyKey].provider = decisionProvider;
+            } else if (avail[previous].avail < settings.availability_threshold) {
+                decisionReason = allReasons.previous_below_availability_threshold;
+                this.saved[stickyKey].provider = decisionProvider;
+            } else if (candidates[decisionProvider].http_rtt < refValue) {
+                this.saved[stickyKey].provider = decisionProvider;
+                decisionReason = allReasons.new_provider_below_varianceThreshold;
+            } else {
+                decisionProvider = previous;
+                decisionReason = allReasons.choosing_previous_best_perform_within_varianceThreshold;
+            }
         }
         else {
-
-            candidates = filterObject(avail, filterCandidates);
-
-            // Join the rtt scores with the list of viable candidates
-            candidates = joinObjects(candidates, rtt, 'http_rtt');
-
-            candidateAliases = Object.keys(candidates);
-
-
-            if (candidateAliases.length !== 0) {
-                addRttPadding(candidates);
-                if (typeof avail[previous] !== 'undefined') {
-                    refValue = settings.variance_threshold * avail[previous].http_rtt;
-                }
-                var bestRtt = getLowest(candidates, 'http_rtt');
-                decisionProvider = bestRtt;
-
-                if (bestRtt === previous) {
-                    decisionReason = allReasons.best_performing_provider_equal_previous;
-                } else if (typeof refValue === 'undefined' || typeof previous === 'undefined') {
-                    decisionReason = allReasons.no_previous;
-                    this.saved[stickyKey].provider = decisionProvider;
-                } else if (avail[previous].avail < settings.availability_threshold) {
-                    decisionReason = allReasons.previous_below_availability_threshold;
-                    this.saved[stickyKey].provider = decisionProvider;
-                } else if (candidates[decisionProvider].http_rtt < refValue) {
-                    this.saved[stickyKey].provider = decisionProvider;
-                    decisionReason = allReasons.new_provider_below_varianceThreshold;
-                } else {
-                    decisionProvider = previous;
-                    decisionReason = allReasons.choosing_previous_best_perform_within_varianceThreshold;
-                }
-            }
-            else {
-                decisionProvider = getHighest(avail);
-                this.saved[stickyKey].provider = decisionProvider;
-                decisionReason = allReasons.all_providers_eliminated;
-            }
+            decisionProvider = getHighest(avail);
+            this.saved[stickyKey].provider = decisionProvider;
+            decisionReason = allReasons.all_providers_eliminated;
         }
+
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
