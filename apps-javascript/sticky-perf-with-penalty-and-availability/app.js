@@ -113,7 +113,6 @@ function OpenmixApplication(settings) {
             new_provider_below_varianceThreshold: 'D',
             choosing_previous_best_perform_within_varianceThreshold: 'E',
             all_providers_eliminated: 'F',
-            unexpected_previous_alias: 'G'
         };
 
         function filterCandidates(candidate) {
