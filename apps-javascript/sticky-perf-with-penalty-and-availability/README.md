@@ -1,8 +1,12 @@
-# Weighted round robin with sonar
+# Sticky perf with penalty and availability
 
 ## Description
 
-Select randomly from a set of weighted providers while taking Sonar scores into account.
+Routes requests to the highest performing available platform, applying an optional handicap to each.
+Once a choice is made, stick with that choice until an alternative is significantly better
+or the original choice no longer exceeds the availability threshold.
+
+Stickiness may optionally be limited to specific countries.
 
 ## Validating the Code
 

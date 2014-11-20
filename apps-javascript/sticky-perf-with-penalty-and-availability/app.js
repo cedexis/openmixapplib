@@ -19,6 +19,8 @@ var handler = new OpenmixApplication({
     // Selected if a provider can't be determined
     default_provider: 'foo',
 
+    // If you want to restrict stickiness to certain countries, list their ISO 3166-1 alpha-2
+// codes in this array (see http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
     sticky_countries: [],
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 30,
@@ -48,12 +50,11 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-    this.lastAliasIndex = -1;
 
     /**
      * @type (Object) An object storing the last provider selected for a
-     * particular market/country combination.  The object is keyed by
-     * "<market>-<country>".
+     * particular market/country/asn combination.  The object is keyed by
+     * "<market>-<country>-<asn>".
      */
     this.saved = {};
 
@@ -100,9 +101,7 @@ function OpenmixApplication(settings) {
              * @type (Object.<string,{http_rtt:number,avail:number}>)
              */
             candidates,
-
             candidateAliases,
-            cnameOverride = '',
             stickyKey = request.market + "-" + request.country + "-" + request.asn,
             previous,
             refValue;
@@ -155,7 +154,7 @@ function OpenmixApplication(settings) {
 
 
             if (candidateAliases.length !== 0) {
-                add_rtt_padding(candidates);
+                addRttPadding(candidates);
                 if (typeof avail[previous] !== 'undefined') {
                     refValue = settings.variance_threshold * avail[previous].http_rtt;
                 }
@@ -185,7 +184,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        response.respond(decisionProvider, cnameOverride || settings.providers[decisionProvider].cname);
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
         response.setReasonCode(decisionReason);
     };
@@ -293,7 +292,7 @@ function OpenmixApplication(settings) {
         return candidate;
     }
 
-    function add_rtt_padding(data) {
+    function addRttPadding(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
