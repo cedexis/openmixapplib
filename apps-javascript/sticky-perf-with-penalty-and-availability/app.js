@@ -20,7 +20,7 @@ var handler = new OpenmixApplication({
     default_provider: 'foo',
 
     // If you want to restrict stickiness to certain countries, list their ISO 3166-1 alpha-2
-// codes in this array (see http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
+    // codes in this array (see http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
     sticky_countries: [],
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 30,
@@ -50,13 +50,8 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-
-    /**
-     * @type (Object) An object storing the last provider selected for a
-     * particular market/country/asn combination.  The object is keyed by
-     * "<market>-<country>-<asn>".
-     */
-    this.saved = {};
+    var cache = this.cache = new LRUCache(settings.maxSavedProviders);
+    var stickyAllCountries = settings.sticky_countries.length === 0;
 
     /**
      * @param {OpenmixConfiguration} config
@@ -74,8 +69,8 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var avail = request.getProbe('avail'),
-            rtt = request.getProbe('http_rtt'),
+        var dataAvail = request.getProbe('avail'),
+            dataRtt = request.getProbe('http_rtt'),
             allReasons,
             decisionProvider,
             decisionReason,
@@ -102,80 +97,82 @@ function OpenmixApplication(settings) {
              */
             candidates,
             candidateAliases,
-            stickyKey = request.market + "-" + request.country + "-" + request.asn,
-            previous,
-            refValue;
+            cacheKey = request.market + "-" + request.country + "-" + request.asn,
+            previousRtt,
+            previousProvider;
 
         allReasons = {
             best_performing_provider_equal_previous: 'A',
             no_previous: 'B',
             previous_below_availability_threshold: 'C',
             new_provider_below_varianceThreshold: 'D',
-            choosing_previous_best_perform_within_varianceThreshold: 'E',
-            all_providers_eliminated: 'F'
+            previous_best_perform_within_varianceThreshold: 'E',
+            all_providers_eliminated: 'F',
+            sparse_rtt: 'G',
+            previous_missing_rtt: 'H',
+            sparse_data: 'I'
         };
 
         function filterCandidates(candidate) {
-            return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold);
+            return candidate.avail >= settings.availability_threshold;
         }
 
-        //update_sticky_data
-
-        var filtered = settings.sticky_countries[request.country];
-        if (typeof filtered !== 'undefined' || settings.sticky_countries.length === 0) {
-            if (typeof this.saved[stickyKey] === 'undefined') {
-                while (settings.maxSavedProviders <= Object.keys(this.saved).length) {
-                    delete this.saved[getLRUIndex(this.saved)];
-                }
-                this.saved[stickyKey] = {'provider': null}; // saves the stickyKey with a provider null
-            }
-            this.saved[stickyKey].timestamp = new Date().getTime();
+        // Get sticky country from cache when appropriate
+        if (stickyAllCountries || settings.sticky_countries.indexOf(request.country) !== -1) {
+            previousProvider = cache.get(cacheKey);
         }
 
-        previous = null;
-
-        if (typeof this.saved[stickyKey] !== 'undefined') {
-            previous = this.saved[stickyKey].provider;
-        }
-
-        candidates = filterObject(avail, filterCandidates);
+        dataAvail = filterObject(dataAvail, filterCandidates);
 
         // Join the rtt scores with the list of viable candidates
-        candidates = joinObjects(candidates, rtt, 'http_rtt');
-
+        candidates = joinObjects(dataRtt, dataAvail, 'avail');
         candidateAliases = Object.keys(candidates);
-
 
         if (candidateAliases.length !== 0) {
             addRttPadding(candidates);
-            if (typeof avail[previous] !== 'undefined') {
-                refValue = settings.variance_threshold * avail[previous].http_rtt;
-            }
-            var bestRtt = getLowest(candidates, 'http_rtt');
-            decisionProvider = bestRtt;
 
-            if (bestRtt === previous) {
-                decisionReason = allReasons.best_performing_provider_equal_previous;
-            } else if (typeof refValue === 'undefined' || typeof previous === 'undefined') {
-                decisionReason = allReasons.no_previous;
-                this.saved[stickyKey].provider = decisionProvider;
-            } else if (avail[previous].avail < settings.availability_threshold) {
-                decisionReason = allReasons.previous_below_availability_threshold;
-                this.saved[stickyKey].provider = decisionProvider;
-            } else if (candidates[decisionProvider].http_rtt < refValue) {
-                this.saved[stickyKey].provider = decisionProvider;
-                decisionReason = allReasons.new_provider_below_varianceThreshold;
-            } else {
-                decisionProvider = previous;
-                decisionReason = allReasons.choosing_previous_best_perform_within_varianceThreshold;
+            if (typeof candidates[previousProvider] !== 'undefined') {
+                previousRtt = settings.variance_threshold * candidates[previousProvider].http_rtt;
             }
+
+            decisionProvider = getLowest(candidates, 'http_rtt');
+
+            if (decisionProvider === previousProvider) {
+                decisionReason = allReasons.best_performing_provider_equal_previous;
+            }
+            else if (typeof previousProvider === 'undefined') {
+                decisionReason = allReasons.no_previous;
+            }
+            else if (typeof dataAvail[previousProvider] === 'undefined') {
+                decisionReason = allReasons.previous_below_availability_threshold;
+            }
+            else if (typeof previousRtt === 'undefined') {
+                decisionReason = allReasons.previous_missing_rtt;
+            }
+            else if (candidates[decisionProvider].http_rtt < previousRtt) {
+                decisionReason = allReasons.new_provider_below_varianceThreshold;
+            }
+            else {
+                decisionReason = allReasons.previous_best_perform_within_varianceThreshold;
+                decisionProvider = previousProvider;
+            }
+        }
+        else if (typeof dataAvail[previousProvider] !== 'undefined') {
+            decisionReason = allReasons.sparse_rtt;
+            decisionProvider = previousProvider;
+        }
+        else if (Object.keys(dataAvail).length !== 0) {
+            decisionReason = allReasons.sparse_rtt;
+            decisionProvider = getHighest(dataAvail);
         }
         else {
-            decisionProvider = getHighest(avail);
-            this.saved[stickyKey].provider = decisionProvider;
             decisionReason = allReasons.all_providers_eliminated;
+            decisionProvider = settings.default_provider;
         }
 
+        if (decisionProvider !== previousProvider) {
+            cache.set(cacheKey, decisionProvider);
+        }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
@@ -246,24 +243,6 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} source
      */
-    function getLRUIndex(source) {
-        var keys = Object.keys(source),
-            i = keys.length,
-            key,
-            candidate,
-            min = Infinity,
-            value;
-        while (i --) {
-            key = keys[i];
-            value = source[key].timestamp;
-            if (value < min) {
-                candidate = key;
-                min = value;
-            }
-        }
-        return candidate;
-    }
-
     function getHighest(source) {
         var keys = Object.keys(source),
             i = keys.length,
@@ -285,6 +264,9 @@ function OpenmixApplication(settings) {
         return candidate;
     }
 
+    /**
+     * @param {!Object} data
+     */
     function addRttPadding(data) {
         var keys = Object.keys(data),
             i = keys.length,
@@ -297,4 +279,42 @@ function OpenmixApplication(settings) {
         return data;
     }
 
+    /** @constructor */
+    function LRUCache(maxSize) {
+        var index = [],
+            values = {},
+            lastIndex = 0;
+
+        /**
+         * @param {string} key
+         * @param {string} value
+         */
+        this.set = function(key, value) {
+            if (typeof this.get(key) === 'undefined') {
+                if (lastIndex < maxSize) {
+                    lastIndex ++;
+                }
+                else {
+                    delete values[index.splice(0, 1)[0]];
+                }
+            }
+
+            index[lastIndex] = key;
+            values[key] = value;
+        };
+
+        /**
+         * @param {string} key
+         */
+        this.get = function(key) {
+            var value = values[key];
+
+            if (typeof value !== 'undefined') {
+                index.splice(index.indexOf(key), 1);
+                index[lastIndex] = key;
+            }
+
+            return value;
+        };
+    }
 }

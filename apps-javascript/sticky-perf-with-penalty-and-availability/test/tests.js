@@ -117,7 +117,7 @@
             i.request.market = 'EG';
             i.request.country = 'NA';
             i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            i.sut.cache.set('EG-NA-123', 'foo');
             sinon.clock.now = 1416513547123;
         },
         verify: function(i) {
@@ -191,7 +191,7 @@
             i.request.market = 'EG';
             i.request.country = 'NA';
             i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            i.sut.cache.set('EG-NA-123', 'foo');
         },
         verify: function(i) {
             console.log(i);
@@ -228,7 +228,7 @@
             i.request.market = 'EG';
             i.request.country = 'NA';
             i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            i.sut.cache.set('EG-NA-123', 'foo');
         },
         verify: function(i) {
             console.log(i);
@@ -265,7 +265,7 @@
             i.request.market = 'EG';
             i.request.country = 'NA';
             i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            i.sut.cache.set('EG-NA-123', 'foo');
         },
         verify: function(i) {
             console.log(i);
@@ -302,7 +302,7 @@
             i.request.market = 'EG';
             i.request.country = 'NA';
             i.request.asn = 123;
-            i.sut.saved['EG-NA-123'] = { 'provider': 'foo', 'timestamp': 1 };
+            i.sut.cache.set('EG-NA-123', 'bar');
         },
         verify: function(i) {
             console.log(i);
@@ -310,63 +310,10 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 30, 'Verifying TTL');
             equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying reason code');
-        }
-    }));
-
-    test('clean out this.saved', test_handle_request({
-        settings: {
-            providers: {
-                'foo': {
-                    cname: 'www.foo.com',
-                    padding:0
-                },
-                'bar': {
-                    cname: 'www.bar.com',
-                    padding:0
-                }
-            },
-            availability_threshold: 60,
-            default_provider: 'foo',
-            default_ttl: 30,
-            error_ttl: 20,
-            sticky_countries: [],
-            varianceThreshold: 0.65,
-            maxSavedProviders: 10
-        },
-        setup: function(i) {
-            i.request
-                .getProbe
-                .withArgs('avail')
-                .returns({
-                    foo: { avail: 100 },
-                    bar: { avail: 100 }
-                });
-            i.request
-                .getProbe
-                .withArgs('http_rtt')
-                .returns({
-                    foo: { http_rtt: 140 },
-                    bar: { http_rtt: 98 }
-                });
-            i.request.market = 'EG';
-            i.request.country = 'NA';
-            i.request.asn = 123;
-            var j = 12;
-            while (j--) {
-                i.sut.saved['EG-N' + j + '-123'] = { 'provider': 'foo', 'timestamp': j };
-            }
-            sinon.clock.tick(123);
-        },
-        verify: function(i) {
-            console.log(i.sut.saved);
-            equal(Object.keys(i.sut.saved).length, 10, 'Verifying count of saved object keys');
-            deepEqual(i.sut.saved['EG-N3-123'],  { 'provider': 'foo', 'timestamp': 3 }, 'Verifying saved object #1');
-            deepEqual(i.sut.saved['EG-N11-123'], { 'provider': 'foo', 'timestamp': 11 }, 'Verifying saved object #2');
-            deepEqual(i.sut.saved['EG-NA-123'],  { 'provider': 'bar', 'timestamp': 123 }, 'Verifying saved object #3');
         }
     }));
 }());
