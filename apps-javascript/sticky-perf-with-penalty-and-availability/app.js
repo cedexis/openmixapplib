@@ -74,27 +74,7 @@ function OpenmixApplication(settings) {
             allReasons,
             decisionProvider,
             decisionReason,
-            /**
-             * An object containing the list of candidate providers, keyed by
-             * provider alias.  It is composed by joining the Radar availability
-             * and HTTP RTT data taken from the Openmix API.  It is also run
-             * through a filter to remove unavailable providers.
-             *
-             * Example after composition:
-             *
-             * {
-             *     "foo": {
-             *         "avail": 99,
-             *         "http_rtt": 201
-             *     }
-             *     "bar": {
-             *         "avail": 100,
-             *         "http_rtt": 198
-             *     }
-             * }
-             *
-             * @type (Object.<string,{http_rtt:number,avail:number}>)
-             */
+            /** @type (Object.<string,{http_rtt:number,avail:number}>) */
             candidates,
             candidateAliases,
             cacheKey = request.market + "-" + request.country + "-" + request.asn,
