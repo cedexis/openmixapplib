@@ -97,7 +97,7 @@
                     "provider2": "0.99000",
                     "provider3": "1.00000"
                 });
-            Math.random.returns(0);
+            Math.random.returns(0.999);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');

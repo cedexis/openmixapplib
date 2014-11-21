@@ -82,7 +82,7 @@ function OpenmixApplication(settings) {
         };
 
         function filterSonar(candidate) {
-            return (candidate >= settings.sonar_threshold);
+            return candidate >= settings.sonar_threshold;
         }
 
         function getTotalWeight(candidates) {
@@ -141,7 +141,7 @@ function OpenmixApplication(settings) {
                 }
                 // Respond with most available from sonar
                 else {
-                    decisionProvider = getHighest(dataSonar);
+                    decisionProvider = getHighest(candidates);
                     reasonCode = allReasons.most_available_platform_chosen;
                 }
             }
@@ -163,18 +163,17 @@ function OpenmixApplication(settings) {
     function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
-            key,
-            data = [];
+            key;
 
         while (i --) {
             key = keys[i];
 
-            if (filter(object[key], key)) {
-                data[key] = object[key];
+            if (!filter(object[key], key)) {
+                delete object[key];
             }
         }
 
-        return data;
+        return object;
     }
 
     /**

@@ -186,15 +186,14 @@ function OpenmixApplication(settings) {
     function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
-            key,
-            data = [];
+            key;
         while (i --) {
             key = keys[i];
             if (filter(object[key], key)) {
-                data[key] = (object[key]);
+                delete object[key];
             }
         }
-        return data;
+        return object;
     }
 
     /**
