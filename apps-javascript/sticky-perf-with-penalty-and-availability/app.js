@@ -189,7 +189,7 @@ function OpenmixApplication(settings) {
             key;
         while (i --) {
             key = keys[i];
-            if (filter(object[key], key)) {
+            if (!filter(object[key], key)) {
                 delete object[key];
             }
         }
