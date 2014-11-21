@@ -151,7 +151,7 @@ function OpenmixApplication(settings) {
         var keys = Object.keys(object),
             i = keys.length,
             key,
-            data = [];
+            data = {};
 
         while (i --) {
             key = keys[i];
