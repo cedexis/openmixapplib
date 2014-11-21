@@ -117,7 +117,7 @@ function OpenmixApplication(settings) {
             return candidate.avail >= settings.availability_threshold;
         }
 
-        // Get sticky country from cache when appropriate
+        // Get sticky provider from cache when appropriate
         if (stickyAllCountries || settings.sticky_countries.indexOf(request.country) !== -1) {
             previousProvider = cache.get(cacheKey);
         }
