@@ -1,4 +1,9 @@
 {
+    "title": "Diagnostic Application",
+    "description": "Provides the ability retrieve diagnostic information about a request.",
+    "lastUpdated": "10/29/2014",
+    "keywords": [""],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",

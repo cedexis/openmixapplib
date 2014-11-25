@@ -1,4 +1,9 @@
 {
+    "title": "Performance with Penalty and Availability, Sticky Winner",
+    "description": "Routes requests to the highest performing available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. \n\n Stickiness may optionally be limited to specific countries.",
+    "lastUpdated": "11/21/2014",
+    "keywords": [""],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",
