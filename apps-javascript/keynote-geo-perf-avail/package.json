@@ -1,4 +1,9 @@
 {
+    "title": "Keynote integration with Availability that routes according to Performance by Geo",
+    "description": "Keynote and Cedexis have partnered to provide the ability for openmix routing based on Keynote data. Uses Keynote for availability and performance measurements.",
+    "lastUpdated": "11/18/2014",
+    "keywords": ["Fusion"],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",

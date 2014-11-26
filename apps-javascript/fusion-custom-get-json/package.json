@@ -1,4 +1,9 @@
 {
+    "title": "Use Custom JSON input using Fusion",
+    "description": "Uses a custom JSON Fusion feed that provides server health data along with RTT for selecting among healthy servers. Demonstrates how to input a custom data feed into Openmix applications and use that data in the decision making process.",
+    "lastUpdated": "10/29/2014",
+    "keywords": ["Fusion"],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",

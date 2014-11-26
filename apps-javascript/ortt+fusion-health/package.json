@@ -1,4 +1,9 @@
 {
+    "title": "Optimal Round Trip Time with Availability",
+    "description": "This application uses latency and Fusion server health to determine which platform to direct requests to. Server health is used as an Availability check and will route around unhealthy platforms.",
+    "lastUpdated": "10/29/2014",
+    "keywords": ["Performance", "Fusion"],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",

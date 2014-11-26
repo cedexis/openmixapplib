@@ -1,4 +1,9 @@
 {
+    "title": "Route Based on Geography with Availability override",
+    "description": "Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.",
+    "lastUpdated": "10/29/2014",
+    "keywords": ["Geography"],
+    "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",
