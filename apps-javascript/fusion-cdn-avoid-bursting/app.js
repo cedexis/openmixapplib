@@ -77,10 +77,10 @@ function OpenmixApplication(settings) {
             return b.threshold - a.threshold;
         }
 
-        if (typeof settings.burstable_cdns[alias].bandwidth !== 'undefined') {
+        if (settings.burstable_cdns[alias].bandwidth !== undefined) {
             settings.burstable_cdns[alias].bandwidth.sort(sort_desc);
         }
-        if (typeof settings.burstable_cdns[alias].usage !== 'undefined') {
+        if (settings.burstable_cdns[alias].usage !== undefined) {
             settings.burstable_cdns[alias].usage.sort(sort_desc);
         }
     });
@@ -115,11 +115,11 @@ function OpenmixApplication(settings) {
                 i,
                 len;
 
-            if (typeof settings.burstable_cdns[alias] !== 'undefined'
-                && typeof settings.burstable_cdns[alias][metric] !== 'undefined') {
-                if (typeof data_fusion[alias] !== 'undefined'
-                    && typeof data_fusion[alias][metric] !== 'undefined'
-                    && typeof data_fusion[alias][metric].value !== 'undefined') {
+            if (settings.burstable_cdns[alias] !== undefined
+                && settings.burstable_cdns[alias][metric] !== undefined) {
+                if (data_fusion[alias] !== undefined
+                    && data_fusion[alias][metric] !== undefined
+                    && data_fusion[alias][metric].value !== undefined) {
 
                     value = parseFloat(data_fusion[alias][metric].value);
                     thresholds = settings.burstable_cdns[alias][metric];
@@ -152,7 +152,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 alias = aliases[i];
                 provider = settings.providers[alias];
-                base_padding = typeof provider.base_padding === 'undefined' ? 0 : provider.base_padding;
+                base_padding = provider.base_padding === undefined ? 0 : provider.base_padding;
                 padding_pct = get_padding_percent(alias, 'bandwidth', reasons.missing_bandwidth_data)
                     + get_padding_percent(alias, 'usage', reasons.missing_usage_data);
                 data[alias].http_rtt = base_padding + ((1 + padding_pct) * data[alias].http_rtt);
@@ -278,7 +278,7 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+            if (source[key] !== undefined && source[key][property] !== undefined) {
                 target[key][property] = source[key][property];
             }
             else {

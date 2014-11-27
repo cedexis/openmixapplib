@@ -37,7 +37,7 @@ function OpenmixApplication(settings) {
         random_provider: 'B'
     };
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -71,8 +71,8 @@ function OpenmixApplication(settings) {
             decision_reason = reasons.random_provider;
         }
 
-        if (typeof data_fusion[aliases[0]] !== 'undefined'
-            && typeof data_fusion[aliases[0]].value !== 'undefined'
+        if (data_fusion[aliases[0]] !== undefined
+            && data_fusion[aliases[0]].value !== undefined
             && data_fusion[aliases[0]].value > 1.0) {
             decision_provider = aliases[1];
             decision_ttl = decision_ttl || settings.default_ttl;

@@ -48,7 +48,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -83,28 +83,28 @@ function OpenmixApplication(settings) {
 
         // determine which providers have a sonar value below threshold
         function belowSonarThreshold(alias) {
-            if( typeof dataSonar[alias] !== 'undefined') {
+            if (dataSonar[alias] !== 'undefined') {
                 return (dataSonar[alias] < settings.sonar_threshold);
             }
             return settings.require_sonar_data;
         }
 
-        
+
         function isEmpty(obj) {
             return Object.keys(obj).length === 0;
         }
 
         // used for reason code logging
         function failedGeoLocation() {
-            if( !isEmpty(failedCandidates)) {
-                if (typeof settings.country_to_provider !== 'undefined'
-                    && typeof settings.country_to_provider[request.country] !== 'undefined' 
+            if (!isEmpty(failedCandidates)) {
+                if (settings.country_to_provider !== 'undefined'
+                    && settings.country_to_provider[request.country] !== 'undefined'
                     && failedCandidates[settings.country_to_provider[request.country]] !== 'undefined') {
                     return true;
                 }
 
-                if (typeof settings.market_to_provider !== 'undefined'
-                    && typeof settings.market_to_provider[request.market] !== 'undefined' 
+                if (settings.market_to_provider !== 'undefined'
+                    && settings.market_to_provider[request.market] !== 'undefined'
                     && failedCandidates[settings.market_to_provider[request.market] ] !== 'undefined') {
                     return true;
                 }
@@ -113,9 +113,9 @@ function OpenmixApplication(settings) {
             return false;
         }
 
-        function getDefaultProvider() {   
-            // the default provider is good, use it          
-            if( isEmpty(failedCandidates) || typeof failedCandidates[settings.default_provider] === 'undefined') {
+        function getDefaultProvider() {
+            // the default provider is good, use it
+            if (isEmpty(failedCandidates) || failedCandidates[settings.default_provider] === 'undefined') {
                 return settings.default_provider;
             }
 
@@ -127,7 +127,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 key = keys[i];
 
-                if (typeof failedCandidates[key] === 'undefined') {
+                if (failedCandidates[key] === 'undefined') {
                     return key;
                 }
             }
@@ -141,17 +141,17 @@ function OpenmixApplication(settings) {
         failedCandidates = filterObject(settings.providers, belowSonarThreshold);
 
         /* jshint laxbreak:true */
-        if (typeof settings.country_to_provider !== 'undefined'
-            && typeof settings.country_to_provider[request.country] !== 'undefined' 
-            && typeof failedCandidates[settings.country_to_provider[request.country]] === 'undefined') {
+        if (settings.country_to_provider !== 'undefined'
+            && settings.country_to_provider[request.country] !== 'undefined'
+            && failedCandidates[settings.country_to_provider[request.country]] === 'undefined') {
             // Override based on the request country
             decision_provider = settings.country_to_provider[request.country];
             decision_ttl = decision_ttl || settings.default_ttl;
             decision_reason = all_reasons.geo_override_on_country;
         }
-        else if (typeof settings.market_to_provider !== 'undefined'
-            && typeof settings.market_to_provider[request.market] !== 'undefined'
-            && typeof failedCandidates[settings.market_to_provider[request.market] ] === 'undefined') {
+        else if (settings.market_to_provider !== 'undefined'
+            && settings.market_to_provider[request.market] !== 'undefined'
+            && failedCandidates[settings.market_to_provider[request.market] ] === 'undefined') {
             // Override based on the request market
             decision_provider = settings.market_to_provider[request.market];
             decision_ttl = decision_ttl || settings.default_ttl;
@@ -161,10 +161,10 @@ function OpenmixApplication(settings) {
 
             decision_provider = getDefaultProvider();
             decision_ttl = decision_ttl || settings.error_ttl;
-            if( typeof decision_reason === 'undefined'|| decision_reason.indexOf(all_reasons.no_available_provider) === -1 ) {
-                if( failedGeoLocation() ) {
+            if (decision_reason === 'undefined'|| decision_reason.indexOf(all_reasons.no_available_provider) === -1 ) {
+                if (failedGeoLocation() ) {
                     decision_reason = all_reasons.geo_sonar_failed + all_reasons.unexpected_market;
-                }else if(typeof decision_reason === 'undefined') {
+                }else if(decision_reason === 'undefined') {
                     decision_reason = all_reasons.unexpected_market;
                 }
             }

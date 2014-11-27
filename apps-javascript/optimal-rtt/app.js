@@ -84,7 +84,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -133,15 +133,15 @@ function OpenmixApplication(settings) {
         function filter_candidates(candidate, alias) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets/asn
-            return (typeof candidate.avail !== 'undefined' && candidate.avail >= settings.availability_threshold)
-                && (typeof provider.countries === 'undefined' || provider.countries.indexOf(request.country) !== -1)
-                && (typeof provider.markets === 'undefined' || provider.markets.indexOf(request.market) !== -1)
-                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
+            return (candidate.avail !== undefined && candidate.avail >= settings.availability_threshold)
+                && (provider.countries === undefined || provider.countries.indexOf(request.country) !== -1)
+                && (provider.markets === undefined || provider.markets.indexOf(request.market) !== -1)
+                && (provider.asns === undefined || provider.asns.indexOf(request.asn) !== -1);
         }
 
         function select_override(providers, locale, reason, error_reason) {
-            if (typeof providers[locale] !== 'undefined') {
-                if (typeof candidates[providers[locale]] !== 'undefined') {
+            if (providers[locale] !== undefined) {
+                if (candidates[providers[locale]] !== undefined) {
                     decision_provider = providers[locale];
                     decision_ttl = decision_ttl || settings.default_ttl;
                     decision_reasons.push(reason);
@@ -186,13 +186,13 @@ function OpenmixApplication(settings) {
                 decision_ttl = decision_ttl || settings.default_ttl;
             }
             else if (settings.geo_default) {
-                if (typeof settings.country_to_provider[request.country] !== 'undefined') {
+                if (settings.country_to_provider[request.country] !== undefined) {
                     // Default based on request country
                     decision_provider = settings.country_to_provider[request.country];
                     decision_ttl = decision_ttl || settings.error_ttl;
                     decision_reasons.push(all_reasons.geo_default_on_country);
                 }
-                else if (typeof settings.market_to_provider[request.market] !== 'undefined') {
+                else if (settings.market_to_provider[request.market] !== undefined) {
                     // Default based on request market
                     decision_provider = settings.market_to_provider[request.market];
                     decision_ttl = decision_ttl || settings.error_ttl;
@@ -207,7 +207,7 @@ function OpenmixApplication(settings) {
             decision_reasons.push(all_reasons.no_available_servers);
         }
 
-        if (typeof settings.conditional_hostname !== 'undefined' && typeof settings.conditional_hostname[request.hostname_prefix] !== 'undefined') {
+        if (settings.conditional_hostname !== undefined && settings.conditional_hostname[request.hostname_prefix] !== undefined) {
             // Confirm and translate the ISO country code to the numeric identifier
             // and format it as a prefix to the cname
             override_cname = settings.conditional_hostname[request.hostname_prefix] + '.';
@@ -276,7 +276,7 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+            if (source[key] !== undefined && source[key][property] !== undefined) {
                 target[key][property] = source[key][property];
             }
             else {

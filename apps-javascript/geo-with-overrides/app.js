@@ -41,7 +41,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -71,15 +71,15 @@ function OpenmixApplication(settings) {
         };
 
         /* jshint laxbreak:true */
-        if (typeof settings.country_to_provider !== 'undefined'
-            && typeof settings.country_to_provider[request.country] !== 'undefined') {
+        if (settings.country_to_provider !== undefined
+            && settings.country_to_provider[request.country] !== undefined) {
             // Override based on the request country
             decision_provider = settings.country_to_provider[request.country];
             decision_ttl = decision_ttl || settings.default_ttl;
             decision_reason = all_reasons.geo_override_on_country;
         }
-        else if (typeof settings.market_to_provider !== 'undefined'
-            && typeof settings.market_to_provider[request.market] !== 'undefined') {
+        else if (settings.market_to_provider !== undefined
+            && settings.market_to_provider[request.market] !== undefined) {
             // Override based on the request market
             decision_provider = settings.market_to_provider[request.market];
             decision_ttl = decision_ttl || settings.default_ttl;

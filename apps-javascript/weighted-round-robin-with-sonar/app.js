@@ -46,7 +46,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -94,7 +94,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 weight = settings.providers[keys[i]].weight;
 
-                if (typeof weight !== 'undefined') {
+                if (weight !== undefined) {
                   total += weight;
                 }
             }
@@ -113,7 +113,7 @@ function OpenmixApplication(settings) {
                 key = keys[i];
                 weight  = settings.providers[key].weight;
 
-                if (typeof weight !== 'undefined') {
+                if (weight !== undefined) {
                     mark += weight;
                     if (random < mark) {
                         return key;

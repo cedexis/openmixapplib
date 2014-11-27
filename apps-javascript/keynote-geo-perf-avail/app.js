@@ -85,11 +85,11 @@ function OpenmixApplication(settings) {
             data_fusion = parse_fusion_data(request.getData('fusion'));
 
         function candidate_has_perf_avail_scores(alias, node, geo_location) {
-            return typeof data_fusion[alias] !== 'undefined'
-                && typeof data_fusion[alias][node] !== 'undefined'
-                && typeof data_fusion[alias][node][geo_location] !== 'undefined'
-                && typeof data_fusion[alias][node][geo_location].perf_data !== 'undefined'
-                && typeof data_fusion[alias][node][geo_location].avail_data !== 'undefined'
+            return data_fusion[alias] !== undefined
+                && data_fusion[alias][node] !== undefined
+                && data_fusion[alias][node][geo_location] !== undefined
+                && data_fusion[alias][node][geo_location].perf_data !== undefined
+                && data_fusion[alias][node][geo_location].avail_data !== undefined
                 && data_fusion[alias][node][geo_location].avail_data > settings.min_availability_threshold
                 && data_fusion[alias][node][geo_location].perf_data < settings.max_perf_threshold;
         }
@@ -131,7 +131,7 @@ function OpenmixApplication(settings) {
         }
 
         function filter_candidates(alias) {
-            if( candidate_has_perf_avail_scores(alias, 'countries', request.country) ||
+            if (candidate_has_perf_avail_scores(alias, 'countries', request.country) ||
                 candidate_has_perf_avail_scores(alias, 'markets', request.market)) {
                 return true;
             }
@@ -147,8 +147,8 @@ function OpenmixApplication(settings) {
 
             while (i --) {
                 alias = aliases[i];
-                if (typeof data_fusion[alias][node] !== 'undefined'
-                    && typeof data_fusion[alias][node][geo_location] !== 'undefined') {
+                if (data_fusion[alias][node] !== undefined
+                    && data_fusion[alias][node][geo_location] !== undefined) {
                     score = data_fusion[alias][node][geo_location].perf_data;
                     if (score < min) {
                         selected_provider = alias;
@@ -185,7 +185,7 @@ function OpenmixApplication(settings) {
             else {
                 // we have more than 1 available provider, route on keynote performance data
                 select_best_performing_provider('countries', request.country);
-                if (typeof selected_provider !== 'undefined') {
+                if (selected_provider !== undefined) {
                     reason_code = reasons.best_provider_selected;
                 } else {
                     select_best_performing_provider('markets', request.market);

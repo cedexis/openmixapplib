@@ -77,13 +77,13 @@ function OpenmixApplication(settings) {
 
         function fusion_health_score_ok(provider) {
             // let the flag determine if the provider is available when we don't have fusion data for the provider
-            if( typeof data_fusion[provider] === 'undefined') {
+            if (data_fusion[provider] === undefined) {
                 return settings.no_health_score_ok;
             }
 
             // normally, the fusion recipe returns a health score of 3 or greater when the server is available
-            return typeof data_fusion[provider].health_score !== 'undefined'
-                && typeof data_fusion[provider].health_score.value !== 'undefined'
+            return data_fusion[provider].health_score !== undefined
+                && data_fusion[provider].health_score.value !== undefined
                 && data_fusion[provider].health_score.value > 2;
         }
 

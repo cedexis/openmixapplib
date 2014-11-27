@@ -41,8 +41,8 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-    var failoverAliases = typeof settings.failover_providers === 'undefined' ? [] : Object.keys(settings.failover_providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
+    var failoverAliases = settings.failover_providers === undefined ? [] : Object.keys(settings.failover_providers);
     this.lastAliasIndex = -1;
     this.lastFailoverAliasIndex = -1;
 
@@ -86,12 +86,12 @@ function OpenmixApplication(settings) {
 
         function filterPrimaryCandidates(candidate, alias) {
             return (candidate >= settings.sonar_threshold)
-                && (typeof settings.providers[alias] !== 'undefined');
+                && (settings.providers[alias] !== undefined);
         }
 
         function filterFailoverCandidates(candidate, alias) {
             return (candidate >= settings.sonar_threshold)
-                && (typeof settings.failover_providers[alias] !== 'undefined');
+                && (settings.failover_providers[alias] !== undefined);
         }
 
         function selectProvider(aliases, reason, lastIndex) {

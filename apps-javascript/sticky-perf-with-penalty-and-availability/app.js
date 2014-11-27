@@ -49,7 +49,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
     var cache = this.cache = new LRUCache(settings.maxSavedProviders);
     var stickyAllCountries = settings.sticky_countries.length === 0;
 
@@ -111,7 +111,7 @@ function OpenmixApplication(settings) {
         if (candidateAliases.length !== 0) {
             addRttPadding(candidates);
 
-            if (typeof candidates[previousProvider] !== 'undefined') {
+            if (candidates[previousProvider] !== undefined) {
                 previousRtt = settings.variance_threshold * candidates[previousProvider].http_rtt;
             }
 
@@ -120,13 +120,13 @@ function OpenmixApplication(settings) {
             if (decisionProvider === previousProvider) {
                 decisionReason = allReasons.best_performing_provider_equal_previous;
             }
-            else if (typeof previousProvider === 'undefined') {
+            else if (previousProvider === undefined) {
                 decisionReason = allReasons.no_previous;
             }
-            else if (typeof dataAvail[previousProvider] === 'undefined') {
+            else if (dataAvail[previousProvider] === undefined) {
                 decisionReason = allReasons.previous_below_availability_threshold;
             }
-            else if (typeof previousRtt === 'undefined') {
+            else if (previousRtt === undefined) {
                 decisionReason = allReasons.previous_missing_rtt;
             }
             else if (candidates[decisionProvider].http_rtt < previousRtt) {
@@ -137,7 +137,7 @@ function OpenmixApplication(settings) {
                 decisionProvider = previousProvider;
             }
         }
-        else if (typeof dataAvail[previousProvider] !== 'undefined') {
+        else if (dataAvail[previousProvider] !== undefined) {
             decisionReason = allReasons.sparse_rtt;
             decisionProvider = previousProvider;
         }
@@ -187,7 +187,7 @@ function OpenmixApplication(settings) {
             key;
         while (i --) {
             key = keys[i];
-            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+            if (source[key] !== undefined && source[key][property] !== undefined) {
                 target[key][property] = source[key][property];
             }
             else {
@@ -269,7 +269,7 @@ function OpenmixApplication(settings) {
          * @param {string} value
          */
         this.set = function(key, value) {
-            if (typeof this.get(key) === 'undefined') {
+            if (this.get(key) === undefined) {
                 if (lastIndex < maxSize) {
                     lastIndex ++;
                 }
@@ -288,7 +288,7 @@ function OpenmixApplication(settings) {
         this.get = function(key) {
             var value = values[key];
 
-            if (typeof value !== 'undefined') {
+            if (value !== undefined) {
                 index.splice(index.indexOf(key), 1);
                 index[lastIndex] = key;
             }

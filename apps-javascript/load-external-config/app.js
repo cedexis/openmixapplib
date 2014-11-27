@@ -78,7 +78,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 alias = aliases[i];
                 provider = settings.providers[alias];
-                base_padding = typeof provider.base_padding === 'undefined' ? 0 : provider.base_padding;
+                base_padding = provider.base_padding === undefined ? 0 : provider.base_padding;
                 data[alias].http_rtt = base_padding + data[alias].http_rtt;
             }
             return data;
@@ -192,7 +192,7 @@ function OpenmixApplication(settings) {
             key;
         while (i --) {
             key = keys[i];
-            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+            if (source[key] !== undefined && source[key][property] !== undefined) {
                 target[key][property] = source[key][property];
             }
             else {

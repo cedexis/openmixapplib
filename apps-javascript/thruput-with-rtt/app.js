@@ -59,7 +59,7 @@ function OpenmixApplication(settings) {
         geo_override_not_available_market: 'J'
     };
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -90,7 +90,7 @@ function OpenmixApplication(settings) {
         function filter_availability(candidate, alias) {
             var provider = settings.providers[alias];
             return candidate.avail >= settings.availability_threshold
-                && (typeof provider.asns === 'undefined' || provider.asns.indexOf(request.asn) !== -1);
+                && (provider.asns === undefined || provider.asns.indexOf(request.asn) !== -1);
         }
 
         function get_kbps_filter(data) {
@@ -122,8 +122,8 @@ function OpenmixApplication(settings) {
         }
 
         function select_geo_override(providers, region, reason, error_reason) {
-            if (typeof providers[region] !== 'undefined') {
-                if (typeof data_avail[providers[region]] !== 'undefined') {
+            if (providers[region] !== undefined) {
+                if (data_avail[providers[region]] !== undefined) {
                     decision_provider_override = providers[region];
                     decision_ttl = decision_ttl || settings.default_ttl;
                     decision_reasons.push(reason);
@@ -135,8 +135,8 @@ function OpenmixApplication(settings) {
         }
 
         function select_asn_override(providers, asn, reason, error_reason) {
-            if (typeof providers[asn] !== 'undefined') {
-                if (typeof data_avail[providers[asn]] !== 'undefined') {
+            if (providers[asn] !== undefined) {
+                if (data_avail[providers[asn]] !== undefined) {
                     decision_provider_override = providers[asn];
                     decision_ttl = decision_ttl || settings.default_ttl;
                     decision_reasons.push(reason);
@@ -167,7 +167,7 @@ function OpenmixApplication(settings) {
 
         if (decision_provider_override === '') {
             if (candidates.length === 0) {
-                if (typeof decision_provider === 'undefined') {
+                if (decision_provider === undefined) {
                     select_random_provider(reasons.missing_avail);
                 }
                 else {
@@ -334,7 +334,7 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (typeof source[key] !== 'undefined' && typeof source[key][property] !== 'undefined') {
+            if (source[key] !== undefined && source[key][property] !== undefined) {
                 target[key][property] = source[key][property];
             }
             else {

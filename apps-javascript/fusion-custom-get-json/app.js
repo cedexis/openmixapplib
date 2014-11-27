@@ -74,11 +74,11 @@ function OpenmixApplication(settings) {
         // determine if the provider has fusion data and if the fusion data health_score is good
         function fusion_health_score_ok(provider) {
             // if fusion data is not required and we don't have fusion data for the provider, the candidate is considered 'available'
-            if( typeof data_fusion[provider] === 'undefined') {
+            if (data_fusion[provider] === undefined) {
                 return !settings.fusion_data_required;
             }
 
-            return typeof data_fusion[provider] !== 'undefined'
+            return data_fusion[provider] !== undefined
                 && data_fusion[provider] > settings.failed_health_score;
         }
 
@@ -110,7 +110,7 @@ function OpenmixApplication(settings) {
         // Main request processing logic below
 
         // if we had a  exception, log and bail with default_provider
-        if ( typeof data_fusion !== 'undefined' && typeof data_fusion.bad_json_data !== 'undefined') {
+        if ( data_fusion !== undefined && data_fusion.bad_json_data !== undefined) {
             selected_provider = settings.default_provider;
             reason_code = reasons.fusion_data_error;
 
@@ -226,8 +226,8 @@ function OpenmixApplication(settings) {
 
         // this is a contrived example to illustrate converting to a health score based on the fusion custom data we get in the test script
         // In this logic, whatever provider has a value above settings.failed_health_score will be considered  'available'
-        if( typeof data[key] !== 'undefined' && typeof data[key].loadpercentage !== 'undefined') {
-            if(data[key].loadpercentage <= 50 ){
+        if (data[key] !== undefined && data[key].loadpercentage !== undefined) {
+            if (data[key].loadpercentage <= 50 ){
                 data[key] = 5;
             } else if(data[key].loadpercentage < 60) {
                 data[key] = 4;
