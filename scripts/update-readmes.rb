@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
-# Used for parsing the `applib.yaml` file for each app
-require "yaml"
+require 'json'
 
 # Used for traversing the App Library directory tree
 require "find"
@@ -19,14 +18,15 @@ base_readme = File.read(relative_to_base("readme.md"))
 base_readme = base_readme.split("\n## Directories")[0]
 
 # Traverse all of the Apps to rewrite each App's readme file based on
-# the info in the App's `applib.yaml` file and the base readme file.
-Find.find(relative_to_base("apps")) do |f|
-    if f.match(/\.yaml\Z/)
+# the info in the App's `package.json` file and the base readme file.
+Find.find(relative_to_base("apps-javascript")) do |f|
+    if f.match(/package.json/)
         # Pull out the App name and description
         puts f
-        app_info = YAML::load(File.read(f))
-        app_name = app_info["name"]
-        app_description = app_info["description"]
+        #app_info = YAML::load(File.read(f))
+        app_json = JSON.parse(File.read(f))
+        app_name = app_json["title"]
+        app_description = app_json["description"]
 
         # Write a new `readme.rb` file
         dir_name = File.dirname(f)
