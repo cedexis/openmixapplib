@@ -1,15 +1,13 @@
-# Avoid CDN Bursting Using Fusion MBPS Data
+# Application: **Avoid CDN Bursting Charges by tracking monthly GB via Fusion Data API**
 
-## Description
+This version of the Optimal Round Trip Time application allows you track your monthly MB usage via that CDN's API. If your usage exceeds your commit, penalize that CDN enough to avoid a bursting charge. Otherwise use the Optimal Round Trip time approach.
+# Openmix Application Library
 
-Application features:
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
 
-* Specify one or more CDNs for which to consider Fusion bandwidth data.
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
 
-* Specify multiple thresholds in order to scale the effect of RTT padding as CDN
-  bandwidth increases.
-
-* Random selection when Radar data is sparse.
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 

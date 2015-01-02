@@ -1,9 +1,15 @@
-# ORTT + Sonar
+# Application: **Optimal Round Trip Time with Availability**
 
-## Description
+This application uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance. 
 
-* User round robin between available sonar providers
-and lowest rtt value if sonar not available
+There is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.
+# Openmix Application Library
+
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
+
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
+
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 

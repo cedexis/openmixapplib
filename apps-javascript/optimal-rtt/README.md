@@ -1,21 +1,15 @@
-# Optimal Round-Trip Time
+# Application: **Optimal Round Trip Time**
 
-## Description
+This application is ideal for getting started with Openmix application development. It uses latency to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance. 
 
-This application template provides load-balancing between multiple providers
-based on optimal round-trip time.  Optional features:
+There is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.
+# Openmix Application Library
 
-* Performance penalty - You can assign an optional penalty (or bonus) to each
-  provider as a percentage of the actual score.
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
 
-* Geo Override - You can map specific providers to countries and markets.  If
-  the application matches the request's geo information to a mapped provider, it
-  will select that provider as long as it meets the availability threshold.
-  Country mappings take precedence over market mappings.
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
 
-* Geo Default - In the event that an optimal provider cannot be selected based
-  on round-trip time, the application can use the country and market mappings to
-  choose a default provider based on the request's geo information.
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 
@@ -72,26 +66,7 @@ Runner.  Here's an example:
     LOG: Object{requireProvider: requireProvider}
     LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
     LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
-    LOG: Object{request: Object{getProbe: getProbe, market: 'NA', country: 'US'}, getProbe: getProbe, respond: respond, setTTL: setTTL, setReasonCode: setReasonCode}
+    ...
     PhantomJS 1.9.7 (Mac OS X): Executed 12 of 12 SUCCESS (0.075 secs / 0.017 secs)
 
     All unit tests passed

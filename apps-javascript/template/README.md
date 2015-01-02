@@ -1,22 +1,19 @@
-# Openmix Application Template
+# Application: **Template**
 
-## Description
+The most basic template for an Openmix application.
+# Openmix Application Library
 
-This template can be used as a starting point for Openmix applications.
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
 
-Application features:
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
 
-* TODO
-
-* TODO
-
-* TODO
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 
 The validate-js.sh script looks for possible errors in the application and test
 code.  You must have Java installed for it to run.  It executes both the Google
-Closure compiler and JSHint.
+Closure compiler and JSLint (jslint4java).
 
 Here's an example where Google Closure compiler detects a misspelled property
 name, and JSLint detects that we forgot to comment-out a console print
@@ -32,16 +29,9 @@ statement.  We'd want to fix these issues before uploading the Openmix app.
 
     0 error(s), 1 warning(s), 65.1% typed
 
-    Validating with JSHint
+    Validating with JSLint
 
-    app.js: line 50, col 14, 'filter_object' is defined but never used.
-    app.js: line 69, col 14, 'filter_empty' is defined but never used.
-    app.js: line 80, col 14, 'get_lowest' is defined but never used.
-    app.js: line 42, col 45, 'response' is defined but never used.
-    app.js: line 42, col 36, 'request' is defined but never used.
-    app.js: line 70, col 18, 'key' is defined but never used.
-
-    6 errors
+    jslint:app.js:17:13:'console' was used before it was defined.
 
 ## Running Unit Tests
 
@@ -100,12 +90,11 @@ sometimes miss:
 
     $ sudo apt-get install nodejs nodejs-legacy
 
-### Installing JSHint and Karma
+### Installing Karma and other dependencies
 
 With Node.js installed you can use *npm*, the package manager for Node.js, to
-install JSHint, Karma Runner and other dependencies.  The project directory
-contains a package.json file, which npm uses to download and install software
-locally.
+install Karma Runner and other dependencies.  The project directory contains a
+package.json file, which npm uses to download and install software locally.
 
 From the directory containing package.json:
 

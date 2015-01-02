@@ -1,10 +1,13 @@
-# Keynote Performance and Availability via Geo Location
+# Application: **Keynote integration with Availability that routes according to Performance by Geo**
 
-## Description
+Keynote and Cedexis have partnered to provide the ability for openmix routing based on Keynote data. Uses Keynote for availability and performance measurements.
+# Openmix Application Library
 
-Application features:
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
 
-* Uses Keynote Fusion data to detect best available platform using Keynote agent availability and performance scores via requestor geo country/market.  
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
+
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 

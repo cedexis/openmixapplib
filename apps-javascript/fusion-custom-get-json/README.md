@@ -1,10 +1,13 @@
-# Optimized Round Trip Time + Catchpoint Availability
+# Application: **Use Custom JSON input using Fusion**
 
-## Description
+Uses a custom JSON Fusion feed that provides server health data along with RTT for selecting among healthy servers. Demonstrates how to input a custom data feed into Openmix applications and use that data in the decision making process.
+# Openmix Application Library
 
-Application features:
+[Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
 
-* Uses Catchpoint Fusion data to detect when the provider is down.
+These Openmix Application scripts are used by specialized DNS servers to respond to DNS requests based on the logic in the scripts. Deployment of the scripts is done via our [customer portal](https://portal.cedexis.com/) or [web services API](https://github.com/cedexis/webservices/wiki).
+
+Learn how to use the library to make your own applications in [the wiki](https://github.com/cedexis/openmixapplib/wiki).
 
 ## Validating the Code
 
