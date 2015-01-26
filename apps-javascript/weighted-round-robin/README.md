@@ -1,8 +1,8 @@
-# Weighted round robin with sonar
+# Weighted round robin
 
 ## Description
 
-Select randomly from a set of weighted providers while taking Sonar scores into account.
+Select randomly from a set of weighted providers.
 
 ## Validating the Code
 

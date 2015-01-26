@@ -17,8 +17,10 @@
                 weight: 20
             }
         },
+
+        // The DNS TTL to be applied to DNS responses in seconds.
         default_ttl: 20,
-        sonar_threshold: 0.95
+        availability_threshold: 90
     };
 
     module('do_init');
@@ -88,56 +90,94 @@
     }
 
     test('routed_randomly_by_weight', test_handle_request({
+        settings: {
+            providers: {
+                'provider1': {
+                    cname: 'cname1.foo.com',
+                    weight: 50
+                },
+                'provider2': {
+                    cname: 'cname2.foo.com',
+                    weight: 30
+                },
+                'provider3': {
+                    cname: 'cname3.foo.com',
+                    weight: 20
+                }
+            },
+            // The DNS TTL to be applied to DNS responses in seconds.
+            default_ttl: 20,
+            availability_threshold: 90
+        },
         setup: function(i) {
             i.request
-                .getData
-                .withArgs('sonar')
+                .getProbe
+                .onCall(0)
                 .returns({
-                    "provider1": "0.97000",
-                    "provider2": "0.99000",
-                    "provider3": "1.00000"
+                    'provider1': { avail: 95 },
+                    'provider2': { avail: 100 },
+                    'provider3': { avail: 100 }
                 });
             Math.random.returns(0.999);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getProbe.callCount, 1, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'provider1', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'cname1.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'provider3', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname3.foo.com', 'Verifying respond CNAME');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
     }));
 
-    test('choose_random_platform', test_handle_request({
+    test('only_one_provider_avail', test_handle_request({
+        settings: {
+            providers: {
+                'provider1': {
+                    cname: 'cname1.foo.com',
+                    weight: 50
+                },
+                'provider2': {
+                    cname: 'cname2.foo.com',
+                    weight: 30
+                },
+                'provider3': {
+                    cname: 'cname3.foo.com',
+                    weight: 20
+                }
+            },
+            // The DNS TTL to be applied to DNS responses in seconds.
+            default_ttl: 20,
+            availability_threshold: 90
+        },
         setup: function(i) {
             i.request
-                .getData
-                .withArgs('sonar')
+                .getProbe
+                .onCall(0)
                 .returns({
-                    "provider1": "0.80000",
-                    "provider2": "0.70000",
-                    "provider3": "0.90000"
+                    'provider1': { avail: 75 },
+                    'provider2': { avail: 100 },
+                    'provider3': { avail: 70 }
                 });
-            Math.random.returns(0);
+            Math.random.returns(0.999);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getProbe.callCount, 1, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'provider1', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'cname1.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+            equal(i.response.respond.args[0][0], 'provider2', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname2.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
     }));
 
-   test('most_available_platform_chosen', test_handle_request({
+    test('most_available_platform_chosen', test_handle_request({
         settings: {
             providers: {
                 'provider1': {
@@ -153,32 +193,116 @@
                     weight: 0
                 }
             },
+            // The DNS TTL to be applied to DNS responses in seconds.
             default_ttl: 20,
-            sonar_threshold: 0.95
+            availability_threshold: 90
         },
         setup: function(i) {
             i.request
-                .getData
-                .withArgs('sonar')
+                .getProbe
+                .onCall(0)
                 .returns({
-                    "provider1": "0.98000",
-                    "provider2": "1.00000",
-                    "provider3": "0.99000"
+                    'provider1': { avail: 100 },
+                    'provider2': { avail: 95 },
+                    'provider3': { avail: 98 }
                 });
+            Math.random.returns(0.999);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getProbe.callCount, 1, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'provider2', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'cname2.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.response.respond.args[0][0], 'provider1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname1.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
     }));
 
+    test('none_available', test_handle_request({
+        settings: {
+            providers: {
+                'provider1': {
+                    cname: 'cname1.foo.com',
+                    weight: 50
+                },
+                'provider2': {
+                    cname: 'cname2.foo.com',
+                    weight: 30
+                },
+                'provider3': {
+                    cname: 'cname3.foo.com',
+                    weight: 20
+                }
+            },
+            // The DNS TTL to be applied to DNS responses in seconds.
+            default_ttl: 20,
+            availability_threshold: 90
+        },
+        setup: function(i) {
+            i.request
+                .getProbe
+                .onCall(0)
+                .returns({
+                    'provider1': { avail: 75 },
+                    'provider2': { avail: 70 },
+                    'provider3': { avail: 60 }
+                });
+            Math.random.returns(0.999);
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
+            equal(i.response.respond.args[0][0], 'provider1', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname1.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+        }
+    }));
+
+    test('data_problem', test_handle_request({
+        settings: {
+            providers: {
+                'provider1': {
+                    cname: 'cname1.foo.com',
+                    weight: 50
+                },
+                'provider2': {
+                    cname: 'cname2.foo.com',
+                    weight: 30
+                },
+                'provider3': {
+                    cname: 'cname3.foo.com',
+                    weight: 20
+                }
+            },
+            // The DNS TTL to be applied to DNS responses in seconds.
+            default_ttl: 20,
+            availability_threshold: 90
+        },
+        setup: function(i) {
+            i.request
+                .getProbe
+                .onCall(0)
+                .returns({});
+            Math.random.returns(0.999);
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'provider3', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname3.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying setReasonCode');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+        }
+    }));
 
 }());

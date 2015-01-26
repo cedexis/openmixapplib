@@ -1,6 +1,5 @@
 /**
- * Select randomly from a set of weighted providers while taking Sonar scores
- * into account.
+ * Select randomly from a set of weighted providers
  */
 var handler = new OpenmixApplication({
     // The array of all possible responses. The key, e.g. 'provider1', is the
@@ -26,7 +25,8 @@ var handler = new OpenmixApplication({
     },
 
     // The DNS TTL to be applied to DNS responses in seconds.
-    default_ttl: 20
+    default_ttl: 20,
+    availability_threshold: 90
 });
 
 function init(config) {
@@ -63,18 +63,30 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var allReasons,
+        var dataAvail = request.getProbe('avail'),
+            allReasons,
             decisionProvider,
             candidates = settings.providers,
             candidatesAliases = Object.keys(candidates),
-            reasonCode,
+            decisionReason = '',
             totalWeight = 0;
 
         allReasons = {
             routed_randomly_by_weight: 'A',
-            most_available_platform_chosen: 'B',
-            choose_random_platform: 'C'
+            only_one_provider_avail: 'B',
+            most_available_platform_chosen: 'C',
+            none_available: 'D',
+            data_problem: 'E'
         };
+
+        /**
+         * @param candidate
+         * @param key
+         * @returns {boolean}
+         */
+        function filterAvailability(candidate, key) {
+            return dataAvail[key].avail >= settings.availability_threshold;
+        }
 
         function getTotalWeight(candidates) {
             var keys = Object.keys(candidates),
@@ -115,31 +127,39 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (candidatesAliases.length > 0) {
-            if (candidatesAliases.length === 1) {
-                decisionProvider = candidatesAliases[0];
-                reasonCode = allReasons.most_available_platform_chosen;
-            }
-            else {
-                // Respond with a weighted random selection
-                totalWeight = getTotalWeight(candidates);
-                if (totalWeight > 0) {
-                    decisionProvider = getWeightedRandom(candidates, totalWeight);
-                    reasonCode = allReasons.routed_randomly_by_weight;
-                }else { // Respond with most available from sonar
-                    decisionProvider = getHighest(candidates);
-                    reasonCode = allReasons.most_available_platform_chosen;
+        if (candidatesAliases.length > 0 && Object.keys(dataAvail).length > 0) {
+            //filter the candidates by availability
+            candidates = filterObject(settings.providers, filterAvailability);
+            candidatesAliases = Object.keys(candidates);
+            if (candidatesAliases.length > 0) {
+                if (candidatesAliases.length === 1) {
+                    decisionProvider = candidatesAliases[0];
+                    decisionReason = allReasons.only_one_provider_avail;
+                } else {
+                    // Respond with a weighted random selection
+                    totalWeight = getTotalWeight(candidates);
+                    if (totalWeight > 0) {
+                        decisionProvider = getWeightedRandom(candidates, totalWeight);
+                        decisionReason = allReasons.routed_randomly_by_weight;
+                    } else { // Respond with most available candidate
+                        decisionProvider = getHighest(dataAvail, 'avail');
+                        decisionReason = allReasons.most_available_platform_chosen;
+                    }
                 }
+            } else{
+                decisionProvider = getHighest(dataAvail, 'avail');
+                decisionReason = allReasons.none_available;
             }
-        } else {
+        }
+        if (decisionProvider === undefined) {
             // If we get here, something went wrong. Select randomly to avoid fallback.
             decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
-            reasonCode = allReasons.choose_random_platform;
+            decisionReason = allReasons.data_problem;
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
-        response.setReasonCode(reasonCode);
+        response.setReasonCode(decisionReason);
     };
 
     /**
@@ -149,40 +169,40 @@ function OpenmixApplication(settings) {
     function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
-            key;
+            key,
+            candidates = {};
 
         while (i --) {
             key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
+            if (filter(object[key], key)) {
+                candidates[key] = object[key];
             }
         }
 
-        return object;
+        return candidates;
     }
 
     /**
      * @param {!Object} source
+     * @param {string} property
      */
-    function getHighest(source) {
+    function getHighest(source, property) {
         var keys = Object.keys(source),
             i = keys.length,
             key,
             candidate,
             max = -Infinity,
             value;
-
         while (i --) {
             key = keys[i];
-            value = source[key];
-
+            value = source[key][property];
             if (value > max) {
                 candidate = key;
                 max = value;
             }
         }
-
         return candidate;
     }
+
 }
