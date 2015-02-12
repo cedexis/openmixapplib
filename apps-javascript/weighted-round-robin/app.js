@@ -88,6 +88,9 @@ function OpenmixApplication(settings) {
             return dataAvail[key].avail >= settings.availability_threshold;
         }
 
+        /**
+         * @param candidates
+         */
         function getTotalWeight(candidates) {
             var keys = Object.keys(candidates),
                 i = keys.length,
@@ -107,6 +110,10 @@ function OpenmixApplication(settings) {
             return total;
         }
 
+        /**
+         * @param candidates
+         * @param max
+         */
         function getWeightedRandom(candidates, max) {
             var random = Math.floor(Math.random() * max),
                 mark = 0,
@@ -129,7 +136,7 @@ function OpenmixApplication(settings) {
 
         if (candidatesAliases.length > 0 && Object.keys(dataAvail).length > 0) {
             //filter the candidates by availability
-            candidates = filterObject(settings.providers, filterAvailability);
+            candidates = filterObject(candidates, filterAvailability);
             candidatesAliases = Object.keys(candidates);
             if (candidatesAliases.length > 0) {
                 if (candidatesAliases.length === 1) {
