@@ -78,6 +78,8 @@
                     request: request,
                     response: response
                 };
+            
+            this.stub(Math,"random");
 
             i.setup(test_stuff);
 
@@ -100,6 +102,7 @@
                     "foo_f": 100,
                     "bar_f": 100
                 });
+            Math.random.returns(0.9);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -111,7 +114,6 @@
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -176,6 +178,7 @@
                     "foo_f": 100,
                     "bar_f": 100
                 });
+            Math.random.returns(0.9);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -187,7 +190,6 @@
             equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.instance.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
@@ -277,7 +279,7 @@
                     "foo_f": 100,
                     "bar_f": 100
                 });
-            i.instance.lastFailoverAliasIndex = 2;
+            Math.random.returns(0.9);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -289,7 +291,6 @@
             equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.instance.lastFailoverAliasIndex, 0, 'Verifying alias index');
         }
     }));
 
