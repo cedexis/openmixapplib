@@ -378,9 +378,6 @@
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
         }

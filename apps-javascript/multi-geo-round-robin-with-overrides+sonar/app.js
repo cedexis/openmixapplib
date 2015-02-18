@@ -48,7 +48,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
     
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
@@ -86,7 +86,7 @@ function OpenmixApplication(settings) {
 
         // determine which providers have a sonar value above threshold
         function aboveSonarThreshold(alias) {
-            if (typeof dataSonar[alias] !== 'undefined') {
+            if (dataSonar[alias] !== undefined) {
                 return (dataSonar[alias] >= settings.sonar_threshold);
             }
             return !settings.require_sonar_data;
@@ -103,9 +103,9 @@ function OpenmixApplication(settings) {
         // First GEO Override
         /* jshint laxbreak:true */
         // Multi Geo Overriding Round Robin
-        if(typeof settings.country_to_provider_roundrobin !== 'undefined'
-            && typeof settings.country_to_provider_roundrobin[request.country] !== 'undefined'
-            && typeof passedCandidatesRRGeo !== 'undefined'
+        if(settings.country_to_provider_roundrobin !== undefined
+            && settings.country_to_provider_roundrobin[request.country] !== undefined
+            && passedCandidatesRRGeo !== undefined
             && passedCandidatesRRGeo.length > 0) {
 
             decision_provider = passedCandidatesRRGeo[Math.floor(Math.random() * passedCandidatesRRGeo.length)];
@@ -114,12 +114,12 @@ function OpenmixApplication(settings) {
         // Else origin
         } else {
             // Check origin sonar decision
-            if (typeof dataSonar.origin !== 'undefined' && dataSonar.origin >= settings.sonar_threshold) {
+            if (dataSonar.origin !== undefined && dataSonar.origin >= settings.sonar_threshold) {
                 decision_provider = 'origin';
                 decision_ttl = decision_ttl || settings.default_ttl;
                 decision_reason = all_reasons.default_selected;
             } else {
-                if (typeof passedCandidates !== 'undefined' && isEmpty(passedCandidates) === false) {
+                if (passedCandidates !== undefined && isEmpty(passedCandidates) === false) {
                     var passedCandidatesAliases = Object.keys(passedCandidates);
                     decision_provider = passedCandidatesAliases[Math.floor(Math.random() * passedCandidatesAliases.length)];
                     decision_ttl = decision_ttl || settings.default_ttl;
@@ -165,7 +165,7 @@ function OpenmixApplication(settings) {
      * @param {Function} filter
      */
     function filterArray(array, filter) {
-        if (typeof array === 'undefined') return [];
+        if (array === undefined) return [];
 
         var i = array.length,
             key,
