@@ -115,7 +115,7 @@ function OpenmixApplication(settings) {
 
         function getDefaultProvider() {
             // the default provider is good, use it
-            if (isEmpty(failedCandidates) ||  failedCandidates[settings.default_provider] === undefined) {
+            if (isEmpty(failedCandidates) || failedCandidates[settings.default_provider] === undefined) {
                 return settings.default_provider;
             }
 
