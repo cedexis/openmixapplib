@@ -83,7 +83,7 @@ function OpenmixApplication(settings) {
 
         // determine which providers have a sonar value below threshold
         function belowSonarThreshold(alias) {
-            if ( dataSonar[alias] !== undefined) {
+            if (dataSonar[alias] !== undefined) {
                 return (dataSonar[alias] < settings.sonar_threshold);
             }
             return settings.require_sonar_data;
@@ -97,15 +97,15 @@ function OpenmixApplication(settings) {
         // used for reason code logging
         function failedGeoLocation() {
             if (!isEmpty(failedCandidates)) {
-                if ( settings.country_to_provider !== undefined
-                    &&  settings.country_to_provider[request.country] !== undefined
-                    &&  failedCandidates[settings.country_to_provider[request.country]] !== undefined) {
+                if (settings.country_to_provider !== undefined
+                    && settings.country_to_provider[request.country] !== undefined
+                    && failedCandidates[settings.country_to_provider[request.country]] !== undefined) {
                     return true;
                 }
 
-                if ( settings.market_to_provider !== undefined
-                    &&  settings.market_to_provider[request.market] !== undefined
-                    &&  failedCandidates[settings.market_to_provider[request.market] ] !== undefined) {
+                if (settings.market_to_provider !== undefined
+                    && settings.market_to_provider[request.market] !== undefined
+                    && failedCandidates[settings.market_to_provider[request.market] ] !== undefined) {
                     return true;
                 }
             }
@@ -127,7 +127,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 key = keys[i];
 
-                if ( failedCandidates[key] === undefined) {
+                if (failedCandidates[key] === undefined) {
                     return key;
                 }
             }
@@ -141,17 +141,17 @@ function OpenmixApplication(settings) {
         failedCandidates = filterObject(settings.providers, belowSonarThreshold);
 
         /* jshint laxbreak:true */
-        if ( settings.country_to_provider !== undefined
-            &&  settings.country_to_provider[request.country] !== undefined
-            &&  failedCandidates[settings.country_to_provider[request.country]] === undefined) {
+        if (settings.country_to_provider !== undefined
+            && settings.country_to_provider[request.country] !== undefined
+            && failedCandidates[settings.country_to_provider[request.country]] === undefined) {
             // Override based on the request country
             decision_provider = settings.country_to_provider[request.country];
             decision_ttl = decision_ttl || settings.default_ttl;
             decision_reason = all_reasons.geo_override_on_country;
         }
-        else if ( settings.market_to_provider !== undefined
-            &&  settings.market_to_provider[request.market] !== undefined
-            &&  failedCandidates[settings.market_to_provider[request.market] ] === undefined) {
+        else if (settings.market_to_provider !== undefined
+            && settings.market_to_provider[request.market] !== undefined
+            && failedCandidates[settings.market_to_provider[request.market] ] === undefined) {
             // Override based on the request market
             decision_provider = settings.market_to_provider[request.market];
             decision_ttl = decision_ttl || settings.default_ttl;
@@ -161,7 +161,7 @@ function OpenmixApplication(settings) {
 
             decision_provider = getDefaultProvider();
             decision_ttl = decision_ttl || settings.error_ttl;
-            if ( decision_reason === undefined || decision_reason.indexOf(all_reasons.no_available_provider) === -1 ) {
+            if (decision_reason === undefined || decision_reason.indexOf(all_reasons.no_available_provider) === -1 ) {
                 if (failedGeoLocation() ) {
                     decision_reason = all_reasons.geo_sonar_failed + all_reasons.unexpected_market;
                 }else if( decision_reason === undefined) {
