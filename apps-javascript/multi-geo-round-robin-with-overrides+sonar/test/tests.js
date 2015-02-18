@@ -54,8 +54,6 @@
             return;
         },
         verify: function(i) {
-            equal(i.instance.lastAliasCountryIndex.CN, -1);
-            equal(i.instance.lastAliasCountryIndex.JP, -1);
             equal(i.config.requireProvider.callCount, 4);
             equal(i.config.requireProvider.args[3][0], 'foo');
             equal(i.config.requireProvider.args[2][0], 'bar');
@@ -171,12 +169,10 @@
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
-            equal(i.instance.lastFailOverAliasIndex, 0, 'Verifying alias index');
         }
     })); 
     test('Test no data on geo + 2 above sonar threshold', test_handle_request({
         setup: function(i) {
-            i.instance.lastFailOverAliasIndex = 0;
             i.request
                 .getData
                 .onCall(0)
@@ -194,42 +190,10 @@
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
-            equal(i.instance.lastFailOverAliasIndex, 1, 'Verifying alias index');
         }
     }));
-    test('Test no data on geo + 2 above sonar threshold + RR alias index reset', test_handle_request({
-            setup: function(i) {
-                i.instance.lastFailOverAliasIndex = 2;
-                i.request
-                    .getData
-                    .onCall(0)
-                    .returns({
-                        "foo": 0.90,
-                        "bar": 0.90,
-                        "baz": 0.80,
-                        "origin": 0.80
-                    });
-            },
-            verify: function(i) {
-         
-                equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-                equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-                equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-                equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-                equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-                equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-                equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
-                equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-                equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
-                equal(i.instance.lastFailOverAliasIndex, 0, 'Verifying alias index');
-            }
-        }));
 
     test('Test JP data on geo', test_handle_request({
         setup: function(i) {
@@ -252,12 +216,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.JP, 0, 'Verifying alias index');
-            equal(i.instance.lastAliasCountryIndex.CN, -1, 'Verifying alias index');
         }
     }));
 
@@ -287,8 +247,6 @@
             equal(i.response.respond.args[0][1], 'www.origin.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.JP, -1, 'Verifying JP alias index');
-            equal(i.instance.lastAliasCountryIndex.CN, -1, 'Verifying alias index');
         }
     }));
 
@@ -313,13 +271,8 @@
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
-            equal(i.instance.lastFailOverAliasIndex, 0, 'Verifying alias index');
-            equal(i.instance.lastAliasCountryIndex.JP, -1, 'Verifying JP alias index');
         }
     }));
 
@@ -343,12 +296,8 @@
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.CN, 0, 'Verifying alias index');
         }
     }));
 
@@ -377,7 +326,6 @@
             equal(i.response.respond.args[0][1], 'www.origin.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.CN, -1, 'Verifying alias index');
         }
     }));
 
@@ -407,14 +355,11 @@
             equal(i.response.respond.args[0][1], 'www.origin.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.CN, -1, 'Verifying alias index');
-            equal(i.instance.lastAliasCountryIndex.JP, -1, 'Verifying alias index');
         }
     }));
 
     test('Test CN geo + no provide above sonar ', test_handle_request({
         setup: function(i) {
-            i.instance.lastAliasCountryIndex.CN = 0;
             i.request.country = 'CN';
             i.request
                 .getData
@@ -438,36 +383,7 @@
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.CN, 1, 'Verifying alias index');
         }
     }));
-    test('Test CN geo + GeoRR index reset  ', test_handle_request({
-        setup: function(i) {
-            i.instance.lastAliasCountryIndex.CN = 2;
-            i.request.country = 'CN';
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": 0.80,
-                    "bar": 0.90,
-                    "baz": 0.90,
-                    "origin": 0.80
-                });
-            
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.instance.lastAliasCountryIndex.CN, 0, 'Verifying alias index');
-        }
-    }));
 }());

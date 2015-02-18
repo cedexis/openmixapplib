@@ -49,14 +49,7 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = typeof settings.providers === 'undefined' ? [] : Object.keys(settings.providers);
-    var country_round_robin = typeof settings.country_to_provider_roundrobin === 'undefined' ? [] : Object.keys(settings.country_to_provider_roundrobin);
-    this.lastAliasCountryIndex = {};
-    this.lastFailOverAliasIndex = -1;
-    var crrl = country_round_robin.length;
-    while (crrl --) {
-        this.lastAliasCountryIndex[String(country_round_robin[crrl])] = -1;
-    }
-
+    
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
         var i = aliases.length;
@@ -103,18 +96,6 @@ function OpenmixApplication(settings) {
             return Object.keys(obj).length === 0;
         }
 
-        // round robin selector function
-        function selectProvider(aliases, reason, lastIndex) {
-            if (lastIndex >= aliases.length) {
-                lastIndex = -1;
-            }
-            decision_provider = aliases[++lastIndex];
-            decision_reason = reason;
-            decision_ttl = settings.default_ttl;
-            return lastIndex;
-        }
-
-
         // Providers which pass the Threshold test
         passedCandidates = filterObject(settings.providers, aboveSonarThreshold);
         passedCandidatesRRGeo = filterArray(settings.country_to_provider_roundrobin[request.country], aboveSonarThreshold);
@@ -124,11 +105,12 @@ function OpenmixApplication(settings) {
         // Multi Geo Overriding Round Robin
         if(typeof settings.country_to_provider_roundrobin !== 'undefined'
             && typeof settings.country_to_provider_roundrobin[request.country] !== 'undefined'
-            && typeof this.lastAliasCountryIndex[request.country] !== 'undefined'
             && typeof passedCandidatesRRGeo !== 'undefined'
             && passedCandidatesRRGeo.length > 0) {
 
-            this.lastAliasCountryIndex[request.country] = selectProvider(passedCandidatesRRGeo, all_reasons.round_robin_geo, this.lastAliasCountryIndex[request.country]);
+            decision_provider = passedCandidatesRRGeo[Math.floor(Math.random() * passedCandidatesRRGeo.length)];
+            decision_reason = all_reasons.round_robin_geo;
+            decision_ttl = settings.default_ttl;
         // Else origin
         } else {
             // Check origin sonar decision
@@ -138,7 +120,10 @@ function OpenmixApplication(settings) {
                 decision_reason = all_reasons.default_selected;
             } else {
                 if (typeof passedCandidates !== 'undefined' && isEmpty(passedCandidates) === false) {
-                    this.lastFailOverAliasIndex = selectProvider(Object.keys(passedCandidates), all_reasons.passed_candidates_selected, this.lastFailOverAliasIndex);
+                    var passedCandidatesAliases = Object.keys(passedCandidates);
+                    decision_provider = passedCandidatesAliases[Math.floor(Math.random() * passedCandidatesAliases.length)];
+                    decision_ttl = decision_ttl || settings.default_ttl;
+                    decision_reason = all_reasons.passed_candidates_selected;
                 } else {
                     decision_provider = 'origin';
                     decision_ttl = decision_ttl || settings.default_ttl;
