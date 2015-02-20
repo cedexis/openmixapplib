@@ -204,6 +204,7 @@ function OpenmixApplication(settings) {
 
     /**
      * @param {!Object} source
+     * @param {string} property
      */
     function getHighest(source, property) {
         var keys = Object.keys(source),

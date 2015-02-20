@@ -1,6 +1,6 @@
-# Application: **Thruput with Availability, Sticky Winner**
+# Application: **Throughput with Availability, Sticky Winner**
 
-Routes requests to the highest Thuput available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. 
+Routes requests to the highest Throughput available platform.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold.
 
 Stickiness may optionally be limited to specific countries.
 # Openmix Application Library
