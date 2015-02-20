@@ -24,7 +24,8 @@
         error_ttl: 20,
         availability_threshold: 60,
         throughput_threshold: 500,
-        maxSavedProviders: 800
+        maxSavedProviders: 800,
+        asn_to_provider: { 1111: 'bar' }
     };
 
     module('do_init');
@@ -401,6 +402,41 @@
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 30, 'Verifying TTL');
             equal(i.response.setReasonCode.args[0][0], 'H', 'Verifying reason code');
+        }
+    }));
+    
+    test('test 10 -asn_override', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .onCall(0)
+                .returns({
+                    foo: { avail: 70 },
+                    bar: { avail: 100 },
+                    baz: { avail: 80 }
+                });
+            i.request
+                .getProbe
+                .onCall(1)
+                .returns({
+                    foo: { http_kbps: 90 },
+                    bar: { http_kbps: 100 },
+                    baz: { http_kbps: 96 }
+                });
+            i.request.market = 'EG';
+            i.request.country = 'NA';
+            i.request.asn = 1111;
+            i.sut.cache.set('EG-NA-123', 'foo');
+        },
+        verify: function(i) {
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 30, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'I', 'Verifying reason code');
         }
     }));
     

@@ -33,7 +33,9 @@ var handler = new OpenmixApplication({
     /**
      * @type {number}
      */
-    maxSavedProviders: 800
+    maxSavedProviders: 800,
+    // A mapping of ASN codes to provider aliases:  asn_to_provider: { 123: 'baz', 124: 'bar' }
+    asn_to_provider: {}
 });
 
 function init(config) {
@@ -72,10 +74,11 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var dataAvail = request.getProbe('avail'),
             dataKbps = request.getProbe('http_kbps'),
+            asn = request.asn,
             country = request.country,
             allReasons,
             decisionProvider,
-            decisionReason,
+            decisionReason = '',
             /** @type (Object.<string,{http_kbps:number,avail:number}>) */
             candidates,
             candidateAliases,
@@ -91,7 +94,8 @@ function OpenmixApplication(settings) {
             previous_better: 'E',
             all_providers_eliminated: 'F',
             sparse_kbps: 'G',
-            previous_missing_kbps: 'H'
+            previous_missing_kbps: 'H',
+            asn_override: 'I'
         };
 
         function filterCandidates(candidate) {
@@ -102,61 +106,79 @@ function OpenmixApplication(settings) {
             }
             return candidate.avail >= settings.availability_threshold;
         }
-
-        // Get sticky provider from cache when appropriate
-        if (stickyAllCountries || settings.sticky_countries.indexOf(request.country) !== -1) {
-            previousProvider = cache.get(cacheKey);
-        }
-
-        dataAvail = filterObject(dataAvail, filterCandidates);
-
-        // Join the kbps scores with the list of viable candidates
-        candidates = joinObjects(dataKbps, dataAvail, 'avail');
-        candidateAliases = Object.keys(candidates);
-
-        if (candidateAliases.length !== 0) {
-
-            if (candidates[previousProvider] !== undefined) {
-                previousKbps = settings.throughput_threshold + candidates[previousProvider].http_kbps;
+        
+        // ASN override
+        if (settings.asn_to_provider[asn] !== undefined) {
+            var available;
+            
+            if (country !== undefined && 
+                settings.country_availability_thresholds[country] !== undefined) {
+                available = dataAvail[settings.asn_to_provider[asn]].avail >= settings.country_availability_thresholds[country];    
+            } else {
+                available = dataAvail[settings.asn_to_provider[asn]].avail >= settings.availability_threshold;    
+            }
+            if (available) {
+                decisionProvider = settings.asn_to_provider[asn];
+                decisionReason = allReasons.asn_override;    
+            }
+        } 
+        
+        if (decisionProvider === undefined) {
+            // Get sticky provider from cache when appropriate
+            if (stickyAllCountries || settings.sticky_countries.indexOf(request.country) !== -1) {
+                previousProvider = cache.get(cacheKey);
             }
 
-            decisionProvider = getHighest(candidates, 'http_kbps');
+            dataAvail = filterObject(dataAvail, filterCandidates);
 
-            if (decisionProvider === previousProvider) {
-                decisionReason = allReasons.best_performing_provider_equal_previous;
+            // Join the kbps scores with the list of viable candidates
+            candidates = joinObjects(dataKbps, dataAvail, 'avail');
+            candidateAliases = Object.keys(candidates);
+
+            if (candidateAliases.length !== 0) {
+
+                if (candidates[previousProvider] !== undefined) {
+                    previousKbps = settings.throughput_threshold + candidates[previousProvider].http_kbps;
+                }
+
+                decisionProvider = getHighest(candidates, 'http_kbps');
+
+                if (decisionProvider === previousProvider) {
+                    decisionReason = allReasons.best_performing_provider_equal_previous;
+                }
+                else if (previousProvider === undefined) {
+                    decisionReason = allReasons.no_previous;
+                }
+                else if (dataAvail[previousProvider] === undefined) {
+                    decisionReason = allReasons.previous_below_availability_threshold;
+                }
+                else if (previousKbps === undefined) {
+                    decisionReason = allReasons.previous_missing_kbps;
+                }
+                else if (candidates[decisionProvider].http_kbps > previousKbps) {
+                    decisionReason = allReasons.new_provider_better;
+                }
+                else {
+                    decisionReason = allReasons.previous_better;
+                    decisionProvider = previousProvider;
+                }
             }
-            else if (previousProvider === undefined) {
-                decisionReason = allReasons.no_previous;
-            }
-            else if (dataAvail[previousProvider] === undefined) {
-                decisionReason = allReasons.previous_below_availability_threshold;
-            }
-            else if (previousKbps === undefined) {
-                decisionReason = allReasons.previous_missing_kbps;
-            }
-            else if (candidates[decisionProvider].http_kbps > previousKbps) {
-                decisionReason = allReasons.new_provider_better;
-            }
-            else {
-                decisionReason = allReasons.previous_better;
+            else if (dataAvail[previousProvider] !== undefined) {
+                decisionReason = allReasons.sparse_kbps;
                 decisionProvider = previousProvider;
             }
-        }
-        else if (dataAvail[previousProvider] !== undefined) {
-            decisionReason = allReasons.sparse_kbps;
-            decisionProvider = previousProvider;
-        }
-        else if (Object.keys(dataAvail).length !== 0) {
-            decisionReason = allReasons.sparse_kbps;
-            decisionProvider = getHighest(dataAvail, 'avail');
-        }
-        else {
-            decisionReason = allReasons.all_providers_eliminated;
-            decisionProvider = settings.default_provider;
-        }
+            else if (Object.keys(dataAvail).length !== 0) {
+                decisionReason = allReasons.sparse_kbps;
+                decisionProvider = getHighest(dataAvail, 'avail');
+            }
+            else {
+                decisionReason = allReasons.all_providers_eliminated;
+                decisionProvider = settings.default_provider;
+            }
 
-        if (decisionProvider !== previousProvider) {
-            cache.set(cacheKey, decisionProvider);
+            if (decisionProvider !== previousProvider) {
+                cache.set(cacheKey, decisionProvider);
+            }    
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
