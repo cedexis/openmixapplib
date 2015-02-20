@@ -20,6 +20,8 @@
 openmixapplib.iml
 
 node_modules/
+# Symlinks
+node_modules
 karma.app.results.xml
 .jshintrc
 npm-debug.log
