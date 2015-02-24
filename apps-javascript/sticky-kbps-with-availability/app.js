@@ -2,6 +2,7 @@ var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced
     // `alias` is the Openmix alias set in the Portal
     // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
+    // `asns` is a list of asns where the provider can be used
     providers: {
         'foo': {
             cname: 'www.foo.com'
@@ -10,7 +11,8 @@ var handler = new OpenmixApplication({
             cname: 'www.bar.com'
         },
         'baz': {
-            cname: 'www.baz.com'
+            cname: 'www.baz.com',
+            asns: [123, 321]
         }
     },
     // Selected if a provider can't be determined
@@ -84,7 +86,8 @@ function OpenmixApplication(settings) {
             candidateAliases,
             cacheKey = request.market + "-" + request.country + "-" + request.asn,
             previousKbps,
-            previousProvider;
+            previousProvider,
+            available;
 
         allReasons = {
             best_performing_provider_equal_previous: 'A',
@@ -98,18 +101,20 @@ function OpenmixApplication(settings) {
             asn_override: 'I'
         };
 
-        function filterCandidates(candidate) {
+        function filterCandidates(candidate, key) {
+            var provider = settings.providers[key];
             // Specific threshold for specific countries
-            if (country !== undefined && 
-                settings.country_availability_thresholds[country] !== undefined) {
-                return candidate.avail >= settings.country_availability_thresholds[country];    
+            if (country !== undefined && settings.country_availability_thresholds[country] !== undefined) {
+                available = candidate.avail >= settings.country_availability_thresholds[country];
+            } else {
+                available = candidate.avail >= settings.availability_threshold;    
             }
-            return candidate.avail >= settings.availability_threshold;
+            
+            return available && (provider === undefined || provider.asns === undefined || provider.asns.indexOf(request.asn) !== -1);
         }
         
         // ASN override
         if (settings.asn_to_provider[asn] !== undefined) {
-            var available;
             
             if (country !== undefined && 
                 settings.country_availability_thresholds[country] !== undefined) {

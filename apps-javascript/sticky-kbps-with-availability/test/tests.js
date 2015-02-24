@@ -8,7 +8,8 @@
                 cname: 'www.foo.com'
             },
             'bar': {
-                cname: 'www.bar.com'
+                cname: 'www.bar.com',
+                asns: [123]
             },
             'baz': {
                 cname: 'www.baz.com'
