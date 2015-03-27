@@ -1,7 +1,6 @@
-# Application: Multi Round-Robin Route Based on Geography with Availability overrides
+# Application: **Template**
 
-This application is a multi round-robin route based on geography with availability overrides. Detects the geolocalisation and executes a round-robin algorithm between the available platforms for this specific country. This application is also using Sonar data in order to select available platforms.
-
+The most basic template for an Openmix application.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
