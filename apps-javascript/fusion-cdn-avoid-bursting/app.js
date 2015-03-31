@@ -58,6 +58,19 @@ function onRequest(request, response) {
 /** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
+    
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
+    
+    /**
+     * @param {OpenmixConfiguration} config
+     */
+    this.do_init = function(config) {
+        var i = aliases.length;
+
+        while (i --) {
+            config.requireProvider(aliases[i]);
+        }
+    };
 
     var reasons = {
         best_performing: 'A',
@@ -68,8 +81,6 @@ function OpenmixApplication(settings) {
         missing_usage_data: 'H',
         missing_bandwidth_data: 'I'
     };
-
-    var aliases = Object.keys(settings.providers);
 
     // Sort the burstable thresholds in descending order
     Object.keys(settings.burstable_cdns).forEach(function(alias) {
@@ -84,32 +95,22 @@ function OpenmixApplication(settings) {
             settings.burstable_cdns[alias].usage.sort(sort_desc);
         }
     });
-    //console.log(JSON.stringify(settings.burstable_cdns));
-
-    /** @param {OpenmixConfiguration} config */
-    this.do_init = function(config) {
-        var i = aliases.length;
-
-        while (i --) {
-            config.requireProvider(aliases[i]);
-        }
-    };
 
     /**
      * @param {OpenmixRequest} request
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var data_avail = filter_object(request.getProbe('avail'), filter_empty),
-            data_rtt = filter_object(request.getProbe('http_rtt'), filter_invalid_rtt_scores),
-            data_fusion = parse_fusion_data(request.getData('fusion')),
-            decision_provider,
-            decision_ttl = settings.default_ttl,
-            decision_reasons = [],
+        var dataAvail = filterObject(request.getProbe('avail'), filterEmpty),
+            dataRtt = filterObject(request.getProbe('http_rtt'), filterInvalidRttScores),
+            dataFusion = parseFusionData(request.getData('fusion')),
+            decisionProvider,
+            decisionTtl = settings.default_ttl,
+            decisionReason = [],
             candidates;
 
         /* jshint laxbreak:true */
-        function get_padding_percent(alias, metric, error_reason) {
+        function getPaddingPercent(alias, metric, error_reason) {
             var value,
                 thresholds,
                 i,
@@ -117,11 +118,11 @@ function OpenmixApplication(settings) {
 
             if (settings.burstable_cdns[alias] !== undefined
                 && settings.burstable_cdns[alias][metric] !== undefined) {
-                if (data_fusion[alias] !== undefined
-                    && data_fusion[alias][metric] !== undefined
-                    && data_fusion[alias][metric].value !== undefined) {
+                if (dataFusion[alias] !== undefined
+                    && dataFusion[alias][metric] !== undefined
+                    && dataFusion[alias][metric].value !== undefined) {
 
-                    value = parseFloat(data_fusion[alias][metric].value);
+                    value = parseFloat(dataFusion[alias][metric].value);
                     thresholds = settings.burstable_cdns[alias][metric];
 
                     for (i = 0, len = thresholds.length; i < len; i ++) {
@@ -133,15 +134,15 @@ function OpenmixApplication(settings) {
                 }
                 else {
                     // No padding, but note the reason
-                    if (!~decision_reasons.indexOf(error_reason)) {
-                        decision_reasons.push(error_reason);
+                    if (!~decisionReason.indexOf(error_reason)) {
+                        decisionReason.push(error_reason);
                     }
                 }
             }
             return 0;
         }
 
-        function add_rtt_padding(data) {
+        function addRttPadding(data) {
             var aliases = Object.keys(data),
                 i = aliases.length,
                 alias,
@@ -153,53 +154,55 @@ function OpenmixApplication(settings) {
                 alias = aliases[i];
                 provider = settings.providers[alias];
                 base_padding = provider.base_padding === undefined ? 0 : provider.base_padding;
-                padding_pct = get_padding_percent(alias, 'bandwidth', reasons.missing_bandwidth_data)
-                    + get_padding_percent(alias, 'usage', reasons.missing_usage_data);
-                data[alias].http_rtt = base_padding + ((1 + padding_pct) * data[alias].http_rtt);
+                padding_pct = getPaddingPercent(alias, 'bandwidth', reasons.missing_bandwidth_data)
+                    + getPaddingPercent(alias, 'usage', reasons.missing_usage_data);
+                if (data[alias] !== undefined) {
+                    data[alias].http_rtt = base_padding + ((1 + padding_pct) * data[alias].http_rtt);    
+                }
             }
             return data;
         }
 
-        function select_random_provider(reason) {
-            decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
-            decision_reasons.push(reason);
-            decision_ttl = settings.error_ttl;
+        function selectRandomProvider(reason) {
+            decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
+            decisionReason.push(reason);
+            decisionTtl = settings.error_ttl;
         }
 
-        if (Object.keys(data_rtt).length !== aliases.length || Object.keys(data_avail).length !== aliases.length) {
-            select_random_provider(reasons.radar_data_sparse);
+        if (Object.keys(dataRtt).length !== aliases.length || Object.keys(dataAvail).length !== aliases.length) {
+            selectRandomProvider(reasons.radar_data_sparse);
         }
-        else if (Object.keys(data_fusion).length !== Object.keys(settings.burstable_cdns).length) {
-            select_random_provider(reasons.fusion_data_problem);
+        else if (Object.keys(dataFusion).length !== Object.keys(settings.burstable_cdns).length) {
+            selectRandomProvider(reasons.fusion_data_problem);
         }
         else {
-            data_avail = filter_object(data_avail, filter_availability);
-            candidates = Object.keys(data_avail);
+            dataAvail = filterObject(dataAvail, filterAvailability);
+            candidates = Object.keys(dataAvail);
 
             if (candidates.length === 0) {
-                select_random_provider(reasons.all_providers_eliminated);
+                selectRandomProvider(reasons.all_providers_eliminated);
             }
             else if (candidates.length === 1) {
-                decision_provider = candidates[0];
-                decision_reasons.push(reasons.best_performing);
+                decisionProvider = candidates[0];
+                decisionReason.push(reasons.best_performing);
             }
             else {
-                data_rtt = add_rtt_padding(join_objects(data_rtt, data_avail, 'avail'));
-                decision_provider = get_lowest(data_rtt, 'http_rtt');
-                decision_reasons.push(reasons.best_performing);
+                dataRtt = addRttPadding(intersectObjects(dataRtt, dataAvail, 'avail'));
+                decisionProvider = getLowest(dataRtt, 'http_rtt');
+                decisionReason.push(reasons.best_performing);
             }
         }
 
-        response.respond(decision_provider, settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reasons.join(','));
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReason.join(','));
     };
 
     /**
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filter_object(object, filter) {
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
@@ -218,21 +221,21 @@ function OpenmixApplication(settings) {
     /**
      * @param {Object} candidate
      */
-    function filter_invalid_rtt_scores(candidate) {
+    function filterInvalidRttScores(candidate) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;
     }
 
     /**
      * @param {{avail: number}} candidate
      */
-    function filter_availability(candidate) {
+    function filterAvailability(candidate) {
         return candidate.avail >= settings.availability_threshold;
     }
 
     /**
      * @param {Object} candidate
      */
-    function filter_empty(candidate) {
+    function filterEmpty(candidate) {
         var key;
         for (key in candidate) {
             return true;
@@ -244,7 +247,7 @@ function OpenmixApplication(settings) {
      * @param {!Object} source
      * @param {string} property
      */
-    function get_lowest(source, property) {
+    function getLowest(source, property) {
         var keys = Object.keys(source),
             i = keys.length,
             key,
@@ -270,7 +273,7 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function join_objects(target, source, property) {
+    function intersectObjects(target, source, property) {
         var keys = Object.keys(target),
             i = keys.length,
             key;
@@ -292,7 +295,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parse_fusion_data(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

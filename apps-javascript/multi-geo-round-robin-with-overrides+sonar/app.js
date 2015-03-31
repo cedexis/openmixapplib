@@ -66,15 +66,15 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
 
         // Initiate variables
-        var dataSonar  = parseSonarData( request.getData('sonar') ),
-            all_reasons,
-            decision_provider,
-            decision_reason,
+        var dataSonar  = parseSonarData(request.getData('sonar')),
+            allReasons,
+            decisionProvider,
+            decisionReason,
             passedCandidates,
             passedCandidatesRRGeo,
-            decision_ttl;
+            decisionTtl;
 
-        all_reasons = {
+        allReasons = {
             round_robin_geo: 'A',
             default_selected: 'B',
             passed_candidates_selected: 'C',
@@ -108,35 +108,35 @@ function OpenmixApplication(settings) {
             && passedCandidatesRRGeo !== undefined
             && passedCandidatesRRGeo.length > 0) {
 
-            decision_provider = passedCandidatesRRGeo[Math.floor(Math.random() * passedCandidatesRRGeo.length)];
-            decision_reason = all_reasons.round_robin_geo;
-            decision_ttl = settings.default_ttl;
+            decisionProvider = passedCandidatesRRGeo[Math.floor(Math.random() * passedCandidatesRRGeo.length)];
+            decisionReason = allReasons.round_robin_geo;
+            decisionTtl = settings.default_ttl;
         // Else origin
         } else {
             // Check origin sonar decision
             if (dataSonar.origin !== undefined && dataSonar.origin >= settings.sonar_threshold) {
-                decision_provider = 'origin';
-                decision_ttl = decision_ttl || settings.default_ttl;
-                decision_reason = all_reasons.default_selected;
+                decisionProvider = 'origin';
+                decisionTtl = decisionTtl || settings.default_ttl;
+                decisionReason = allReasons.default_selected;
             } else {
                 if (passedCandidates !== undefined && isEmpty(passedCandidates) === false) {
                     var passedCandidatesAliases = Object.keys(passedCandidates);
-                    decision_provider = passedCandidatesAliases[Math.floor(Math.random() * passedCandidatesAliases.length)];
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reason = all_reasons.passed_candidates_selected;
+                    decisionProvider = passedCandidatesAliases[Math.floor(Math.random() * passedCandidatesAliases.length)];
+                    decisionTtl = decisionTtl || settings.default_ttl;
+                    decisionReason = allReasons.passed_candidates_selected;
                 } else {
-                    decision_provider = 'origin';
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reason = all_reasons.no_passed_candidates_default_selected; 
+                    decisionProvider = 'origin';
+                    decisionTtl = decisionTtl || settings.default_ttl;
+                    decisionReason = allReasons.no_passed_candidates_default_selected; 
                 }
             }
         }
         /* jshint laxbreak:false */
 
 
-        response.respond(decision_provider, settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reason); 
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReason); 
     };
 
     /**

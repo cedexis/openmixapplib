@@ -59,12 +59,12 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var all_reasons,
-            decision_provider,
-            decision_reason,
-            decision_ttl;
+        var allReasons,
+            decisionProvider,
+            decisionReason,
+            decisionTtl;
 
-        all_reasons = {
+        allReasons = {
             got_expected_market: 'A',
             geo_override_on_country: 'B',
             unexpected_market: 'C'
@@ -74,26 +74,26 @@ function OpenmixApplication(settings) {
         if (settings.country_to_provider !== undefined
             && settings.country_to_provider[request.country] !== undefined) {
             // Override based on the request country
-            decision_provider = settings.country_to_provider[request.country];
-            decision_ttl = decision_ttl || settings.default_ttl;
-            decision_reason = all_reasons.geo_override_on_country;
+            decisionProvider = settings.country_to_provider[request.country];
+            decisionTtl = decisionTtl || settings.default_ttl;
+            decisionReason = allReasons.geo_override_on_country;
         }
         else if (settings.market_to_provider !== undefined
             && settings.market_to_provider[request.market] !== undefined) {
             // Override based on the request market
-            decision_provider = settings.market_to_provider[request.market];
-            decision_ttl = decision_ttl || settings.default_ttl;
-            decision_reason = all_reasons.got_expected_market;
+            decisionProvider = settings.market_to_provider[request.market];
+            decisionTtl = decisionTtl || settings.default_ttl;
+            decisionReason = allReasons.got_expected_market;
         }
         else {
-            decision_provider = settings.default_provider;
-            decision_ttl = decision_ttl || settings.error_ttl;
-            decision_reason = all_reasons.unexpected_market;
+            decisionProvider = settings.default_provider;
+            decisionTtl = decisionTtl || settings.error_ttl;
+            decisionReason = allReasons.unexpected_market;
         }
         /* jshint laxbreak:false */
 
-        response.respond(decision_provider, settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reason);
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReason);
     };
 }

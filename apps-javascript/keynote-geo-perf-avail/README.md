@@ -1,6 +1,6 @@
-# Application: **Keynote integration with Availability that routes according to Performance by Geo**
+# Application: **Route Based on Geography**
 
-Keynote and Cedexis have partnered to provide the ability for openmix routing based on Keynote data. Uses Keynote for availability and performance measurements.
+Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

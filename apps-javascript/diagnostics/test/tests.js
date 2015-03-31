@@ -1,10 +1,18 @@
 (function() {
     'use strict';
 
-    var default_settings;
-
-    default_settings = {
-        providers: [ 'provider-a', 'provider-b', 'provider-c' ],
+    var default_settings = {
+        providers: {
+            'provider-a': {
+                cname: 'cname1.com'
+            },
+            'provider-b': {
+                cname: 'cname2.com'
+            },
+            'provider-c': {
+                cname: 'cname3.com'
+            }
+        },
         default_ttl: 20
     };
 
@@ -12,57 +20,62 @@
 
     function test_do_init(i) {
         return function() {
-
-            var sut = new OpenmixApplication(default_settings),
+            var sut,
                 config = {
                     requireProvider: this.stub()
                 },
                 test_stuff = {
-                    instance: sut,
                     config: config
                 };
-
             i.setup(test_stuff);
-
+            sut = new OpenmixApplication(i.settings || default_settings);
             // Test
             sut.do_init(config);
-
             // Assert
             i.verify(test_stuff);
         };
     }
-
-    test('init', test_do_init({
-        setup: function(i) {
-            console.log(i);
+    
+    test('default', test_do_init({
+        setup: function() {
+            return;
         },
         verify: function(i) {
-            console.log(i);
             equal(i.config.requireProvider.callCount, 3);
-            equal(i.config.requireProvider.args[0][0], 'provider-a');
+            equal(i.config.requireProvider.args[2][0], 'provider-a');
             equal(i.config.requireProvider.args[1][0], 'provider-b');
-            equal(i.config.requireProvider.args[2][0], 'provider-c');
+            equal(i.config.requireProvider.args[0][0], 'provider-c');
         }
     }));
-
+    
     module('handle_request');
-
+    
     function test_handle_request(i) {
         return function() {
-            var sut = new OpenmixApplication(default_settings),
+            var sut,
+                config = {
+                    requireProvider: this.stub()
+                },
                 request = {
                     getProbe: this.stub(),
                     getData: this.stub()
                 },
                 response = {
                     addCName: this.stub(),
-                    setTTL: this.stub()
+                    respond: this.stub(),
+                    setTTL: this.stub(),
+                    setReasonCode: this.stub()
                 },
-                test_stuff = {
-                    instance: sut,
-                    request: request,
-                    response: response
-                };
+                test_stuff;
+
+            sut = new OpenmixApplication(i.settings || default_settings);
+            sut.do_init(config);
+
+            test_stuff = {
+                request: request,
+                response: response,
+                sut: sut
+            };
 
             i.setup(test_stuff);
 
@@ -111,7 +124,7 @@
         },
         verify: function(i) {
             console.log(i);
-            equal(i.response.addCName.args[0][0], 'as-jp-1234.avail-len-3.99-100-100.rtt-len-3.199-201-202.example.com', 'Verifying CNAME');
+            equal(i.response.addCName.args[0][0], 'as-jp-1234.avail-len-3.100-100-99.rtt-len-3.202-201-199.example.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
         }
     }));

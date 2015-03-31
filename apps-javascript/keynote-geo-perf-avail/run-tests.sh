@@ -6,11 +6,13 @@ green='\033[0;32m'
 yellow='\033[1;33m'
 nocolor='\033[0m'
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 run_test_suite() {
     echo
     echo -e "${yellow}Running $1 unit tests${nocolor}"
     echo
-    ./node_modules/karma/bin/karma start $2
+    "${DIR}/node_modules/karma/bin/karma" start "$2"
     LAST=$?
     if [ "$LAST" -ne "0" ]
     then
@@ -21,7 +23,7 @@ run_test_suite() {
     fi
 }
 
-run_test_suite "Openmix application" "karma.app.conf.js"
+run_test_suite "Openmix application" "${DIR}/karma.app.conf.js"
 
 echo
 echo -e "${green}All unit tests passed${nocolor}"
