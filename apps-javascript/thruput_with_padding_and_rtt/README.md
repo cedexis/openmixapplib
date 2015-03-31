@@ -1,6 +1,6 @@
-# Application: **Throughput with RTT Tie Breaker **
+# Application: **Throughput with padding and RTT Tie Breaker **
 
-Choose the best provider based on HTTP Throughput. If the top 2 are with 5% of each other, use HTTP Response time to break the tie.
+Choose the best provider based on HTTP Throughput using padding as a penalty to reduce kbps. If the top 2 are with 5% of each other, use HTTP Response time to break the tie.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

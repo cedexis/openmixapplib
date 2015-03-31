@@ -11,7 +11,7 @@ var OpenmixConfiguration;
  *      asn:number,
  *      ip_address:string,
  *      hostname_prefix:string,
- *      getProbe:function(string):!Object.<string,!Object.<string,number>>,
+ *      getProbe:function(string):!Object.<string,{ http_rtt: number, http_kbps: number }>,
  *      getData:function(string):!Object.<string,string>
  *  }}
  */
