@@ -94,7 +94,7 @@ function OpenmixApplication(settings) {
             }
             else {
                 // Join kbps with available candidates
-                kbpsCandidates = joinObjects(dataKbps, candidates, 'avail');
+                kbpsCandidates = intersectObjects(dataKbps, candidates, 'avail');
 
                 if (Object.keys(kbpsCandidates).length > 1) {
                     // Add kbps padding
@@ -120,7 +120,7 @@ function OpenmixApplication(settings) {
                 // We lack KBPS measurements so choose by RTT
                 if (decisionProvider === '' && Object.keys(dataRtt).length > 0) {
                     // Join rtt with available candidates
-                    candidates = joinObjects(dataRtt, candidates, 'avail');
+                    candidates = intersectObjects(dataRtt, candidates, 'avail');
                     decisionProvider = getLowest(candidates, 'http_rtt');
                     reasonCode = allReasons.best_performing_by_rtt;
                 }
@@ -151,7 +151,6 @@ function OpenmixApplication(settings) {
             key = keys[i];
             if (filter(object[key], key)) {
                 data[key] = object[key];
-                //delete object[key];
             }
         }
         return data;
@@ -211,7 +210,7 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function joinObjects(target, source, property) {
+    function intersectObjects(target, source, property) {
         var keys = Object.keys(target),
             i = keys.length,
             key;
