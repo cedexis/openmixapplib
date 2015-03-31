@@ -12,15 +12,15 @@
         providers: {
             'foo': {
                 cname: 'www.foo.com',
-                kbps_penalty: 0
+                kbps_padding: 0
             },
             'bar': {
                 cname: 'www.bar.com',
-                kbps_penalty: 0
+                kbps_padding: 0
             },
             'baz': {
                 cname: 'www.baz.com',
-                kbps_penalty: 0
+                kbps_padding: 0
             }
         },
         default_ttl: 20,
@@ -98,15 +98,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    kbps_penalty: 20
+                    kbps_padding: 20
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    kbps_penalty: 10
+                    kbps_padding: 10
                 }
             },
             default_ttl: 20,
@@ -170,20 +170,20 @@
         }
     }));
 
-    test('best_performing_by__rtt_kbps_tie', test_handle_request({
+    test('best_performing_by_rtt_kbps_tie', test_handle_request({
         settings: {
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 }
             },
             default_ttl: 20,
@@ -253,15 +253,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    kbps_penalty: 0
+                    kbps_padding: 0
                 }
             },
             default_ttl: 20,
@@ -276,10 +276,10 @@
                     "foo": {
                         "avail": 100
                     },
-                    "leaseweb": {
+                    "bar": {
                         "avail": 100
                     },
-                    "edgecast__large": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -292,12 +292,12 @@
                 .withArgs('http_rtt')
                 .returns({
                     "foo": {
+                        "http_rtt": 120
+                    },
+                    "bar": {
                         "http_rtt": 100
                     },
-                    "leaseweb": {
-                        "http_rtt": 100
-                    },
-                    "edgecast__large": {
+                    "baz": {
                         "http_rtt": 90
                     }
                 });
@@ -308,26 +308,104 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'edgecast__large', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'wpc.B890.edgecastcdn.net', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
             equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
     }));
 
+    test('data_problem_avail', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com',
+                    kbps_padding: 0
+                },
+                'bar': {
+                    cname: 'www.bar.com',
+                    kbps_padding: 0
+                },
+                'baz': {
+                    cname: 'www.baz.com',
+                    kbps_padding: 0
+                }
+            },
+            default_ttl: 20,
+            availability_threshold: 90,
+            tie_threshold: 0.95
+        },
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({});
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({});
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 120
+                    },
+                    "bar": {
+                        "http_rtt": 100
+                    },
+                    "baz": {
+                        "http_rtt": 90
+                    }
+                });
+            Math.random.returns(0.9);
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getProbe call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+        }
+    }));
+
+
     test('data_problem', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com',
+                    kbps_padding: 0
+                },
+                'bar': {
+                    cname: 'www.bar.com',
+                    kbps_padding: 0
+                },
+                'baz': {
+                    cname: 'www.baz.com',
+                    kbps_padding: 0
+                }
+            },
+            default_ttl: 20,
+            availability_threshold: 90,
+            tie_threshold: 0.95
+        },
         setup: function(i) {
             i.request
                 .getProbe
                 .withArgs('avail')
                 .returns({
-                    "highwinds": {
+                    "foo": {
                         "avail": 100
                     },
-                    "leaseweb": {
+                    "bar": {
                         "avail": 100
                     },
-                    "edgecast__large": {
+                    "baz": {
                         "avail": 100
                     }
                 });
@@ -347,8 +425,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'edgecast__large', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'wpc.B890.edgecastcdn.net', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
@@ -360,13 +438,13 @@
                 .getProbe
                 .withArgs('avail')
                 .returns({
-                    "highwinds": {
+                    "foo": {
                         "avail": 50
                     },
-                    "leaseweb": {
+                    "bar": {
                         "avail": 70
                     },
-                    "edgecast__large": {
+                    "baz": {
                         "avail": 60
                     }
                 });
@@ -374,13 +452,13 @@
                 .getProbe
                 .withArgs('http_kbps')
                 .returns({
-                    "highwinds": {
+                    "foo": {
                         "http_kbps": 100
                     },
-                    "leaseweb": {
+                    "bar": {
                         "http_kbps": 100
                     },
-                    "edgecast__large": {
+                    "baz": {
                         "http_kbps": 100
                     }
                 });
@@ -388,13 +466,13 @@
                 .getProbe
                 .withArgs('http_rtt')
                 .returns({
-                    "highwinds": {
+                    "foo": {
                         "http_rtt": 100
                     },
-                    "leaseweb": {
+                    "bar": {
                         "http_rtt": 100
                     },
-                    "edgecast__large": {
+                    "baz": {
                         "http_rtt": 100
                     }
                 });
@@ -406,9 +484,68 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'edgecast__large', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'wpc.B890.edgecastcdn.net', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying setReasonCode');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+        }
+    }));
+
+    test('all_but_one_eliminated', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({
+                    "foo": {
+                        "avail": 50
+                    },
+                    "bar": {
+                        "avail": 70
+                    },
+                    "baz": {
+                        "avail": 100
+                    }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({
+                    "foo": {
+                        "http_kbps": 100
+                    },
+                    "bar": {
+                        "http_kbps": 100
+                    },
+                    "baz": {
+                        "http_kbps": 100
+                    }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 100
+                    },
+                    "bar": {
+                        "http_rtt": 100
+                    },
+                    "baz": {
+                        "http_rtt": 100
+                    }
+                });
+            Math.random.returns(0.9);
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getProbe call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
         }
     }));

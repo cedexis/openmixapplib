@@ -8,15 +8,15 @@ var handler = new OpenmixApplication({
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            kbps_penalty: 0
+            kbps_padding: 0
         },
         'bar': {
             cname: 'www.bar.com',
-            kbps_penalty: 0
+            kbps_padding: 0
         },
         'baz': {
             cname: 'www.baz.com',
-            kbps_penalty: 0
+            kbps_padding: 0
         }
     },
     default_ttl: 20,
@@ -74,48 +74,56 @@ function OpenmixApplication(settings) {
             best_performing_by_kbps: 'A',
             best_performing_by_rtt: 'B',
             data_problem: 'C',
-            all_but_one_eliminated: 'D'
+            all_but_one_eliminated: 'D',
+            all_providers_eliminated: 'E'
         };
 
-        // Remove unavailable providers
-        candidates = filterObject(dataAvail, filterAvailability);
-        candidateAliases = Object.keys(candidates);
+        if (Object.keys(dataAvail).length > 0) {
+            // Remove unavailable providers
+            candidates = filterObject(dataAvail, filterAvailability);
+            candidateAliases = Object.keys(candidates);
 
-        // If only one is available
-         if (candidateAliases.length === 1) {
-            decisionProvider = candidateAliases[0];
-            reasonCode = allReasons.all_but_one_eliminated;
-        } else if (candidateAliases.length > 0) {
-            // Join kbps with available candidates
-            kbpsCandidates = joinObjects(dataKbps, candidates, 'avail');
-
-            if (Object.keys(kbpsCandidates).length > 1) {
-                // Add kbps penalties
-                addKbpsPenalty(kbpsCandidates);
-
-                // See if the top 2 are a tie
-                first = getHighest(kbpsCandidates, 'http_kbps', '');
-                second = getHighest(kbpsCandidates, 'http_kbps', first);
-
-                if (kbpsCandidates[first].http_kbps * settings.tie_threshold < kbpsCandidates[second].http_kbps
-                    && dataRtt[first] !== undefined && dataRtt[second] !== undefined
-                    && dataRtt[second].http_rtt < dataRtt[first].http_rtt) {
-                    // Tied and send fastest by kbps has lower rtt
-                    decisionProvider = second;
-                    reasonCode = allReasons.best_performing_by_rtt;
-                } else {
-                    // Best provider chosen by either kbps or rtt...
-                    decisionProvider = first;
-                    reasonCode = allReasons.best_performing_by_kbps;
-                }
+            // If only one is available
+            if (candidateAliases.length === 1) {
+                decisionProvider = candidateAliases[0];
+                reasonCode = allReasons.all_but_one_eliminated;
             }
+            else if (candidateAliases.length === 0) {
+                decisionProvider = getHighest(dataAvail,'avail','');
+                reasonCode = allReasons.all_providers_eliminated;
+            }
+            else {
+                // Join kbps with available candidates
+                kbpsCandidates = joinObjects(dataKbps, candidates, 'avail');
 
-            // We lack KBPS measurements so choose by RTT
-            if (decisionProvider === '' && Object.keys(dataRtt).length > 0) {
-                // Join rtt with available candidates
-                candidates = joinObjects(dataRtt, candidates, 'avail');
-                decisionProvider = getLowest(candidates, 'http_rtt');
-                reasonCode = allReasons.best_performing_by_rtt;
+                if (Object.keys(kbpsCandidates).length > 1) {
+                    // Add kbps padding
+                    addKbpsPadding(kbpsCandidates);
+
+                    // See if the top 2 are a tie
+                    first = getHighest(kbpsCandidates, 'http_kbps', '');
+                    second = getHighest(kbpsCandidates, 'http_kbps', first);
+
+                    if (kbpsCandidates[first].http_kbps * settings.tie_threshold < kbpsCandidates[second].http_kbps
+                        && dataRtt[first] !== undefined && dataRtt[second] !== undefined
+                        && dataRtt[second].http_rtt < dataRtt[first].http_rtt) {
+                        // Tied and send fastest by kbps has lower rtt
+                        decisionProvider = second;
+                        reasonCode = allReasons.best_performing_by_rtt;
+                    } else {
+                        // Best provider chosen by either kbps or rtt...
+                        decisionProvider = first;
+                        reasonCode = allReasons.best_performing_by_kbps;
+                    }
+                }
+
+                // We lack KBPS measurements so choose by RTT
+                if (decisionProvider === '' && Object.keys(dataRtt).length > 0) {
+                    // Join rtt with available candidates
+                    candidates = joinObjects(dataRtt, candidates, 'avail');
+                    decisionProvider = getLowest(candidates, 'http_rtt');
+                    reasonCode = allReasons.best_performing_by_rtt;
+                }
             }
         }
 
@@ -137,14 +145,16 @@ function OpenmixApplication(settings) {
     function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
+            data = {},
             key;
         while (i --) {
             key = keys[i];
-            if (!filter(object[key], key)) {
-                delete object[key];
+            if (filter(object[key], key)) {
+                data[key] = object[key];
+                //delete object[key];
             }
         }
-        return object;
+        return data;
     }
 
     /**
@@ -185,13 +195,13 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object.<string,{ http_kbps: number }>} data
      */
-    function addKbpsPenalty(data) {
+    function addKbpsPadding(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
         while (i --) {
             key = keys[i];
-            data[key].http_kbps *= 1 - settings.providers[key].kbps_penalty / 100;
+            data[key].http_kbps *= 1 - settings.providers[key].kbps_padding / 100;
         }
         return data;
     }
