@@ -47,7 +47,7 @@ function OpenmixApplication(settings) {
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filter_object(object, filter) {
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
@@ -66,7 +66,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {Object} candidate
      */
-    function filter_empty(candidate) {
+    function filterEmpty(candidate) {
         for (var key in candidate) {
             return true;
         }
@@ -77,7 +77,7 @@ function OpenmixApplication(settings) {
      * @param {!Object} source
      * @param {String} property
      */
-    function get_lowest(source, property) {
+    function getLowest(source, property) {
         var keys = Object.keys(source),
             i = keys.length,
             key,

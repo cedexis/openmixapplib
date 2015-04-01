@@ -1,4 +1,4 @@
-# Application: **Route Based on Geography with Availability override**
+# Application: **Route Based on Geography**
 
 Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.
 # Openmix Application Library

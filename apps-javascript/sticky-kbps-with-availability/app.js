@@ -137,7 +137,7 @@ function OpenmixApplication(settings) {
             dataAvail = filterObject(dataAvail, filterCandidates);
 
             // Join the kbps scores with the list of viable candidates
-            candidates = joinObjects(dataKbps, dataAvail, 'avail');
+            candidates = intersectObjects(dataKbps, dataAvail, 'avail');
             candidateAliases = Object.keys(candidates);
 
             if (candidateAliases.length !== 0) {
@@ -213,7 +213,7 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function joinObjects(target, source, property) {
+    function intersectObjects(target, source, property) {
         var keys = Object.keys(target),
             i = keys.length,
             key;

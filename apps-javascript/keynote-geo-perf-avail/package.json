@@ -1,17 +1,18 @@
 {
-    "title": "Keynote integration with Availability that routes according to Performance by Geo",
-    "description": "Keynote and Cedexis have partnered to provide the ability for openmix routing based on Keynote data. Uses Keynote for availability and performance measurements.",
-    "lastUpdated": "11/18/2014",
-    "keywords": ["Fusion"],
+    "title": "Route Based on Geography",
+    "description": "Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.",
+    "lastUpdated": "10/29/2014",
+    "keywords": ["Geography"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
         "karma-qunit": "0.1.x",
         "karma-phantomjs-launcher": "0.1.x",
-        "karma-junit-reporter": "0.2.x"
+        "karma-junit-reporter": "0.2.x",
+        "jshint": "2.5.x"
     },
-    "repository" : {
-        "type" : "git",
-        "url" : "https://github.com/cedexis/radar.cedexis.com.git"
+    "repository": {
+        "type": "git",
+        "url": "http://code.example.com/git/example.git"
     }
 }

@@ -34,17 +34,8 @@ function onRequest(request, response) {
 /** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
-
-    var reasons = {
-        one_acceptable_provider: 'A',
-        best_provider_selected: 'B',
-        no_available_providers: 'C',
-        default_provider: 'D',
-        sonar_data_not_robust: 'E',
-        radar_rtt_not_robust: 'F'
-    };
-
-    var aliases = Object.keys(settings.providers);
+    
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
@@ -65,14 +56,24 @@ function OpenmixApplication(settings) {
             dataSonar = parseSonarData(request.getData('sonar')),
             dataRtt = request.getProbe('http_rtt'),
             decisionProvider,
-            reasonCode,
-            candidateAliases;
+            decisionReason,
+            candidateAliases,
+            allReasons;
+        
+        allReasons = {
+            one_acceptable_provider: 'A',
+            best_provider_selected: 'B',
+            no_available_providers: 'C',
+            default_provider: 'D',
+            sonar_data_not_robust: 'E',
+            radar_rtt_not_robust: 'F'
+        };
 
         /**
         * @param key
         */
         function filterInvalidRttScores(key) {
-            return dataRtt[key].http_rtt >= settings.min_valid_rtt_score;
+            return dataRtt[key] !== undefined && dataRtt[key].http_rtt >= settings.min_valid_rtt_score;
         }
 
         /**
@@ -103,21 +104,21 @@ function OpenmixApplication(settings) {
 
             if (n === 0) {
                 decisionProvider = settings.default_provider;
-                reasonCode = reasons.no_available_providers + reasons.default_provider;
+                decisionReason = allReasons.no_available_providers + allReasons.default_provider;
             } else if (n === 1) {
                 decisionProvider = candidates[0];
-                reasonCode = reason;
+                decisionReason = reason;
             } else {
                 decisionProvider = candidates[(Math.random() * n) >> 0];
-                reasonCode = reason;
+                decisionReason = reason;
             }
         }
 
         if (Object.keys(dataSonar).length !== aliases.length && settings.need_sonar_data) {
-            selectAnyProvider(reasons.sonar_data_not_robust);
+            selectAnyProvider(allReasons.sonar_data_not_robust);
         } else if (Object.keys(dataRtt).length !== aliases.length) {
             // if we don't have rtt, return any sonar available provider
-            selectAnyProvider(reasons.radar_rtt_not_robust);
+            selectAnyProvider(allReasons.radar_rtt_not_robust);
         } else {
             // we've got radar and sonar data for all providers, filter out any unavailable sonar providers
             candidates = filterObject(dataRtt, filterInvalidRttScores);
@@ -127,23 +128,23 @@ function OpenmixApplication(settings) {
 
             if (candidateAliases.length === 0) {
                 // No available providers
-                selectAnyProvider(reasons.no_available_providers);
+                selectAnyProvider(allReasons.no_available_providers);
             }
             else if (candidateAliases.length === 1) {
                 // if only one available, return available
                 decisionProvider = candidateAliases[0];
-                reasonCode = reasons.one_acceptable_provider;
+                decisionReason = allReasons.one_acceptable_provider;
             }
             else {
                 // we've got more than 1 available / rtt provider, route based on rtt
                 decisionProvider = getLowest(candidates, 'http_rtt');
-                reasonCode = reasons.best_provider_selected;
+                decisionReason = allReasons.best_provider_selected;
             }
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(decisionTtl);
-        response.setReasonCode(reasonCode);
+        response.setReasonCode(decisionReason);
     };
 
     /**

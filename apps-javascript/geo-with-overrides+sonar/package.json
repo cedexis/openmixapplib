@@ -1,5 +1,5 @@
 {
-    "title": "Route Based on Geography with Availability override",
+    "title": "Route Based on Geography",
     "description": "Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.",
     "lastUpdated": "10/29/2014",
     "keywords": ["Geography"],

@@ -31,12 +31,7 @@ function onRequest(request, response) {
 /** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
-
-    var reasons = {
-        first_provider: 'A',
-        random_provider: 'B'
-    };
-
+    
     var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
@@ -60,36 +55,42 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var data_fusion = parse_fusion_data(request.getData('fusion')),
-            decision_provider,
-            decision_reason,
-            decision_ttl;
+        var dataFusion = parseFusionData(request.getData('fusion')),
+            decisionProvider,
+            decisionReason,
+            decisionTtl,
+            allReasons;
+        
+        allReasons = {
+            first_provider: 'A',
+            random_provider: 'B'
+        };
 
-        function select_random_provider() {
-            decision_provider = aliases[Math.floor(Math.random() * aliases.length)];
-            decision_ttl = decision_ttl || settings.error_ttl;
-            decision_reason = reasons.random_provider;
+        function selectRandomProvider() {
+            decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
+            decisionTtl = decisionTtl || settings.error_ttl;
+            decisionReason = allReasons.random_provider;
         }
 
-        if (data_fusion[aliases[0]] !== undefined
-            && data_fusion[aliases[0]].value !== undefined
-            && data_fusion[aliases[0]].value > 1.0) {
-            decision_provider = aliases[1];
-            decision_ttl = decision_ttl || settings.default_ttl;
-            decision_reason = reasons.first_provider;
+        if (dataFusion[aliases[0]] !== undefined
+            && dataFusion[aliases[0]].value !== undefined
+            && dataFusion[aliases[0]].value > 1.0) {
+            decisionProvider = aliases[1];
+            decisionTtl = decisionTtl || settings.default_ttl;
+            decisionReason = allReasons.first_provider;
         } else {
-            select_random_provider();
+            selectRandomProvider();
         }
 
-        response.respond(decision_provider, settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reason);
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReason);
     };
 
     /**
      * @param {!Object} data
      */
-    function parse_fusion_data(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
