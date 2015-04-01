@@ -72,7 +72,7 @@ function OpenmixApplication(settings) {
             decisionProvider,
             candidates,
             candidateAliases,
-            reasonCode,
+            decisionReason,
             totalWeight = 0;
 
         allReasons = {
@@ -129,31 +129,31 @@ function OpenmixApplication(settings) {
 
         if (candidateAliases.length > 0) {
             if (candidateAliases.length === 1) {
-                decisionProvider = candidates[candidateAliases[0]];
-                reasonCode = allReasons.most_available_platform_chosen;
+                decisionProvider = candidateAliases[0];
+                decisionReason = allReasons.most_available_platform_chosen;
             }
             else {
                 // Respond with a weighted random selection
                 totalWeight = getTotalWeight(candidates);
                 if (totalWeight > 0) {
                     decisionProvider = getWeightedRandom(candidates, totalWeight);
-                    reasonCode = allReasons.routed_randomly_by_weight;
+                    decisionReason = allReasons.routed_randomly_by_weight;
                 }
                 // Respond with most available from sonar
                 else {
                     decisionProvider = getHighest(candidates);
-                    reasonCode = allReasons.most_available_platform_chosen;
+                    decisionReason = allReasons.most_available_platform_chosen;
                 }
             }
         } else {
             // If we get here, something went wrong. Select randomly to avoid fallback.
             decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
-            reasonCode = allReasons.choose_random_platform;
+            decisionReason = allReasons.choose_random_platform;
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
-        response.setReasonCode(reasonCode);
+        response.setReasonCode(decisionReason);
     };
 
     /**

@@ -105,7 +105,7 @@ function OpenmixApplication(settings) {
         dataAvail = filterObject(dataAvail, filterCandidates);
 
         // Join the rtt scores with the list of viable candidates
-        candidates = joinObjects(dataRtt, dataAvail, 'avail');
+        candidates = intersectObjects(dataRtt, dataAvail, 'avail');
         candidateAliases = Object.keys(candidates);
 
         if (candidateAliases.length !== 0) {
@@ -181,7 +181,7 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function joinObjects(target, source, property) {
+    function intersectObjects(target, source, property) {
         var keys = Object.keys(target),
             i = keys.length,
             key;

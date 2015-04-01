@@ -179,6 +179,46 @@
         }
     }));
 
+    test('most_available_platform_chosen-2', test_handle_request({
+        settings: {
+            providers: {
+                'provider1': {
+                    cname: 'cname1.foo.com',
+                    weight: 0
+                },
+                'provider2': {
+                    cname: 'cname2.foo.com',
+                    weight: 0
+                },
+                'provider3': {
+                    cname: 'cname3.foo.com',
+                    weight: 0
+                }
+            },
+            default_ttl: 20,
+            sonar_threshold: 0.95
+        },
+        setup: function(i) {
+            i.request
+                .getData
+                .withArgs('sonar')
+                .returns({
+                    "provider1": "0.90000",
+                    "provider2": "1.00000",
+                    "provider3": "0.90000"
+                });
+        },
+        verify: function(i) {
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
+            equal(i.response.respond.args[0][0], 'provider2', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cname2.foo.com', 'Verifying respond CNAME');
+            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+        }
+    }));
 
 }());

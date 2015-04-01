@@ -85,7 +85,7 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function filterAvailability(candidate, key) {
-            return dataAvail[key].avail >= settings.availability_threshold;
+            return dataAvail[key] !== undefined && dataAvail[key].avail >= settings.availability_threshold;
         }
 
         /**

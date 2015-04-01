@@ -107,16 +107,17 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var avail = request.getProbe('avail'),
+        var dataAvail = request.getProbe('avail'),
+            dataRtt = request.getProbe('http_rtt'),
             candidates,
-            candidate_aliases,
-            all_reasons,
-            decision_provider = '',
-            decision_reasons = [],
-            decision_ttl,
-            override_cname = '';
+            candidateAliases,
+            allReasons,
+            decisionProvider = '',
+            decisionReasons = [],
+            decisionTtl,
+            cnameOverride = '';
 
-        all_reasons = {
+        allReasons = {
             optimum_server_chosen: 'A',
             no_available_servers: 'B',
             geo_override_on_country: 'C',
@@ -130,99 +131,99 @@ function OpenmixApplication(settings) {
         };
 
         /* jslint laxbreak:true */
-        function filter_candidates(candidate, alias) {
+        function filterCandidates(candidate, alias) {
             var provider = settings.providers[alias];
             // Considered only available providers in the provider countries/markets/asn
             return (candidate.avail !== undefined && candidate.avail >= settings.availability_threshold)
+                && provider !== undefined
                 && (provider.countries === undefined || provider.countries.indexOf(request.country) !== -1)
                 && (provider.markets === undefined || provider.markets.indexOf(request.market) !== -1)
                 && (provider.asns === undefined || provider.asns.indexOf(request.asn) !== -1);
         }
 
-        function select_override(providers, locale, reason, error_reason) {
+        function selectOverride(providers, locale, reason, error_reason) {
             if (providers[locale] !== undefined) {
                 if (candidates[providers[locale]] !== undefined) {
-                    decision_provider = providers[locale];
-                    decision_ttl = decision_ttl || settings.default_ttl;
-                    decision_reasons.push(reason);
+                    decisionProvider = providers[locale];
+                    decisionTtl = decisionTtl || settings.default_ttl;
+                    decisionReasons.push(reason);
                 } else {
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(error_reason);
+                    decisionTtl = decisionTtl || settings.error_ttl;
+                    decisionReasons.push(error_reason);
                 }
             }
         }
 
         // First figure out the available platforms
-        candidates = filter_object(avail, filter_candidates);
-        //console.log('available candidates: ' + JSON.stringify(candidates));
+        candidates = filterObject(dataAvail, filterCandidates);
 
-        if (decision_provider === '' && settings.geo_override) {
-            select_override(settings.country_to_provider, request.country, all_reasons.geo_override_on_country, all_reasons.geo_override_not_available_country);
+        if (decisionProvider === '' && settings.geo_override) {
+            selectOverride(settings.country_to_provider, request.country, allReasons.geo_override_on_country, allReasons.geo_override_not_available_country);
 
-            if (decision_provider === '') {
-                select_override(settings.market_to_provider, request.market, all_reasons.geo_override_on_market, all_reasons.geo_override_not_available_market);
+            if (decisionProvider === '') {
+                selectOverride(settings.market_to_provider, request.market, allReasons.geo_override_on_market, allReasons.geo_override_not_available_market);
             }
         }
 
-        if (decision_provider === '' && settings.asn_override) {
-            select_override(settings.asn_to_provider, request.asn, all_reasons.asn_override, all_reasons.asn_override_not_available);
+        if (decisionProvider === '' && settings.asn_override) {
+            selectOverride(settings.asn_to_provider, request.asn, allReasons.asn_override, allReasons.asn_override_not_available);
         }
 
-        if (decision_provider === '') {
+        if (decisionProvider === '') {
             // Join the rtt scores with the list of viable candidates
-            candidates = join_objects(candidates, request.getProbe('http_rtt'), 'http_rtt');
-            candidate_aliases = Object.keys(candidates);
+            candidates = intersectObjects(candidates, dataRtt, 'http_rtt');
+            candidateAliases = Object.keys(candidates);
 
-            if (candidate_aliases.length === 1) {
-                decision_provider = candidate_aliases[0];
-                decision_reasons.push(all_reasons.optimum_server_chosen);
-                decision_ttl = decision_ttl || settings.default_ttl;
+            if (candidateAliases.length === 1) {
+                decisionProvider = candidateAliases[0];
+                decisionReasons.push(allReasons.optimum_server_chosen);
+                decisionTtl = decisionTtl || settings.default_ttl;
             }
-            else if (candidate_aliases.length !== 0) {
+            else if (candidateAliases.length !== 0) {
                 // Apply padding to rtt scores
-                add_rtt_padding(candidates);
-                decision_provider = get_lowest(candidates, 'http_rtt');
-                decision_reasons.push(all_reasons.optimum_server_chosen);
-                decision_ttl = decision_ttl || settings.default_ttl;
+                addRttPadding(candidates);
+                decisionProvider = getLowest(candidates, 'http_rtt');
+                decisionReasons.push(allReasons.optimum_server_chosen);
+                decisionTtl = decisionTtl || settings.default_ttl;
             }
             else if (settings.geo_default) {
                 if (settings.country_to_provider[request.country] !== undefined) {
                     // Default based on request country
-                    decision_provider = settings.country_to_provider[request.country];
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_default_on_country);
+                    decisionProvider = settings.country_to_provider[request.country];
+                    decisionTtl = decisionTtl || settings.error_ttl;
+                    decisionReasons.push(allReasons.geo_default_on_country);
                 }
                 else if (settings.market_to_provider[request.market] !== undefined) {
                     // Default based on request market
-                    decision_provider = settings.market_to_provider[request.market];
-                    decision_ttl = decision_ttl || settings.error_ttl;
-                    decision_reasons.push(all_reasons.geo_default_on_market);
+                    decisionProvider = settings.market_to_provider[request.market];
+                    decisionTtl = decisionTtl || settings.error_ttl;
+                    decisionReasons.push(allReasons.geo_default_on_market);
                 }
             }
         }
 
-        if (decision_provider === '') {
-            decision_provider = settings.default_provider;
-            decision_ttl = decision_ttl || settings.error_ttl;
-            decision_reasons.push(all_reasons.no_available_servers);
+        if (decisionProvider === '') {
+            decisionProvider = settings.default_provider;
+            decisionTtl = decisionTtl || settings.error_ttl;
+            decisionReasons.push(allReasons.no_available_servers);
         }
 
         if (settings.conditional_hostname !== undefined && settings.conditional_hostname[request.hostname_prefix] !== undefined) {
             // Confirm and translate the ISO country code to the numeric identifier
             // and format it as a prefix to the cname
-            override_cname = settings.conditional_hostname[request.hostname_prefix] + '.';
+            cnameOverride = settings.conditional_hostname[request.hostname_prefix] + '.';
         }
 
-        response.respond(decision_provider, override_cname + settings.providers[decision_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(decision_reasons.join(','));
+        response.respond(decisionProvider, cnameOverride + settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReasons.join(','));
     };
 
     /**
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filter_object(object, filter) {
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
@@ -242,7 +243,7 @@ function OpenmixApplication(settings) {
      * @param {!Object} source
      * @param {string} property
      */
-    function get_lowest(source, property) {
+    function getLowest(source, property) {
         var keys = Object.keys(source),
             i = keys.length,
             key,
@@ -268,7 +269,7 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function join_objects(target, source, property) {
+    function intersectObjects(target, source, property) {
         var keys = Object.keys(target),
             i = keys.length,
             key;
@@ -290,7 +291,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object.<string,{ http_rtt: number }>} data
      */
-    function add_rtt_padding(data) {
+    function addRttPadding(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

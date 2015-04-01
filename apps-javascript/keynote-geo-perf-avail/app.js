@@ -47,8 +47,6 @@ function OpenmixApplication(settings) {
     'use strict';
     
     var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
-    var json_cache = {},
-        json_cache_index = {};
 
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
@@ -212,6 +210,10 @@ function OpenmixApplication(settings) {
         return object;
     }
 
+    
+    /**
+     * @param {!Object} data
+     */
     function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
@@ -220,7 +222,10 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (!(data[key] = jsonParse(key, data[key]))) {
+            try {
+                data[key] = JSON.parse(data[key]);
+            }
+            catch (e) {
                 delete data[key];
             }
         }
@@ -228,20 +233,4 @@ function OpenmixApplication(settings) {
         return data;
     }
 
-    function jsonParse(key, json) {
-        if (json_cache_index[key] === json) {
-            return json_cache[key];
-        }
-        else {
-            json_cache_index[key] = json;
-            /*jshint boss:true*/
-            try {
-                return json_cache[key] = JSON.parse(json);
-            }
-            catch (e) {
-                return json_cache[key] = false;
-            }
-            /*jshint boss:false*/
-        }
-    }
 }

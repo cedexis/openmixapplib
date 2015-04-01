@@ -31,22 +31,8 @@ function onRequest(request, response) {
 /** @constructor */
 function OpenmixApplication(settings) {
     'use strict';
-
-    var reasons = {
-        default_provider: 'A',
-        one_acceptable_provider: 'B',
-        best_provider_selected: 'C',
-        error_condition: 'D',
-        fusion_data_not_robust: 'E',
-        radar_rtt_not_robust: 'F',
-        no_available_fusion_providers: 'G'
-
-    };
-
-    var aliases = Object.keys(settings.providers);
-
-    var json_cache = {},
-        json_cache_index = {};
+    
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
@@ -62,90 +48,102 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var selected_provider,
-            decision_ttl = settings.default_ttl,
+        var decisionProvider,
+            decisionTtl = settings.default_ttl,
             candidates,
-            candidate_aliases,
-            reason_code,
+            candidateAliases,
+            decisionReason,
+            allReasons,
             /**
              * A data object to store data from Fusion
              *
              * @type { !Object.<string, { health_score: { value:string } }> }
              */
-            data_fusion = parse_fusion_data(request.getData('fusion')),
-            data_rtt = filter_object(request.getProbe('http_rtt'), filter_empty);
+            dataFusion = parseFusionData(request.getData('fusion')),
+            dataRtt = filterObject(request.getProbe('http_rtt'), filterEmpty);
+        
+        allReasons = {
+            default_provider: 'A',
+            one_acceptable_provider: 'B',
+            best_provider_selected: 'C',
+            error_condition: 'D',
+            fusion_data_not_robust: 'E',
+            radar_rtt_not_robust: 'F',
+            no_available_fusion_providers: 'G'
 
-        function fusion_health_score_ok(provider) {
+        };
+
+        function fusionHealthScoreOk(provider) {
             // let the flag determine if the provider is available when we don't have fusion data for the provider
-            if (data_fusion[provider] === undefined) {
+            if (dataFusion[provider] === undefined) {
                 return settings.no_health_score_ok;
             }
 
             // normally, the fusion recipe returns a health score of 3 or greater when the server is available
-            return data_fusion[provider].health_score !== undefined
-                && data_fusion[provider].health_score.value !== undefined
-                && data_fusion[provider].health_score.value > 2;
+            return dataFusion[provider].health_score !== undefined
+                && dataFusion[provider].health_score.value !== undefined
+                && dataFusion[provider].health_score.value > 2;
         }
 
         // radar or fusion health_score data not available, select any fusion available provider
-        function select_any_provider(reason) {
+        function selectAnyProvider(reason) {
             var i = aliases.length,
                 n = 0,
                 candidates = [];
 
             while (i --) {
-                if (fusion_health_score_ok(aliases[i])) {
+                if (fusionHealthScoreOk(aliases[i])) {
                     candidates[n ++] = aliases[i];
                 }
             }
 
             if (n === 0) {
-                selected_provider = settings.default_provider;
-                reason_code = reasons.no_available_fusion_providers + reasons.default_provider;
+                decisionProvider = settings.default_provider;
+                decisionReason = allReasons.no_available_fusion_providers + allReasons.default_provider;
             }
             else if (n === 1) {
-                selected_provider = candidates[0];
-                reason_code = reason;
+                decisionProvider = candidates[0];
+                decisionReason = reason;
             }
             else {
-                selected_provider = candidates[(Math.random() * n) >> 0];
-                reason_code = reason;
+                decisionProvider = candidates[(Math.random() * n) >> 0];
+                decisionReason = reason;
             }
         }
 
-        if (Object.keys(data_fusion).length !== aliases.length && !settings.no_health_score_ok){
-            select_any_provider(reasons.fusion_data_not_robust);
+        if (Object.keys(dataFusion).length !== aliases.length && !settings.no_health_score_ok){
+            selectAnyProvider(allReasons.fusion_data_not_robust);
         }
         // if we don't have rtt, return any fusion available provider
-        else if (Object.keys(data_rtt).length !== aliases.length) {
-            select_any_provider(reasons.radar_rtt_not_robust);
+        else if (Object.keys(dataRtt).length !== aliases.length) {
+            selectAnyProvider(allReasons.radar_rtt_not_robust);
         }
         else {
             // we've got radar and fusion data for all providers, filter out any unavailable fusion providers
-            candidates = filter_object(data_rtt, fusion_health_score_ok);
-            candidate_aliases = Object.keys(candidates);
+            candidates = filterObject(dataRtt, fusionHealthScoreOk);
+            candidateAliases = Object.keys(candidates);
 
-            if (candidate_aliases.length === 0) {
+            if (candidateAliases.length === 0) {
                 // No available providers
-                select_any_provider(reasons.no_available_fusion_providers);
+                selectAnyProvider(allReasons.no_available_fusion_providers);
             }
-            else if (candidate_aliases.length === 1) {
-                selected_provider = candidate_aliases[0];
-                reason_code = reasons.one_acceptable_provider;
+            else if (candidateAliases.length === 1) {
+                decisionProvider = candidateAliases[0];
+                decisionReason = allReasons.one_acceptable_provider;
             }
             else {
                 // we've got more than 1 available provider, route based on rtt
-                selected_provider = get_lowest(candidates, 'http_rtt');
-                reason_code = reasons.best_provider_selected;
+                decisionProvider = getLowest(candidates, 'http_rtt');
+                decisionReason = allReasons.best_provider_selected;
             }
         }
 
-        response.respond(selected_provider, settings.providers[selected_provider].cname);
-        response.setTTL(decision_ttl);
-        response.setReasonCode(reason_code);
+        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.setTTL(decisionTtl);
+        response.setReasonCode(decisionReason);
     };
 
-    function filter_object(object, filter) {
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
@@ -164,7 +162,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {Object} candidate
      */
-    function filter_empty(candidate) {
+    function filterEmpty(candidate) {
         var key;
         for (key in candidate) {
             return true;
@@ -172,7 +170,7 @@ function OpenmixApplication(settings) {
         return false;
     }
 
-    function get_lowest(source, property) {
+    function getLowest(source, property) {
         var keys = Object.keys(source),
             i = keys.length,
             key,
@@ -192,8 +190,11 @@ function OpenmixApplication(settings) {
 
         return candidate;
     }
-
-    function parse_fusion_data(data) {
+    
+    /**
+     * @param {!Object} data
+     */
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
@@ -201,29 +202,14 @@ function OpenmixApplication(settings) {
         while (i --) {
             key = keys[i];
 
-            if (!(data[key] = json_parse(key, data[key]))) {
+            try {
+                data[key] = JSON.parse(data[key]);
+            }
+            catch (e) {
                 delete data[key];
             }
         }
-
         return data;
     }
 
-    function json_parse(key, json) {
-        if (json_cache_index[key] === json) {
-            return json_cache[key];
-        }
-        else {
-            json_cache_index[key] = json;
-
-            /*jshint boss:true*/
-            try {
-                return json_cache[key] = JSON.parse(json);
-            }
-            catch (e) {
-                return json_cache[key] = false;
-            }
-            /*jshint boss:false*/
-        }
-    }
 }

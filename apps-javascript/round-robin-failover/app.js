@@ -73,7 +73,7 @@ function OpenmixApplication(settings) {
             decisionTtl,
             candidates,
             candidateAliases,
-            reasonCode = '',
+            decisionReason = '',
             decisionCname;
 
         allReasons = {
@@ -97,11 +97,11 @@ function OpenmixApplication(settings) {
 
         if (candidateAliases.length === 1) {
             decisionProvider = candidateAliases[0];
-            reasonCode = allReasons.primary_selected;
+            decisionReason = allReasons.primary_selected;
             decisionTtl = decisionTtl || settings.default_ttl;
         } else if (candidateAliases.length !== 0) {
             decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
-            reasonCode = allReasons.primary_selected;
+            decisionReason = allReasons.primary_selected;
             decisionTtl = settings.default_ttl;
         }
 
@@ -113,11 +113,11 @@ function OpenmixApplication(settings) {
             if (candidateAliases.length === 1) {
                 decisionProvider = candidateAliases[0];
                 decisionCname = settings.failover_providers[decisionProvider].cname;
-                reasonCode = allReasons.failover_selected;
+                decisionReason = allReasons.failover_selected;
                 decisionTtl = decisionTtl || settings.default_ttl;
             } else if (candidateAliases.length !== 0) {
                 decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
-                reasonCode = allReasons.failover_selected;
+                decisionReason = allReasons.failover_selected;
                 decisionTtl = settings.default_ttl;
                 decisionCname = settings.failover_providers[decisionProvider].cname;
             }
@@ -125,13 +125,13 @@ function OpenmixApplication(settings) {
 
         if (!decisionProvider) {
             decisionProvider = settings.default_provider;
-            reasonCode = allReasons.default_selected;
+            decisionReason = allReasons.default_selected;
             decisionTtl = decisionTtl || settings.default_ttl;
         }
 
         response.respond(decisionProvider, decisionCname || settings.providers[decisionProvider].cname);
         response.setTTL(decisionTtl);
-        response.setReasonCode(reasonCode);
+        response.setReasonCode(decisionReason);
     };
 
     /**

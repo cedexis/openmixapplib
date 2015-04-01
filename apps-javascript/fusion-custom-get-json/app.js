@@ -35,9 +35,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
     
-    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers),
-        json_cache = {},
-        json_cache_index = {};
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     var reasons = {
         default_provider: 'A',
@@ -252,7 +250,7 @@ function OpenmixApplication(settings) {
             while (i --) {
                 key = keys[i];
 
-                if (!(data[key] = jsonParse(key, data[key]))) {
+                if (!(data[key] = JSON.parse(data[key]))) {
                     delete data[key];
                 } else {
                     convertToHealthScore(key, data);
@@ -265,30 +263,4 @@ function OpenmixApplication(settings) {
         }
     }
 
-    /**
-     * A function that parses incoming raw JSON and returns the parsed object.
-     * It maintains a cache to avoid extraneous calls to JSON.parse
-     *
-     * @param  {string} key
-     * @param  {string} json
-     *
-     * @return {{loadpercentage:number}|boolean}
-     */
-    function jsonParse(key, json) {
-        if (json_cache_index[key] === json) {
-            return json_cache[key];
-        }
-        else {
-            json_cache_index[key] = json;
-
-            /*jshint boss:true*/
-            try {
-                return json_cache[key] = JSON.parse(json);
-            }
-            catch (e) {
-                return json_cache[key] = false;
-            }
-            /*jshint boss:false*/
-        }
-    }
 }
