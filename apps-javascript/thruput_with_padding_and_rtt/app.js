@@ -19,6 +19,12 @@ var handler = new OpenmixApplication({
             kbps_padding: 0
         }
     },
+    // A mapping of ISO 3166-1 country codes to provider aliases
+    country_overrides: {},
+    // A mapping of market codes to provider aliases
+    market_overrides: {},
+    // A mapping of ASN codes to provider aliases:  asn_overrides: { 123: 'baz', 124: 'bar' }
+    asn_overrides: {},
     default_ttl: 20,
     availability_threshold: 90,
     tie_threshold: 0.95
@@ -61,6 +67,9 @@ function OpenmixApplication(settings) {
         var dataAvail = request.getProbe('avail'),
             dataKbps = request.getProbe('http_kbps'),
             dataRtt = request.getProbe('http_rtt'),
+            country = request.country,
+            market = request.market,
+            asn = request.asn,
             allReasons,
             decisionProvider = '',
             candidates,
@@ -75,10 +84,25 @@ function OpenmixApplication(settings) {
             best_performing_by_rtt: 'B',
             data_problem: 'C',
             all_but_one_eliminated: 'D',
-            all_providers_eliminated: 'E'
+            all_providers_eliminated: 'E',
+            found_country: 'F',
+            found_market: 'G',
+            found_asn: 'H'
         };
 
-        if (Object.keys(dataAvail).length > 0) {
+        if (country !== undefined && settings.country_overrides[country] !== undefined) {
+            decisionProvider = settings.country_overrides[country];
+            reasonCode = allReasons.found_country;
+        }
+        else if (market !== undefined && settings.market_overrides[market] !== undefined) {
+            decisionProvider = settings.market_overrides[market];
+            reasonCode = allReasons.found_market;
+        }
+        else if (asn !== undefined && settings.asn_overrides[asn] !== undefined) {
+            decisionProvider = settings.asn_overrides[asn];
+            reasonCode = allReasons.found_asn;
+        }
+        else if (Object.keys(dataAvail).length > 0) {
             // Remove unavailable providers
             candidates = filterObject(dataAvail, filterAvailability);
             candidateAliases = Object.keys(candidates);
