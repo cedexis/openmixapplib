@@ -1,7 +1,7 @@
-# Application: **Sonar and Radar availability with Radar RTT**
+# Application: **RAX Sonar and Radar availability with Radar RTT**
 
-This application uses sonar and radar availability to filter the platform, then it chooses the best performance platform.
-It chooses a default platform in case on none platform available.
+This application uses RAX sonar and radar availability to filter the platform, then it chooses the best performance platform.
+It chooses a default platform when none platform is available.
 
 # Openmix Application Library
 
