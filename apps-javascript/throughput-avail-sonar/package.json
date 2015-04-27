@@ -1,8 +1,8 @@
 {
-    "title": "Optimal Round Trip Time with Availability",
-    "description": "This application uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance. \n\nThere is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.",
-    "lastUpdated": "11/11/2014",
-    "keywords": ["Performance"],
+    "title": "Throughput with Availability override",
+    "description": "Choose the best provider based on HTTP Throughput. Use Sonar for Availability override",
+    "lastUpdated": "04/16/2015",
+    "keywords": ["Throughput", "Sonar"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",

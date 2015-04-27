@@ -1,8 +1,8 @@
 {
-    "title": "Template",
-    "description": "The most basic template for an Openmix application.",
-    "lastUpdated": "10/29/2014",
-    "keywords": [""],
+    "title": "Geographic Round Robin with Sonar Availability override",
+    "description": "Round Robin routing based on geographic market and country data. Use Sonar for availability override checks",
+    "lastUpdated": "03/31/2015",
+    "keywords": ["Round-Robin", "Geography", "Sonar"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",

@@ -1,7 +1,7 @@
 {
     "title": "Diagnostic Application",
     "description": "Provides the ability retrieve diagnostic information about a request.",
-    "lastUpdated": "10/29/2014",
+    "lastUpdated": "03/31/2015",
     "keywords": [""],
     "author": "Cedexis",
     "devDependencies": {

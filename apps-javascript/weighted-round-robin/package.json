@@ -1,8 +1,8 @@
 {
-    "title": "Weighted Round Robin with Sonar",
-    "description": "A weighted round robin application that takes Sonar availability scores into account.",
-    "lastUpdated": "11/20/2014",
-    "keywords": ["Sonar"],
+    "title": "Weighted Round Robin",
+    "description": "A weighted round robin application that takes Radar availability scores into account.",
+    "lastUpdated": "04/01/2015",
+    "keywords": ["Round-Robin"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",

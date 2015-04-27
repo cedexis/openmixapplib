@@ -1,8 +1,8 @@
 {
-    "title": "Route Based on Geography",
-    "description": "Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.",
-    "lastUpdated": "10/29/2014",
-    "keywords": ["Geography"],
+    "title": "Route Based on Geography using Keynote Performance Data",
+    "description": "Use Keynote performance data to route by Market for most decsisions but override certain countries.",
+    "lastUpdated": "04/01/2015",
+    "keywords": ["Geography", "Fusion"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",

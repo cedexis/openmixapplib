@@ -1,8 +1,8 @@
 {
-    "title": "Performance with Penalty and Availability, Sticky Winner",
-    "description": "Routes requests to the highest performing available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. \n\nStickiness may optionally be limited to specific countries.",
-    "lastUpdated": "11/21/2014",
-    "keywords": [""],
+    "title": "Throughput and Availability, Sticky Winner",
+    "description": "Routes requests to the highest throughput available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. \n\nStickiness may optionally be limited to specific countries.",
+    "lastUpdated": "04/01/2015",
+    "keywords": ["Throughput"],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
