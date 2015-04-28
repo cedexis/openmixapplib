@@ -1,6 +1,6 @@
-# Application: **Template**
+# Application: **Geographic Round Robin with Sonar Availability override**
 
-The most basic template for an Openmix application.
+Round Robin routing based on geographic market and country data. Use Sonar for availability override checks
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

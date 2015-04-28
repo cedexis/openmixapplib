@@ -1,4 +1,4 @@
-# Application: **Optimal Round Trip Time with Availability**
+# Application: **Optimal Round Trip Time with Fusion Server Health Availability**
 
 This application uses latency and Fusion server health to determine which platform to direct requests to. Server health is used as an Availability check and will route around unhealthy platforms.
 # Openmix Application Library

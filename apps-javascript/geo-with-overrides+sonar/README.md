@@ -1,6 +1,6 @@
-# Application: **Route Based on Geography**
+# Application: **Route Based on Geography with Sonar Availibility override**
 
-Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries. Based on contribution by Jake Maul of Mozilla.
+Use Market data for most decisions, but override certain countries. Use Sonar for avaialbility checks. Based on contribution by Jake Maul of Mozilla.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

@@ -1,8 +1,6 @@
-# Application: **Optimal Round Trip Time with Availability**
+# Application: **Optimal Round Trip Time with Sonar Availability**
 
-This application uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance. 
-
-There is an Openmix Quick Start application type named 'Optimal Round Trip Time' that provides the same functionality.
+This application uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

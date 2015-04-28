@@ -1,8 +1,6 @@
-# Application: **RAX Sonar and Radar availability with Radar RTT**
+# Application: **Optimal Round Trip Time with Radar and Sonar Availability**
 
-This application uses RAX sonar and radar availability to filter the platform, then it chooses the best performance platform.
-It chooses a default platform when none platform is available.
-
+This application uses both latency and availability to determine which platform to direct requests to, and you can quickly change from using latency to some other measure of performance. Uses Radar and Sonar for availability checks.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

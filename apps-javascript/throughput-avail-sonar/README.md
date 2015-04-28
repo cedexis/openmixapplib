@@ -1,8 +1,6 @@
-# Application: **RAX Sonar and Radar availability with Radar KBPS**
+# Application: **Throughput with Availability override**
 
-This application uses RAX sonar and radar availability to filter the platform, then it chooses the Highest Kbps platform.
-It chooses a default platform when none platform is available.
-
+Choose the best provider based on HTTP Throughput. Use Sonar for Availability override
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.

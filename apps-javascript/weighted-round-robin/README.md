@@ -1,6 +1,6 @@
-# Application: **Weighted Round Robin with Sonar**
+# Application: **Weighted Round Robin**
 
-A weighted round robin application that takes Sonar availability scores into account.
+A weighted round robin application that takes Radar availability scores into account.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
