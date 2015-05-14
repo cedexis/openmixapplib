@@ -1,4 +1,4 @@
-# Application: **Avoid CDN Bursting Charges by tracking MBPS via Fusion Data API**
+# Application: **Avoid CDN Bursting Charges by tracking GB via Fusion Data API**
 
 This version of the Optimal Round Trip Time application allows you track your monthly
 GB usage via that CDN's API. If your usage exceeds your commit, penalize that CDN enough
