@@ -6,6 +6,7 @@ var handler = new OpenmixApplication({
     // `countries` is a list of countries where the provider can be used
     // `markets` is a list of markets where the provider can be used
     // `asns` is a list of asns where the provider can be used
+    // `except_country` is a list of countries where provider can't be used, e.g ['CN']
     providers: {
         'foo': {
             cname: 'www.foo.com',
@@ -24,7 +25,8 @@ var handler = new OpenmixApplication({
         },
         'qux': {
             cname: 'www.qux.com',
-            padding: 0
+            padding: 0,
+            except_country: ['CN']
         }
     },
     // The minimum availability score that providers must have in order to be considered available
@@ -136,6 +138,7 @@ function OpenmixApplication(settings) {
             // Considered only available providers in the provider countries/markets/asn
             return (candidate.avail !== undefined && candidate.avail >= settings.availability_threshold)
                 && provider !== undefined
+                && (provider.except_country === undefined || provider.except_country.indexOf(request.country) === -1)
                 && (provider.countries === undefined || provider.countries.indexOf(request.country) !== -1)
                 && (provider.markets === undefined || provider.markets.indexOf(request.market) !== -1)
                 && (provider.asns === undefined || provider.asns.indexOf(request.asn) !== -1);
