@@ -333,7 +333,7 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {!Object} source
+     * @param source
      * @param {string} property
      */
     function getLowest(source, property) {
