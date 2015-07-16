@@ -718,7 +718,7 @@
         }
     }));
 
-    test('missing fusion data for bar', test_handle_request({
+    test('fusion data problem', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -795,15 +795,7 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-                        "bandwidth": {
-                            "unit": "Mbps",
-                            "value": "8623.57"
-                        }
-                    }),
-                    "bar": ""
-                });
+                .returns({});
             Math.random.returns(0);
         },
         verify: function(i) {

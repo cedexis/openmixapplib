@@ -254,7 +254,7 @@ function OpenmixApplication(settings) {
         if (Object.keys(dataRtt).length !== aliases.length || Object.keys(dataAvail).length !== aliases.length) {
             selectRandomProvider(reasons.radar_data_sparse);
         }
-        else if (Object.keys(dataFusion).length !== Object.keys(settings.burstable_cdns).length) {
+        else if (Object.keys(dataFusion).length === 0) {
             selectRandomProvider(reasons.fusion_data_problem);
         }
         else {
