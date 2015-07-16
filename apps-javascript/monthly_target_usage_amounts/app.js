@@ -161,7 +161,7 @@ function OpenmixApplication(settings) {
 
                 if (settings.enable_usage_target_min_routing === true
                     && usage < currentMinUsageTarget) {
-                    return 1 - ((1 - devianceMinUsage) * (elapsedMonth + (1 - elapsedMonth) * settings.usage_strictness));
+                    return (1 - ((1 - devianceMinUsage) * (elapsedMonth + (1 - elapsedMonth) * settings.usage_strictness))) * -1;
                 } else if (settings.enable_usage_target_max_routing === true
                     && usage > currentMaxUsageTarget) {
                     return 1 - ((1 - devianceMaxUsage) * (elapsedMonth + (1 - elapsedMonth) * settings.usage_strictness));

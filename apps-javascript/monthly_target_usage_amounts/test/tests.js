@@ -811,7 +811,7 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 50,
+                    base_padding: 0,
                     targetMin: 180,
                     targetMax: 200
                 },
@@ -914,8 +914,8 @@
             sinon.clock.tick(1436378332572);
         },
         verify: function(i) {
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
         }
