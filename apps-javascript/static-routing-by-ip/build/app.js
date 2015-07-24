@@ -1,5 +1,4 @@
 var productionConfig = {
-    availabilityThreshold: 50,
     providers: {
         'provider-a': {
             'cname': 'a.foo.com'
