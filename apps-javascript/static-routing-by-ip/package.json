@@ -1,8 +1,8 @@
 {
-    "title": "Template",
-    "description": "The most basic template for an Openmix application.",
-    "lastUpdated": "04/01/2015",
-    "keywords": [""],
+    "title": "Static Routing By IP",
+    "description": "Routes to platforms based on a list of IP blocks",
+    "lastUpdated": "07/23/2015",
+    "keywords": [ "CIDR", "IP" ],
     "author": "Cedexis",
     "devDependencies": {
         "karma": "0.10.x",
