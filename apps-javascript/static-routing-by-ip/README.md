@@ -8,6 +8,12 @@ From the directory containing package.json:
 $ npm install
 ```
 
+## Build
+
+```bash
+$ make build
+```
+
 ## JavaScript Validation
 
 ```bash
