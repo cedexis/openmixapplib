@@ -1,0 +1,20 @@
+{
+    "title": "Template",
+    "description": "The most basic template for an Openmix application.",
+    "lastUpdated": "04/01/2015",
+    "keywords": [""],
+    "author": "Cedexis",
+    "devDependencies": {
+        "karma": "0.10.x",
+        "karma-qunit": "0.1.x",
+        "karma-phantomjs-launcher": "0.1.x",
+        "karma-junit-reporter": "0.2.x",
+        "jshint": "2.5.x",
+        "google-closure-compiler": ">=20150609.0.0",
+        "coffee-script": ">=1.9.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://code.example.com/git/example.git"
+    }
+}

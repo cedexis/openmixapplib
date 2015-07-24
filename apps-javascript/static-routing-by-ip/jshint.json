@@ -1,0 +1,8 @@
+{
+    "undef": true,
+    "unused": true,
+    "laxbreak": true,
+    "sub": true,
+    "exported": [ "init", "onRequest" ],
+    "predef": [ "Netmask" ]
+}
