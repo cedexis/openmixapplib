@@ -167,7 +167,7 @@ function OpenmixApplication(settings) {
                     return 1 - ((1 - devianceMaxUsage) * (elapsedMonth + (1 - elapsedMonth) * settings.usage_strictness));
                 }
             }
-            return 0;
+            return 1;
         }
 
         /* jshint laxbreak:true */
