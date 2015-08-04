@@ -13,9 +13,9 @@ var handler = new OpenmixApplication({
     default_provider: 'foo',
     default_ttl: 20,
     availability_threshold: 80,
-    //Set RAX Sonar threshold for availability for the platform to be included.
+    //Set Fusion Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 5
-    rax_sonar_threshold: 2
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -72,7 +72,7 @@ function OpenmixApplication(settings) {
         function filterAvailability(candidate, key) {
             // Filter sonar and radar availability
             return dataFusion[key] !== undefined
-                && dataFusion[key].health_score.value > settings.rax_sonar_threshold
+                && dataFusion[key].health_score.value > settings.fusion_sonar_threshold
                 && dataAvail[key] !== undefined
                 && dataAvail[key].avail >= settings.availability_threshold;
         }
@@ -85,7 +85,7 @@ function OpenmixApplication(settings) {
             // Select the highest kbps provider
             // availability score, if given
             
-            // Remove any that don't meet the RAX Sonar threshold and Radar sonar threshold
+            // Remove any that don't meet the Fusion Sonar threshold and Radar sonar threshold
             candidates = filterObject(candidates, filterAvailability);
             candidateAliases = Object.keys(candidates);
             
