@@ -27,9 +27,9 @@ var handler = new OpenmixApplication({
 
     // The DNS TTL to be applied to DNS responses in seconds.
     default_ttl: 20,
-    //Set Sonar threhold for availability for the platform to be included.
-    // sonar values are between 0 - 1
-    sonar_threshold: 0.95
+    //Set Fusion Sonar threshold for availability for the platform to be included.
+    // sonar values are between 0 - 5
+    fusionSonarThreshold: 2
 });
 
 function init(config) {
@@ -67,12 +67,14 @@ function OpenmixApplication(settings) {
      */
     this.handle_request = function(request, response) {
         //get the sonar data
-        var dataSonar = parseSonarData(request.getData('sonar')),
+        var /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
+            dataFusion = parseFusionData(request.getData('fusion')),
+            dataFusionAliases,
             allReasons,
             decisionProvider,
             candidates,
             candidateAliases,
-            decisionReason,
+            decisionReason = '',
             totalWeight = 0;
 
         allReasons = {
@@ -81,8 +83,12 @@ function OpenmixApplication(settings) {
             choose_random_platform: 'C'
         };
 
-        function filterSonar(candidate) {
-            return candidate >= settings.sonar_threshold;
+        /**
+         * @param candidate
+         * @param key
+         */
+        function filterFusionSonar(candidate, key) {
+            return dataFusion[key] !== undefined && dataFusion[key].health_score.value > settings.fusionSonarThreshold;
         }
 
         function getTotalWeight(candidates) {
@@ -95,7 +101,7 @@ function OpenmixApplication(settings) {
                 weight = settings.providers[keys[i]].weight;
 
                 if (weight !== undefined) {
-                  total += weight;
+                    total += weight;
                 }
             }
 
@@ -122,30 +128,37 @@ function OpenmixApplication(settings) {
             }
         }
 
-        // filter candidates by sonar threshold,
-        // remove all the provider with sonar data < than settings.sonar_threshold
-        candidates = filterObject(dataSonar, filterSonar);
-        candidateAliases = Object.keys(candidates);
+        if (Object.keys(dataFusion).length > 0) {
+            dataFusionAliases = Object.keys(dataFusion);
+            //check if "Big Red Button" isn't activated
+            if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
+                // filter candidates by  fusion sonar threshold,
+                // remove all the provider with fusion sonar data <= than settings.fusionSonarThreshold
+                candidates = filterObject(dataFusion, filterFusionSonar);
+                candidateAliases = Object.keys(candidates);
 
-        if (candidateAliases.length > 0) {
-            if (candidateAliases.length === 1) {
-                decisionProvider = candidateAliases[0];
-                decisionReason = allReasons.most_available_platform_chosen;
-            }
-            else {
-                // Respond with a weighted random selection
-                totalWeight = getTotalWeight(candidates);
-                if (totalWeight > 0) {
-                    decisionProvider = getWeightedRandom(candidates, totalWeight);
-                    decisionReason = allReasons.routed_randomly_by_weight;
+                if (candidateAliases.length > 0) {
+                    if (candidateAliases.length === 1) {
+                        decisionProvider = candidateAliases[0];
+                        decisionReason = allReasons.most_available_platform_chosen;
+                    }
+                    else {
+                        // Respond with a weighted random selection
+                        totalWeight = getTotalWeight(candidates);
+                        if (totalWeight > 0) {
+                            decisionProvider = getWeightedRandom(candidates, totalWeight);
+                            decisionReason = allReasons.routed_randomly_by_weight;
+                        }
+                        // Respond with most available from sonar
+                        else {
+                            decisionProvider = getHighest(candidates);
+                            decisionReason = allReasons.most_available_platform_chosen;
+                        }
+                    }
                 }
-                // Respond with most available from sonar
-                else {
-                    decisionProvider = getHighest(candidates);
-                    decisionReason = allReasons.most_available_platform_chosen;
-                }
             }
-        } else {
+        }
+        if (decisionProvider === undefined) {
             // If we get here, something went wrong. Select randomly to avoid fallback.
             decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
             decisionReason = allReasons.choose_random_platform;
@@ -177,20 +190,6 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {!Object} data
-     */
-    function parseSonarData(data) {
-        var keys = Object.keys(data),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
-            data[key] = parseFloat(data[key]);
-        }
-        return data;
-    }
-
-    /**
      * @param {!Object} source
      */
     function getHighest(source) {
@@ -203,7 +202,7 @@ function OpenmixApplication(settings) {
 
         while (i --) {
             key = keys[i];
-            value = source[key];
+            value = source[key].health_score.value;
 
             if (value > max) {
                 candidate = key;
@@ -212,5 +211,24 @@ function OpenmixApplication(settings) {
         }
 
         return candidate;
+    }
+
+    /**
+     * @param {!Object} data
+     */
+    function parseFusionData(data) {
+        var keys = Object.keys(data),
+            i = keys.length,
+            key;
+        while (i --) {
+            key = keys[i];
+            try {
+                data[key] = JSON.parse(data[key]);
+            }
+            catch (e) {
+                delete data[key];
+            }
+        }
+        return data;
     }
 }
