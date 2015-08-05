@@ -24,7 +24,9 @@ var handler = new OpenmixApplication({
     default_provider: 'foo',
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
-    sonar_threshold: 90
+    // Set RAX Sonar threshold for availability for the platform to be included.
+    // sonar values are between 0 - 5
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -48,18 +50,15 @@ function OpenmixApplication(settings) {
      * @param {OpenmixConfiguration} config
      */
     this.do_init = function(config) {
-        var i = aliases.length;
+        var i = aliases.length,
+            j = failoverAliases.length;
 
         while (i --) {
             config.requireProvider(aliases[i]);
         }
-
-        i = failoverAliases.length;
-
-        while (i --) {
-            config.requireProvider(failoverAliases[i]);
+        while (j --) {
+            config.requireProvider(failoverAliases[j]);
         }
-
     };
 
     /**
@@ -67,10 +66,11 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var dataSonar  = parseSonarData(request.getData('sonar')),
-            allReasons,
+        var allReasons,
+            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
+            dataFusion = parseFusionData(request.getData('fusion')),
+            dataFusionAliases = Object.keys(dataFusion),
             decisionProvider,
-            decisionTtl,
             candidates,
             candidateAliases,
             decisionReason = '',
@@ -82,55 +82,63 @@ function OpenmixApplication(settings) {
             default_selected: 'C'
         };
 
-        function filterPrimaryCandidates(candidate, alias) {
-            return (candidate >= settings.sonar_threshold)
+        /**
+         * @param alias
+         * @returns {boolean}
+         */
+        function filterPrimaryCandidates(alias) {
+            return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
+                && dataFusion[alias].health_score.value > settings.fusion_sonar_threshold
                 && (settings.providers[alias] !== undefined);
         }
 
-        function filterFailoverCandidates(candidate, alias) {
-            return (candidate >= settings.sonar_threshold)
+        /**
+         * @param alias
+         * @returns {boolean}
+         */
+        function filterFailoverCandidates(alias) {
+            return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
+                && dataFusion[alias].health_score.value > settings.fusion_sonar_threshold
                 && (settings.failover_providers[alias] !== undefined);
         }
 
-        candidates = filterObject(dataSonar, filterPrimaryCandidates);
-        candidateAliases = Object.keys(candidates);
-
-        if (candidateAliases.length === 1) {
-            decisionProvider = candidateAliases[0];
-            decisionReason = allReasons.primary_selected;
-            decisionTtl = decisionTtl || settings.default_ttl;
-        } else if (candidateAliases.length !== 0) {
-            decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
-            decisionReason = allReasons.primary_selected;
-            decisionTtl = settings.default_ttl;
-        }
-
-        if (!decisionProvider) {
-            candidates = filterObject(dataSonar, filterFailoverCandidates);
-
+        // Check if "Big Red Button" isn't activated
+        if (dataFusionAliases.length > 0 && dataFusion[dataFusionAliases[0]].availability_override === undefined) {
+            candidates = filterObject(dataFusion, filterPrimaryCandidates);
             candidateAliases = Object.keys(candidates);
 
             if (candidateAliases.length === 1) {
                 decisionProvider = candidateAliases[0];
-                decisionCname = settings.failover_providers[decisionProvider].cname;
-                decisionReason = allReasons.failover_selected;
-                decisionTtl = decisionTtl || settings.default_ttl;
+                decisionReason = allReasons.primary_selected;
             } else if (candidateAliases.length !== 0) {
                 decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
-                decisionReason = allReasons.failover_selected;
-                decisionTtl = settings.default_ttl;
-                decisionCname = settings.failover_providers[decisionProvider].cname;
+                decisionReason = allReasons.primary_selected;
+            }
+
+            if (!decisionProvider) {
+                candidates = filterObject(dataFusion, filterFailoverCandidates);
+
+                candidateAliases = Object.keys(candidates);
+
+                if (candidateAliases.length === 1) {
+                    decisionProvider = candidateAliases[0];
+                    decisionCname = settings.failover_providers[decisionProvider].cname;
+                    decisionReason = allReasons.failover_selected;
+                } else if (candidateAliases.length !== 0) {
+                    decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
+                    decisionReason = allReasons.failover_selected;
+                    decisionCname = settings.failover_providers[decisionProvider].cname;
+                }
             }
         }
 
         if (!decisionProvider) {
             decisionProvider = settings.default_provider;
             decisionReason = allReasons.default_selected;
-            decisionTtl = decisionTtl || settings.default_ttl;
         }
 
         response.respond(decisionProvider, decisionCname || settings.providers[decisionProvider].cname);
-        response.setTTL(decisionTtl);
+        response.setTTL(settings.default_ttl);
         response.setReasonCode(decisionReason);
     };
 
@@ -143,22 +151,19 @@ function OpenmixApplication(settings) {
             i = keys.length,
             key,
             data = {};
-
         while (i --) {
             key = keys[i];
-
-            if (filter(object[key], key)) {
+            if (filter(key)) {
                 data[key] = (object[key]);
             }
         }
-
         return data;
     }
 
     /**
      * @param {!Object} data
      */
-    function parseSonarData(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

@@ -21,7 +21,7 @@
         },
         default_provider: 'foo',
         default_ttl: 20,
-        sonar_threshold: 90
+        fusion_sonar_threshold: 2
     };
 
     module('do_init');
@@ -95,12 +95,44 @@
         setup: function(i) {
             i.request
                 .getData
-                .onCall(0)
+                .withArgs('fusion')
                 .returns({
-                    "foo": 100,
-                    "bar": 100,
-                    "foo_f": 100,
-                    "bar_f": 100
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0.9);
         },
@@ -123,10 +155,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 88,
-                    "bar": 90,
-                    "foo_f": 100,
-                    "bar_f": 100
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -148,10 +212,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 90,
-                    "bar": 89,
-                    "foo_f": 100,
-                    "bar_f": 100
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -173,10 +269,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 89,
-                    "bar": 89,
-                    "foo_f": 100,
-                    "bar_f": 100
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0.9);
         },
@@ -199,10 +327,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 89,
-                    "bar": 89,
-                    "foo_f": 90,
-                    "bar_f": 89
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -224,10 +384,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 89,
-                    "bar": 89,
-                    "foo_f": 89,
-                    "bar_f": 90
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -249,10 +441,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 89,
-                    "bar": 89,
-                    "foo_f": 89,
-                    "bar_f": 89
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -274,10 +498,42 @@
                 .getData
                 .onCall(0)
                 .returns({
-                    "foo": 89,
-                    "bar": 89,
-                    "foo_f": 100,
-                    "bar_f": 100
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "foo_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar_f": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0.9);
         },
