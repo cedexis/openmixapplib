@@ -17,8 +17,6 @@ var handler = new OpenmixApplication({
                 }
             },
 
-    default_ttl: 20,
-
     // A mapping of ISO 3166-1 country codes to a array of provider aliases
     // Provide a multi geolocalized roundrobin
     // country_to_provider_roundrobin: { 'UK': ['bar','foo'], 'ES': ['baz','faa']},
@@ -27,11 +25,15 @@ var handler = new OpenmixApplication({
             'JP': ['foo']
             },
 
-    // sonar values are between 0 - 1
-    sonar_threshold: 0.8,
-
+    default_ttl: 20,
+    // A mapping of ISO 3166-1 country codes to a array of provider aliases
+    // Provide a multi geolocalized roundrobin
+    // country_to_provider_roundrobin: { 'UK': ['bar','foo'], 'ES': ['baz','faa']},
     // flip to true if the platform will be considered unavailable if it does not have sonar data
-    require_sonar_data: false
+    require_sonar_data: false,
+    //Set Fusion Sonar threshold for availability for the platform to be included.
+    // sonar values are between 0 - 5
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -49,7 +51,7 @@ function OpenmixApplication(settings) {
     'use strict';
 
     var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
-    
+
     /** @param {OpenmixConfiguration} config */
     this.do_init = function(config) {
         var i = aliases.length;
@@ -66,13 +68,13 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
 
         // Initiate variables
-        var dataSonar  = parseSonarData(request.getData('sonar')),
-            allReasons,
+        var allReasons,
+            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
+            dataFusion = parseFusionData(request.getData('fusion')),
             decisionProvider,
             decisionReason,
             passedCandidates,
-            passedCandidatesRRGeo,
-            decisionTtl;
+            passedCandidatesRRGeo;
 
         allReasons = {
             round_robin_geo: 'A',
@@ -82,18 +84,16 @@ function OpenmixApplication(settings) {
 
         };
 
-        // Declaring useful functions
-
         // determine which providers have a sonar value above threshold
+        /**
+         * @param alias
+         * @returns {boolean}
+         */
         function aboveSonarThreshold(alias) {
-            if (dataSonar[alias] !== undefined) {
-                return (dataSonar[alias] >= settings.sonar_threshold);
+            if (dataFusion[alias] !== undefined && dataFusion[alias].availability_override === undefined) {
+                return dataFusion[alias].health_score.value > settings.fusion_sonar_threshold;
             }
             return !settings.require_sonar_data;
-        }
-        // test if an object is empty
-        function isEmpty(obj) {
-            return Object.keys(obj).length === 0;
         }
 
         // Providers which pass the Threshold test
@@ -110,24 +110,20 @@ function OpenmixApplication(settings) {
 
             decisionProvider = passedCandidatesRRGeo[Math.floor(Math.random() * passedCandidatesRRGeo.length)];
             decisionReason = allReasons.round_robin_geo;
-            decisionTtl = settings.default_ttl;
-        // Else origin
+            // Else origin
         } else {
             // Check origin sonar decision
-            if (dataSonar.origin !== undefined && dataSonar.origin >= settings.sonar_threshold) {
+            if (dataFusion.origin !== undefined && dataFusion.origin.health_score.value > settings.fusion_sonar_threshold && dataFusion.origin.availability_override === undefined) {
                 decisionProvider = 'origin';
-                decisionTtl = decisionTtl || settings.default_ttl;
                 decisionReason = allReasons.default_selected;
             } else {
                 if (passedCandidates !== undefined && isEmpty(passedCandidates) === false) {
                     var passedCandidatesAliases = Object.keys(passedCandidates);
                     decisionProvider = passedCandidatesAliases[Math.floor(Math.random() * passedCandidatesAliases.length)];
-                    decisionTtl = decisionTtl || settings.default_ttl;
                     decisionReason = allReasons.passed_candidates_selected;
                 } else {
                     decisionProvider = 'origin';
-                    decisionTtl = decisionTtl || settings.default_ttl;
-                    decisionReason = allReasons.no_passed_candidates_default_selected; 
+                    decisionReason = allReasons.no_passed_candidates_default_selected;
                 }
             }
         }
@@ -135,9 +131,17 @@ function OpenmixApplication(settings) {
 
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
-        response.setTTL(decisionTtl);
-        response.setReasonCode(decisionReason); 
+        response.setTTL(settings.default_ttl);
+        response.setReasonCode(decisionReason);
     };
+
+    /**
+     * @param obj
+     * @returns {boolean}
+     */
+    function isEmpty(obj) {
+        return Object.keys(obj).length === 0;
+    }
 
     /**
      * @param {!Object} object
@@ -185,7 +189,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseSonarData(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
