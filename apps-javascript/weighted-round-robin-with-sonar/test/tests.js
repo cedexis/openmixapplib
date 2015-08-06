@@ -18,7 +18,7 @@
             }
         },
         default_ttl: 20,
-        sonar_threshold: 0.95
+        fusion_sonar_threshold: 2
     };
 
     module('do_init');
@@ -91,11 +91,35 @@
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "provider1": "0.97000",
-                    "provider2": "0.99000",
-                    "provider3": "1.00000"
+                    "provider1": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider2": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider3": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0.999);
         },
@@ -116,11 +140,35 @@
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "provider1": "0.80000",
-                    "provider2": "0.70000",
-                    "provider3": "0.90000"
+                    "provider1": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider2": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider3": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0);
         },
@@ -154,16 +202,40 @@
                 }
             },
             default_ttl: 20,
-            sonar_threshold: 0.95
+            fusion_sonar_threshold: 2
         },
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "provider1": "0.98000",
-                    "provider2": "1.00000",
-                    "provider3": "0.99000"
+                    "provider1": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 4
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider2": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider3": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 3
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -196,16 +268,40 @@
                 }
             },
             default_ttl: 20,
-            sonar_threshold: 0.95
+            fusion_sonar_threshold: 2
         },
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "provider1": "0.90000",
-                    "provider2": "1.00000",
-                    "provider3": "0.90000"
+                    "provider1": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider2": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "provider3": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
