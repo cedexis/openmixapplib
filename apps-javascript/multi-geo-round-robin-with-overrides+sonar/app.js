@@ -3,28 +3,26 @@ var handler = new OpenmixApplication({
     // All must be monitored by sonar
     // You must have a "origin" key in "providers" object in order to make the fallback effective
     providers: {
-                'foo': {
-                    cname: 'www.foo.com'
-                },
-                'bar': {
-                    cname: 'www.bar.com'
-                },
-                'baz': {
-                    cname: 'www.baz.com'
-                },
-                'origin': {
-                    cname: 'www.origin.com'
-                }
-            },
-
+        'foo': {
+            cname: 'www.foo.com'
+        },
+        'bar': {
+            cname: 'www.bar.com'
+        },
+        'baz': {
+            cname: 'www.baz.com'
+        },
+        'origin': {
+            cname: 'www.origin.com'
+        }
+    },
     // A mapping of ISO 3166-1 country codes to a array of provider aliases
     // Provide a multi geolocalized roundrobin
     // country_to_provider_roundrobin: { 'UK': ['bar','foo'], 'ES': ['baz','faa']},
     country_to_provider_roundrobin: {
-            'CN': ['bar','baz'],
-            'JP': ['foo']
-            },
-
+        'CN': ['bar','baz'],
+        'JP': ['foo']
+    },
     default_ttl: 20,
     // A mapping of ISO 3166-1 country codes to a array of provider aliases
     // Provide a multi geolocalized roundrobin
@@ -81,7 +79,6 @@ function OpenmixApplication(settings) {
             default_selected: 'B',
             passed_candidates_selected: 'C',
             no_passed_candidates_default_selected: 'D'
-
         };
 
         // determine which providers have a sonar value above threshold
@@ -90,7 +87,7 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function aboveSonarThreshold(alias) {
-            if (dataFusion[alias] !== undefined && dataFusion[alias].availability_override === undefined) {
+            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
                 return dataFusion[alias].health_score.value > settings.fusion_sonar_threshold;
             }
             return !settings.require_sonar_data;
@@ -129,7 +126,6 @@ function OpenmixApplication(settings) {
         }
         /* jshint laxbreak:false */
 
-
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(settings.default_ttl);
         response.setReasonCode(decisionReason);
@@ -160,7 +156,6 @@ function OpenmixApplication(settings) {
                 data[key] = (object[key]);
             }
         }
-
         return data;
     }
 
@@ -182,7 +177,6 @@ function OpenmixApplication(settings) {
                 data.push(key);
             }
         }
-
         return data;
     }
 
