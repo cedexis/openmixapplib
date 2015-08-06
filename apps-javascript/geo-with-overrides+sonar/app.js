@@ -25,10 +25,11 @@ var handler = new OpenmixApplication({
     default_ttl: 20,
     // The TTL to be set when the application chooses the default provider.
     error_ttl: 20,
-    // sonar values are between 0 - 1
-    sonar_threshold: 0.9,
     // flip to true if the platform will be considered unavailable if it does not have sonar data
-    require_sonar_data: false
+    require_sonar_data: false,
+    //Set Fusion Sonar threshold for availability for the platform to be included.
+    // sonar values are between 0 - 5
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -63,8 +64,9 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var dataSonar  = parseSonarData(request.getData('sonar')),
-            allReasons,
+        var allReasons,
+            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
+            dataFusion = parseFusionData(request.getData('fusion')),
             decisionProvider,
             decisionReason,
             failedCandidates,
@@ -79,16 +81,14 @@ function OpenmixApplication(settings) {
         };
 
         // determine which providers have a sonar value below threshold
+        /**
+         * @param alias
+         */
         function belowSonarThreshold(alias) {
-            if (dataSonar[alias] !== undefined) {
-                return (dataSonar[alias] < settings.sonar_threshold);
+            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
+                return dataFusion[alias].health_score.value <= settings.fusion_sonar_threshold;
             }
             return settings.require_sonar_data;
-        }
-
-
-        function isEmpty(obj) {
-            return Object.keys(obj).length === 0;
         }
 
         // used for reason code logging
@@ -106,7 +106,6 @@ function OpenmixApplication(settings) {
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -132,7 +131,6 @@ function OpenmixApplication(settings) {
             // log no available providers and return the default_provider
             decisionReason = allReasons.no_available_provider + allReasons.unexpected_market;
             return settings.default_provider;
-
         }
 
         failedCandidates = filterObject(settings.providers, belowSonarThreshold);
@@ -143,7 +141,7 @@ function OpenmixApplication(settings) {
             && failedCandidates[settings.country_to_provider[request.country]] === undefined) {
             // Override based on the request country
             decisionProvider = settings.country_to_provider[request.country];
-            decisionTtl = decisionTtl || settings.default_ttl;
+            decisionTtl = settings.default_ttl;
             decisionReason = allReasons.geo_override_on_country;
         }
         else if (settings.market_to_provider !== undefined
@@ -151,13 +149,12 @@ function OpenmixApplication(settings) {
             && failedCandidates[settings.market_to_provider[request.market] ] === undefined) {
             // Override based on the request market
             decisionProvider = settings.market_to_provider[request.market];
-            decisionTtl = decisionTtl || settings.default_ttl;
+            decisionTtl = settings.default_ttl;
             decisionReason = allReasons.got_expected_market;
         }
         else {
-
             decisionProvider = getDefaultProvider();
-            decisionTtl = decisionTtl || settings.error_ttl;
+            decisionTtl = settings.error_ttl;
             if (decisionReason === undefined || decisionReason.indexOf(allReasons.no_available_provider) === -1 ) {
                 if (failedGeoLocation() ) {
                     decisionReason = allReasons.geo_sonar_failed + allReasons.unexpected_market;
@@ -173,27 +170,36 @@ function OpenmixApplication(settings) {
         response.setReasonCode(decisionReason);
     };
 
-     function filterObject(object, filter) {
+    /**
+     * @param obj
+     * @returns {boolean}
+     */
+    function isEmpty(obj) {
+        return Object.keys(obj).length === 0;
+    }
+
+    /**
+     * @param object
+     * @param filter
+     */
+    function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
             key,
             data = {};
-
         while (i --) {
             key = keys[i];
-
             if (filter(key)) {
                 data[key] = (object[key]);
             }
         }
-
         return data;
     }
 
     /**
      * @param {!Object} data
      */
-    function parseSonarData(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
