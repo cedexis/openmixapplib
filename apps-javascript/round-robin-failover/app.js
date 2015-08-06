@@ -24,7 +24,7 @@ var handler = new OpenmixApplication({
     default_provider: 'foo',
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
-    // Set RAX Sonar threshold for availability for the platform to be included.
+    // Set Fusion Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 5
     fusion_sonar_threshold: 2
 });
