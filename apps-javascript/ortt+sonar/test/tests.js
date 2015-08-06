@@ -17,8 +17,12 @@
         default_provider: 'foo',
         default_ttl: 90,
         min_valid_rtt_score: 5,
-        need_sonar_data: true,
-        sonar_threshold: 0.95
+        // when set true if one of the provider has not data it will be removed,
+        // when set to false, sonar data is optional, so a provider with no sonar data will be used
+        require_sonar_data: true,
+        //Set Fusion Sonar threshold for availability for the platform to be included.
+        // sonar values are between 0 - 5
+        fusion_sonar_threshold: 2
     };
 
     module('do_init');
@@ -104,11 +108,35 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "0.80000",
-                    "bar": "1.00000",
-                    "baz": "0.80000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -142,10 +170,26 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "bar": "0.80000",
-                    "baz": "1.00000"
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -179,10 +223,26 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "bar": "1.00000",
-                    "baz": "1.00000"
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
             Math.random.returns(0.9);
         },
@@ -217,11 +277,100 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "0.80000",
-                    "bar": "0.80000",
-                    "baz": "0.80000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
+                });
+        },
+        verify: function(i) {
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 90, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'CD', 'Verifying reason code');
+        }
+    }));
+
+    test('no_available_providers 2', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    "foo": {
+                        "http_rtt": 190
+                    },
+                    "bar": {
+                        "http_rtt": 180
+                    },
+                    "baz": {
+                        "http_rtt": 100
+                    }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true,
+                        "availability_override": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true,
+                        "availability_override": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true,
+                        "availability_override": true
+                    })
                 });
         },
         verify: function(i) {
@@ -255,11 +404,35 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "1.00000",
-                    "bar": "1.00000",
-                    "baz": "0.80000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -291,8 +464,12 @@
             default_provider: 'foo',
             default_ttl: 90,
             min_valid_rtt_score: 5,
-            use_sonar_data: false,
-            sonar_threshold: 0.95
+            // when set true if one of the provider has not data it will be removed,
+            // when set to false, sonar data is optional, so a provider with no sonar data will be used
+            require_sonar_data: false,
+            //Set Fusion Sonar threshold for availability for the platform to be included.
+            // sonar values are between 0 - 5
+            fusion_sonar_threshold: 2
         },
         setup: function(i) {
             i.request
@@ -308,11 +485,35 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "0.80000",
-                    "bar": "1.00000",
-                    "baz": "0.80000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -344,8 +545,12 @@
             default_provider: 'foo',
             default_ttl: 90,
             min_valid_rtt_score: 5,
-            use_sonar_data: false,
-            sonar_threshold: 0.95
+            // when set true if one of the provider has not data it will be removed,
+            // when set to false, sonar data is optional, so a provider with no sonar data will be used
+            require_sonar_data: false,
+            //Set Fusion Sonar threshold for availability for the platform to be included.
+            // sonar values are between 0 - 5
+            fusion_sonar_threshold: 2
         },
         setup: function(i) {
             i.request
@@ -354,11 +559,35 @@
                 .returns({});
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "0.80000",
-                    "bar": "0.80000",
-                    "baz": "0.80000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 1
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {
@@ -390,8 +619,12 @@
             default_provider: 'foo',
             default_ttl: 90,
             min_valid_rtt_score: 5,
-            use_sonar_data: false,
-            sonar_threshold: 0.95
+            // when set true if one of the provider has not data it will be removed,
+            // when set to false, sonar data is optional, so a provider with no sonar data will be used
+            require_sonar_data: false,
+            //Set Fusion Sonar threshold for availability for the platform to be included.
+            // sonar values are between 0 - 5
+            fusion_sonar_threshold: 2
         },
         setup: function(i) {
             i.request
@@ -410,10 +643,26 @@
                 });
             i.request
                 .getData
-                .withArgs('sonar')
+                .withArgs('fusion')
                 .returns({
-                    "foo": "1.00000",
-                    "bar": "1.00000"
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
                 });
         },
         verify: function(i) {

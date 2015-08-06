@@ -15,10 +15,10 @@ var handler = new OpenmixApplication({
     min_valid_rtt_score: 5,
     // when set true if one of the provider has not data it will be removed,
     // when set to false, sonar data is optional, so a provider with no sonar data will be used
-    need_sonar_data: true,
-    //Set Sonar threshold for availability for the platform to be included.
-    // sonar values are between 0 - 1
-    sonar_threshold: 0.95
+    require_sonar_data: true,
+    //Set Fusion Sonar threshold for availability for the platform to be included.
+    // sonar values are between 0 - 5
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -51,9 +51,9 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        var decisionTtl = settings.default_ttl,
-            candidates,
-            dataSonar = parseSonarData(request.getData('sonar')),
+        var candidates,
+            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
+            dataFusion = parseFusionData(request.getData('fusion')),
             dataRtt = request.getProbe('http_rtt'),
             decisionProvider,
             decisionReason,
@@ -70,21 +70,21 @@ function OpenmixApplication(settings) {
         };
 
         /**
-        * @param key
+        * @param alias
         */
-        function filterInvalidRttScores(key) {
-            return dataRtt[key] !== undefined && dataRtt[key].http_rtt >= settings.min_valid_rtt_score;
+        function filterInvalidRttScores(alias) {
+            return dataRtt[alias] !== undefined && dataRtt[alias].http_rtt >= settings.min_valid_rtt_score;
         }
 
         /**
-         * @param key
+         * @param alias
          */
-        function filterSonar(key) {
+        function filterSonar(alias) {
             // let the flag determine if the provider is available when we don't have sonar data for the provider
-            if (dataSonar[key] === undefined) {
-                return !settings.need_sonar_data;
+            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
+                return dataFusion[alias].health_score.value > settings.fusion_sonar_threshold;
             }
-            return (dataSonar[key] >= settings.sonar_threshold);
+            return !settings.require_sonar_data;
         }
 
         /**
@@ -114,7 +114,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (Object.keys(dataSonar).length !== aliases.length && settings.need_sonar_data) {
+        if (Object.keys(dataFusion).length !== aliases.length && settings.require_sonar_data) {
             selectAnyProvider(allReasons.sonar_data_not_robust);
         } else if (Object.keys(dataRtt).length !== aliases.length) {
             // if we don't have rtt, return any sonar available provider
@@ -143,7 +143,7 @@ function OpenmixApplication(settings) {
         }
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
-        response.setTTL(decisionTtl);
+        response.setTTL(settings.default_ttl);
         response.setReasonCode(decisionReason);
     };
 
@@ -155,7 +155,6 @@ function OpenmixApplication(settings) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
-
         while (i --) {
             key = keys[i];
 
@@ -163,7 +162,6 @@ function OpenmixApplication(settings) {
                 delete object[key];
             }
         }
-
         return object;
     }
 
@@ -178,7 +176,6 @@ function OpenmixApplication(settings) {
             candidate,
             min = Infinity,
             value;
-
         while (i --) {
             key = keys[i];
             value = source[key][property];
@@ -188,22 +185,25 @@ function OpenmixApplication(settings) {
                 min = value;
             }
         }
-
         return candidate;
     }
 
     /**
      * @param {!Object} data
      */
-    function parseSonarData(data) {
+    function parseFusionData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
         while (i --) {
             key = keys[i];
-            data[key] = parseFloat(data[key]);
+            try {
+                data[key] = JSON.parse(data[key]);
+            }
+            catch (e) {
+                delete data[key];
+            }
         }
         return data;
     }
-
 }
