@@ -18,9 +18,9 @@
         // The TTL to be set when the application chooses a geo provider.
         default_ttl: 20,
         availability_threshold: 90,
-        //Set RAX Sonar threshold for availability for the platform to be included.
+        //Set Fusion Sonar threshold for availability for the platform to be included.
         // sonar values are between 0 - 5
-        rax_sonar_threshold: 2
+        fusion_sonar_threshold: 2
     };
 
     module('do_init');

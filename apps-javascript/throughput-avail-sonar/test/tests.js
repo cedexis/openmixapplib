@@ -17,9 +17,9 @@
         default_provider: 'foo',
         default_ttl: 20,
         availability_threshold: 80,
-        //Set RAX Sonar threshold for availability for the platform to be included.
+        //Set Fusion Sonar threshold for availability for the platform to be included.
         // sonar values are between 0 - 5
-        rax_sonar_threshold: 2
+        fusion_sonar_threshold: 2
     };
 
     module('do_init');

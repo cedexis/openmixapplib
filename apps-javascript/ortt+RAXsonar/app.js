@@ -17,9 +17,9 @@ var handler = new OpenmixApplication({
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
     availability_threshold: 90,
-    //Set RAX Sonar threshold for availability for the platform to be included.
+    //Set Fusion Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 5
-    rax_sonar_threshold: 2
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -74,8 +74,8 @@ function OpenmixApplication(settings) {
          * @param candidate
          * @param key
          */
-        function filterFusionRAXSonar(candidate, key) {
-            return dataFusion[key] !== undefined && dataFusion[key].health_score.value > settings.rax_sonar_threshold;
+        function filterFusionSonar(candidate, key) {
+            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value > settings.fusion_sonar_threshold;
         }
 
         /**
@@ -95,7 +95,7 @@ function OpenmixApplication(settings) {
                 //check if "Big Red Button" isn't activated
                 if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
                     // remove any that don't meet the RAX Sonar threshold
-                    candidates = filterObject(candidates, filterFusionRAXSonar);
+                    candidates = filterObject(candidates, filterFusionSonar);
                 }
             }
             if (Object.keys(candidates).length > 0 && Object.keys(dataAvail).length > 0) {

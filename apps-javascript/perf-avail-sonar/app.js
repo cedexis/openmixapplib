@@ -72,6 +72,7 @@ function OpenmixApplication(settings) {
         function filterAvailability(candidate, key) {
             // Filter sonar and radar availability
             return dataFusion[key] !== undefined
+                && dataFusion[key].health_score !== undefined
                 && dataFusion[key].health_score.value > settings.fusion_sonar_threshold
                 && dataAvail[key] !== undefined
                 && dataAvail[key].avail >= settings.availability_threshold;

@@ -29,7 +29,7 @@ var handler = new OpenmixApplication({
     default_ttl: 20,
     //Set Fusion Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 5
-    fusionSonarThreshold: 2
+    fusion_sonar_threshold: 2
 });
 
 function init(config) {
@@ -88,15 +88,17 @@ function OpenmixApplication(settings) {
          * @param key
          */
         function filterFusionSonar(candidate, key) {
-            return dataFusion[key] !== undefined && dataFusion[key].health_score.value > settings.fusionSonarThreshold;
+            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value > settings.fusion_sonar_threshold;
         }
 
+        /**
+         * @param candidates
+         */
         function getTotalWeight(candidates) {
             var keys = Object.keys(candidates),
                 i = keys.length,
                 total = 0,
                 weight;
-
             while (i --) {
                 weight = settings.providers[keys[i]].weight;
 
@@ -104,17 +106,19 @@ function OpenmixApplication(settings) {
                     total += weight;
                 }
             }
-
             return total;
         }
 
+        /**
+         * @param candidates
+         * @param max
+         */
         function getWeightedRandom(candidates, max) {
             var random = Math.floor(Math.random() * max),
                 mark = 0,
                 keys = Object.keys(candidates),
                 i = keys.length,
                 key, weight;
-
             while (i --) {
                 key = keys[i];
                 weight  = settings.providers[key].weight;
@@ -133,7 +137,7 @@ function OpenmixApplication(settings) {
             //check if "Big Red Button" isn't activated
             if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
                 // filter candidates by  fusion sonar threshold,
-                // remove all the provider with fusion sonar data <= than settings.fusionSonarThreshold
+                // remove all the provider with fusion sonar data <= than settings.fusion_sonar_threshold
                 candidates = filterObject(dataFusion, filterFusionSonar);
                 candidateAliases = Object.keys(candidates);
 
@@ -158,6 +162,7 @@ function OpenmixApplication(settings) {
                 }
             }
         }
+
         if (decisionProvider === undefined) {
             // If we get here, something went wrong. Select randomly to avoid fallback.
             decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
@@ -177,7 +182,6 @@ function OpenmixApplication(settings) {
         var keys = Object.keys(object),
             i = keys.length,
             key;
-
         while (i --) {
             key = keys[i];
 
@@ -185,7 +189,6 @@ function OpenmixApplication(settings) {
                 delete object[key];
             }
         }
-
         return object;
     }
 
@@ -199,7 +202,6 @@ function OpenmixApplication(settings) {
             candidate,
             max = -Infinity,
             value;
-
         while (i --) {
             key = keys[i];
             value = source[key].health_score.value;
@@ -209,7 +211,6 @@ function OpenmixApplication(settings) {
                 max = value;
             }
         }
-
         return candidate;
     }
 
