@@ -11,6 +11,10 @@ var handler = new OpenmixApplication({
         'baz': {
             cname: 'www.baz.com',
             base_padding: 0
+        },
+        'qux': {
+            cname: 'www.qux.com',
+            base_padding: 0
         }
     },
     burstable_cdns: {
@@ -39,10 +43,17 @@ var handler = new OpenmixApplication({
             ]
         }
     },
+    //platforms that have sonar enabled
+    sonarProviders: ['baz', 'qux'],
     default_ttl: 20,
     error_ttl: 20,
     min_valid_rtt_score: 5,
-    availability_threshold: 90
+    availability_threshold: 90,
+    fusion_sonar_threshold: 2,
+    //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
+    //both options can be set to true or false.
+    use_radar_avail: true,
+    use_sonar_avail: true
 });
 
 function init(config) {
@@ -103,11 +114,13 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var dataAvail = filterObject(request.getProbe('avail'), filterEmpty),
             dataRtt = filterObject(request.getProbe('http_rtt'), filterInvalidRttScores),
+            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
             dataFusion = parseFusionData(request.getData('fusion')),
             decisionProvider,
             decisionTtl = settings.default_ttl,
             decisionReason = [],
-            candidates;
+            candidates = settings.providers,
+            candidatesAliases = Object.keys(candidates);
 
         /* jshint laxbreak:true */
         function getPaddingPercent(alias, metric, error_reason) {
@@ -169,27 +182,62 @@ function OpenmixApplication(settings) {
             decisionTtl = settings.error_ttl;
         }
 
+
+        // determine which providers have a sonar value below threshold
+        /**
+         * @param candidate
+         * @param alias
+         */
+        function filterFusionSonar(candidate, alias) {
+            return settings.sonarProviders.indexOf(alias) !== -1 &&
+                dataFusion[alias] !== undefined &&
+                dataFusion[alias].health_score !== undefined &&
+                dataFusion[alias].availability_override === undefined &&
+                dataFusion[alias].health_score.value <= settings.fusion_sonar_threshold;
+        }
+
+        /**
+         * @param candidate
+         * @param key
+         * @returns {boolean}
+         */
+        function filterAvailability(candidate, key) {
+            return dataAvail[key] !== undefined && dataAvail[key].avail >= settings.availability_threshold;
+        }
+
+
         if (Object.keys(dataRtt).length !== aliases.length || Object.keys(dataAvail).length !== aliases.length) {
             selectRandomProvider(reasons.radar_data_sparse);
         }
-        else if (Object.keys(dataFusion).length !== Object.keys(settings.burstable_cdns).length) {
+        else if (Object.keys(dataFusion).length <= 0) {
             selectRandomProvider(reasons.fusion_data_problem);
         }
         else {
-            dataAvail = filterObject(dataAvail, filterAvailability);
-            candidates = Object.keys(dataAvail);
-
-            if (candidates.length === 0) {
+            if (settings.use_sonar_avail) {
+                //filter the candidates with RAX sonar
+                candidates = filterObject(candidates, filterFusionSonar);
+                candidatesAliases = Object.keys(candidates);
+            }
+            if (candidatesAliases.length === 0) {
                 selectRandomProvider(reasons.all_providers_eliminated);
             }
-            else if (candidates.length === 1) {
-                decisionProvider = candidates[0];
-                decisionReason.push(reasons.best_performing);
-            }
             else {
-                dataRtt = addRttPadding(intersectObjects(dataRtt, dataAvail, 'avail'));
-                decisionProvider = getLowest(dataRtt, 'http_rtt');
-                decisionReason.push(reasons.best_performing);
+                if (settings.use_radar_avail) {
+                    candidates = filterObject(candidates, filterAvailability);
+                    candidatesAliases = Object.keys(candidates);
+                }
+                if (candidatesAliases.length === 0) {
+                    selectRandomProvider(reasons.all_providers_eliminated);
+                }
+                else if (candidatesAliases.length === 1) {
+                    decisionProvider = candidatesAliases[0];
+                    decisionReason.push(reasons.best_performing);
+                }
+                else {
+                    candidates = addRttPadding(intersectObjects(candidates, dataRtt, 'http_rtt'));
+                    decisionProvider = getLowest(candidates, 'http_rtt');
+                    decisionReason.push(reasons.best_performing);
+                }
             }
         }
 
@@ -205,17 +253,18 @@ function OpenmixApplication(settings) {
     function filterObject(object, filter) {
         var keys = Object.keys(object),
             i = keys.length,
-            key;
+            key,
+            candidates = {};
 
         while (i --) {
             key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
+            if (filter(object[key], key)) {
+                candidates[key] = object[key];
             }
         }
 
-        return object;
+        return candidates;
     }
 
     /**
@@ -223,13 +272,6 @@ function OpenmixApplication(settings) {
      */
     function filterInvalidRttScores(candidate) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;
-    }
-
-    /**
-     * @param {{avail: number}} candidate
-     */
-    function filterAvailability(candidate) {
-        return candidate.avail >= settings.availability_threshold;
     }
 
     /**

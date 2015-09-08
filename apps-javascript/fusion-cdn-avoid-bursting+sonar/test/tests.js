@@ -15,6 +15,10 @@
             'baz': {
                 cname: 'www.baz.com',
                 base_padding: 0
+            },
+            'qux': {
+                cname: 'www.qux.com',
+                base_padding: 0
             }
         },
         burstable_cdns: {
@@ -33,11 +37,16 @@
                 ]
             }
         },
-        sonarProviders: ['bar', 'baz'],
+        sonarProviders: ['baz', 'qux'],
         default_ttl: 20,
         error_ttl: 10,
         min_valid_rtt_score: 5,
-        availability_threshold: 90
+        availability_threshold: 90,
+        fusion_sonar_threshold: 2,
+        //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
+        //both options can be set to true or false.
+        use_radar_avail: true,
+        use_sonar_avail: true
     };
 
     module('do_init');
