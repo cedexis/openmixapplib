@@ -911,13 +911,13 @@
                 .onCall(0)
                 .returns({
                     "foo": {
-                        "avail": 60
+                        "avail": 93
                     },
                     "bar": {
-                        "avail": 75
+                        "avail": 99
                     },
                     "baz": {
-                        "avail": 40
+                        "avail": 95
                     }
                 });
             i.request
@@ -987,10 +987,10 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
         }
     }));
 

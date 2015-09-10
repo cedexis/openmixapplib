@@ -193,8 +193,7 @@ function OpenmixApplication(settings) {
         function filterFusionSonar(candidate, alias) {
             return dataFusion[candidate.sonar] !== undefined &&
                 dataFusion[candidate.sonar].health_score !== undefined &&
-                dataFusion[candidate.sonar].availability_override === undefined &&
-                dataFusion[candidate.sonar].health_score.value > settings.fusion_sonar_threshold;
+                (dataFusion[candidate.sonar].health_score.value > settings.fusion_sonar_threshold || dataFusion[candidate.sonar].availability_override !== undefined );
         }
 
         /**
