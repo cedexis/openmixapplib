@@ -2,19 +2,19 @@ var handler = new OpenmixApplication({
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            base_padding: 0
+            base_padding: 0,
+            sonar: 'foo_sonar'  //Alias of platform created to get sonar data from same URL as provider 'foo'
         },
         'bar': {
             cname: 'www.bar.com',
-            base_padding: 0
+            base_padding: 0,
+            sonar: 'bar_sonar'
+
         },
         'baz': {
             cname: 'www.baz.com',
-            base_padding: 0
-        },
-        'qux': {
-            cname: 'www.qux.com',
-            base_padding: 0
+            base_padding: 0,
+            sonar: 'baz_sonar'
         }
     },
     burstable_cdns: {
@@ -43,8 +43,6 @@ var handler = new OpenmixApplication({
             ]
         }
     },
-    //platforms that have sonar enabled
-    sonarProviders: ['baz', 'qux'],
     default_ttl: 20,
     error_ttl: 20,
     min_valid_rtt_score: 5,
@@ -80,11 +78,14 @@ function OpenmixApplication(settings) {
 
         while (i --) {
             config.requireProvider(aliases[i]);
+            config.requireProvider(settings.providers[aliases[i]].sonar);
         }
+
     };
 
     var reasons = {
         best_performing: 'A',
+        one_provider_avail:'B',
         all_providers_eliminated: 'C',
         radar_data_sparse: 'E',
         fusion_data_problem: 'F',
@@ -187,13 +188,13 @@ function OpenmixApplication(settings) {
         /**
          * @param candidate
          * @param alias
+         * @returns {boolean}
          */
         function filterFusionSonar(candidate, alias) {
-            return settings.sonarProviders.indexOf(alias) !== -1 &&
-                dataFusion[alias] !== undefined &&
-                dataFusion[alias].health_score !== undefined &&
-                dataFusion[alias].availability_override === undefined &&
-                dataFusion[alias].health_score.value <= settings.fusion_sonar_threshold;
+            return dataFusion[candidate.sonar] !== undefined &&
+                dataFusion[candidate.sonar].health_score !== undefined &&
+                dataFusion[candidate.sonar].availability_override === undefined &&
+                dataFusion[candidate.sonar].health_score.value > settings.fusion_sonar_threshold;
         }
 
         /**
@@ -231,7 +232,7 @@ function OpenmixApplication(settings) {
                 }
                 else if (candidatesAliases.length === 1) {
                     decisionProvider = candidatesAliases[0];
-                    decisionReason.push(reasons.best_performing);
+                    decisionReason.push(reasons.one_provider_avail);
                 }
                 else {
                     candidates = addRttPadding(intersectObjects(candidates, dataRtt, 'http_rtt'));
