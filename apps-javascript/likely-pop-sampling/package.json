@@ -1,0 +1,16 @@
+{
+    "title": "Routing Based on Likely POP Sample Rate With Failover to Alternate Providers",
+    "description": "This application routes between a primary provider and a set of alternate providers.  A custom Fusion feed is used to determine the current percentage capacity for each of the primary provider's POPs, as well as the most likely POP to be selected for each country.  The application uses the percentage capacity of the likely POP for the current request's country to determine whether to route to the primary provider.  If it decides that the likely POP is over capacity, then it routes to one of the alternate providers.\n\nThe application routes to the alternate providers based on a weighted distribution that is configurable by continent.\n\nWhen routing to the primary provider, the TTL is scaled according to the current capacity of the likely POP and configurable minimum and maximum values.",
+    "lastUpdated": "11/04/2015",
+    "keywords": ["Performance"],
+    "author": "Cedexis",
+    "devDependencies": {
+        "karma": "*",
+        "qunitjs": "*",
+        "phantomjs": "*",
+        "karma-qunit": "*",
+        "karma-phantomjs-launcher": "*",
+        "jshint": "*",
+        "google-closure-compiler": "*"
+    }
+}

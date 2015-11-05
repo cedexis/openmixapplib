@@ -1,0 +1,7 @@
+{
+    "unused": true,
+    "undef": true,
+    "laxbreak": true,
+    "sub": true,
+    "globalstrict": true
+}
