@@ -120,7 +120,7 @@ When selecting the primary provider, *maxTTL* and *minTTL* are used to scale the
 
 The *availabilityThreshold* setting is the minimum Radar availability score that a provider must have in order to be considered a candidate for selection.  Setting this to zero effectively disables Radar availability checking.
 
-The *marketWeights* setting is an object mapping market codes (NA, SA, EU, AF, AS, and OC) to another object that maps the alternative providers to the desired *weight* relative to one another.  These are weights, not percentages, but you can make them appear to be percentages by making sure they add up to 100 for each market.
+The *marketWeights* setting is an object mapping market codes (NA, SA, EU, AF, AS, and OC) to another object that maps the alternate providers to the desired *weight* relative to one another.  These are weights, not percentages, but you can make them appear to be percentages by making sure they add up to 100 for each market.
 
 The *defaultMarketWeights* setting is provided for convenience.  If the market for the current request is not found in the *marketWeights* object, then these weights will be used instead.
 
