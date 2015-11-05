@@ -88,8 +88,8 @@ var appConfig = {
     fusionFeedProvider: 'fusion_feed',
     defaultProvider: 'primary',
     defaultTTL: 60, // the TTL when one of the alternate provides is selected
-    minTTL: 20, // the (theoretical) TTL when like POP sample rate is 0%
-    maxTTL: 600, // the TTL when likely POP sample rate is 100%
+    minTTL: 20, // the (theoretical) TTL when the likely POP sample rate is 0%
+    maxTTL: 600, // the TTL when the likely POP sample rate is 100%
     availabilityThreshold: 90,
     marketWeights: {
         'AS': {
