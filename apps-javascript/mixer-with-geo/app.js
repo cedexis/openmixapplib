@@ -1,26 +1,11 @@
 var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced (all the providers that can be used)
     // keys are the Openmix aliases set in the Portal
-    // `cname` is the CNAME or IP address to be sent as the answer when this provider is selected
-    providers: {
-        'foo': {
-            cname: 'www.foo.com',
-            // kbps_padding - per normal, this penalizes by 10% in this example. Provider's http_kbps score of 1000kbps would be handled as if it were 900kbps.
-            kbps_padding: 10,
-            // rtt_padding - per normal, this penalizes by 15% in this example.  Provider's http_rtt score of 100ms would be handled as if it were 115ms.
-            rtt_padding: 15
-        },
-        'bar': {
-            cname: 'www.bar.com',
-            kbps_padding: 0,
-            rtt_padding: 0
-        },
-        'baz': {
-            cname: 'www.baz.com',
-            kbps_padding: 0,
-            rtt_padding: 0
-        }
-    },
+    providers: [
+        'foo',
+        'bar',
+        'baz'
+    ],
     geo_order: ['state', 'region', 'country', 'market'],
     use_radar_availability_threshold: true,
     use_sonar_availability_threshold: true,
@@ -76,7 +61,9 @@ var handler = new OpenmixApplication({
             },
             'bar': {
                 cname: 'cn.bar.net',
+                // kbps_padding - per normal, this penalizes by 10% in this example. Provider's http_kbps score of 1000kbps would be handled as if it were 900kbps.
                 kbps_padding: 0,
+                // rtt_padding - per normal, this penalizes by 15% in this example.  Provider's http_rtt score of 100ms would be handled as if it were 115ms.
                 rtt_padding: 0
             }
         },
@@ -86,7 +73,8 @@ var handler = new OpenmixApplication({
         min_rtt: 5,
         rtt_tp_mix: 0.95
     },
-    // A mapping of ASN codes to ONE provider alias:  asn_overrides: { 123: 'baz', 124: 'bar' }
+    // A mapping of ASN codes to ONE provider alias:  asn_overrides: { 123: 'baz', 124: 'bar' },
+    // The providers here should exists in the default_settings.providers
     asn_overrides: {}
 });
 
@@ -104,7 +92,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
+    var aliases = settings.providers === undefined ? [] : settings.providers;
 
     /**
      * @param {OpenmixConfiguration} config
@@ -117,8 +105,6 @@ function OpenmixApplication(settings) {
             alias = aliases[i];
 
             config.requireProvider(alias);
-
-            settings.providers[alias].padding = settings.providers[alias].padding || 0;
         }
     };
 
@@ -144,7 +130,9 @@ function OpenmixApplication(settings) {
             rttTpMix,
             asn = request.asn,
             totalRtt = 0,
-            totalKbps = 0;
+            totalKbps = 0,
+            selectedCandidates,
+            cnameOverride;
 
         allReasons = {
             optimum_server_chosen: 'A',
@@ -193,8 +181,8 @@ function OpenmixApplication(settings) {
 
             while (i --) {
                 key = keys[i];
-                candidates[key].http_rtt *= 1 + settings.providers[key].rtt_padding / 100;
-                candidates[key].http_kbps *= 1 - settings.providers[key].kbps_padding / 100;
+                candidates[key].http_rtt *= 1 + candidates[key].rtt_padding / 100;
+                candidates[key].http_kbps *= 1 - candidates[key].kbps_padding / 100;
 
                 // Update the totals
                 totalRtt += candidates[key].http_rtt;
@@ -221,7 +209,8 @@ function OpenmixApplication(settings) {
 
         // Override the settings if geo mapping is defined, if not use the default geo settings
         function overrideSettingByGeo() {
-            var geotype, geo, i;
+            var geotype, geo, i,
+                candidates;
 
             for (i = 0; i < settings.geo_order.length; i ++) {
                 geotype = settings.geo_order[i];
@@ -256,11 +245,13 @@ function OpenmixApplication(settings) {
         // ASN override
         if (settings.asn_overrides[asn] !== undefined) {
             decisionProvider = settings.asn_overrides[asn];
+            cnameOverride = settings.default_settings.providers[decisionProvider].cname;
             decisionReasons.push(allReasons.asn_override);
         } else {
             // Provider eligibility check - filtering per Global_Settings or Geo_Settings
             candidates = overrideSettingByGeo();
-            candidateAliases = Object.keys(candidates);
+            selectedCandidates = cloneObject(candidates);
+            candidateAliases = Object.keys(selectedCandidates);
 
             if (((settings.use_sonar_availability_threshold === true && Object.keys(dataFusion).length > 0) || settings.use_sonar_availability_threshold === false)
                 && ((settings.use_radar_availability_threshold === true && Object.keys(dataAvail).length > 0) || settings.use_radar_availability_threshold === false)
@@ -287,7 +278,12 @@ function OpenmixApplication(settings) {
                 }
 
                 if (candidateAliases.length === 0) {
-                    decisionProvider = getHighest(dataAvail, 'avail');
+                    // Join the avail scores with the list of viable candidates
+                    candidates = intersectObjects(cloneObject(selectedCandidates), dataAvail, 'avail');
+                    candidateAliases = Object.keys(candidates);
+                    if (candidateAliases.length > 0) {
+                        decisionProvider = getHighest(candidates, 'avail');
+                    }
                 } else if (candidateAliases.length === 1) {
                     decisionProvider = candidateAliases[0];
                     decisionReasons.push(allReasons.only_one_provider_avail);
@@ -316,14 +312,14 @@ function OpenmixApplication(settings) {
                     }
                 }
             }
+
+            if (decisionProvider === undefined || selectedCandidates[decisionProvider] === undefined) {
+                decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
+                decisionReasons.push(allReasons.data_problem);
+            }
         }
 
-        if (decisionProvider === undefined) {
-            decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
-            decisionReasons.push(allReasons.data_problem);
-        }
-
-        response.respond(decisionProvider, settings.providers[decisionProvider].cname);
+        response.respond(decisionProvider, cnameOverride || selectedCandidates[decisionProvider].cname);
         response.setTTL(decisionTtl);
         response.setReasonCode(decisionReasons.join(','));
     };
@@ -342,6 +338,21 @@ function OpenmixApplication(settings) {
             if (filter(object[key], key)) {
                 data[key] = object[key];
             }
+        }
+        return data;
+    }
+
+    /**
+     * @param {!Object} object
+     */
+    function cloneObject(object) {
+        var keys = Object.keys(object),
+            i = keys.length,
+            data = {},
+            key;
+        while (i --) {
+            key = keys[i];
+            data[key] = object[key];
         }
         return data;
     }

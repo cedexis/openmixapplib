@@ -3,23 +3,11 @@
     'use strict';
 
     var default_settings = {
-        providers: {
-            'foo': {
-                cname: 'www.foo.com',
-                kbps_padding: 10,
-                rtt_padding: 15
-            },
-            'bar': {
-                cname: 'www.bar.com',
-                kbps_padding: 0,
-                rtt_padding: 0
-            },
-            'baz': {
-                cname: 'www.baz.com',
-                kbps_padding: 0,
-                rtt_padding: 0
-            }
-        },
+        providers: [
+            'foo',
+            'bar',
+            'baz'
+        ],
         geo_order: ['state', 'region', 'country', 'market'],
         use_radar_availability_threshold: true,
         use_sonar_availability_threshold: true,
@@ -153,7 +141,7 @@
             rtt_tp_mix: 0.95
         },
         asn_overrides: {
-            1234: 'baz'
+            1234: 'bar'
         }
     };
 
@@ -296,7 +284,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,A', 'Verifying setReasonCode');
         }
@@ -374,7 +362,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'az.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'B,A', 'Verifying setReasonCode');
         }
@@ -452,7 +440,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'az.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C,A', 'Verifying setReasonCode');
         }
@@ -530,7 +518,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'az.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'D,A', 'Verifying setReasonCode');
         }
@@ -608,7 +596,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'az.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'E,A', 'Verifying setReasonCode');
         }
@@ -685,8 +673,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying setReasonCode');
         }
@@ -763,8 +751,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,G', 'Verifying setReasonCode');
         }
@@ -841,8 +829,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,H', 'Verifying setReasonCode');
         }
@@ -920,7 +908,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'cn.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,J', 'Verifying setReasonCode');
         }
@@ -993,8 +981,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,K', 'Verifying setReasonCode');
         }
@@ -1075,7 +1063,7 @@
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
             equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,L,A', 'Verifying setReasonCode');
         }
