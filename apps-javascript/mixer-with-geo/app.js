@@ -314,6 +314,7 @@ function OpenmixApplication(settings) {
             }
 
             if (decisionProvider === undefined || selectedCandidates[decisionProvider] === undefined) {
+                candidateAliases = Object.keys(settings.default_settings.providers);
                 decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
                 decisionReasons.push(allReasons.data_problem);
             }
