@@ -1,11 +1,17 @@
 var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced (all the providers that can be used)
     // keys are the Openmix aliases set in the Portal
-    providers: [
-        'foo',
-        'bar',
-        'baz'
-    ],
+    providers: {
+        'foo': {
+            cname: 'cn.foo.net'
+        },
+        'bar': {
+            cname: 'cn.bar.net'
+        },
+        'baz': {
+            cname: 'cn.baz.net'
+        }
+    },
     geo_order: ['state', 'region', 'country', 'market'],
     use_radar_availability_threshold: true,
     use_sonar_availability_threshold: true,
@@ -74,7 +80,7 @@ var handler = new OpenmixApplication({
         rtt_tp_mix: 0.95
     },
     // A mapping of ASN codes to ONE provider alias:  asn_overrides: { 123: 'baz', 124: 'bar' },
-    // The providers here should exists in the default_settings.providers
+    // The providers here should exists in the settings.providers
     asn_overrides: {}
 });
 
@@ -92,7 +98,7 @@ function onRequest(request, response) {
 function OpenmixApplication(settings) {
     'use strict';
 
-    var aliases = settings.providers === undefined ? [] : settings.providers;
+    var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     /**
      * @param {OpenmixConfiguration} config
@@ -132,7 +138,7 @@ function OpenmixApplication(settings) {
             totalRtt = 0,
             totalKbps = 0,
             selectedCandidates,
-            cnameOverride;
+            cname;
 
         allReasons = {
             optimum_server_chosen: 'A',
@@ -177,12 +183,16 @@ function OpenmixApplication(settings) {
         function addPadding(candidates) {
             var keys = Object.keys(candidates),
                 i = keys.length,
-                key;
+                key,
+                rtt_padding,
+                kbps_padding;
 
             while (i --) {
                 key = keys[i];
-                candidates[key].http_rtt *= 1 + candidates[key].rtt_padding / 100;
-                candidates[key].http_kbps *= 1 - candidates[key].kbps_padding / 100;
+                rtt_padding = candidates[key].rtt_padding || 0;
+                kbps_padding = candidates[key].kbps_padding || 0;
+                candidates[key].http_rtt *= 1 + rtt_padding / 100;
+                candidates[key].http_kbps *= 1 - kbps_padding / 100;
 
                 // Update the totals
                 totalRtt += candidates[key].http_rtt;
@@ -198,10 +208,20 @@ function OpenmixApplication(settings) {
             return candidate.http_rtt >= minRtt;
         }
 
+        /**
+         * @param candidate
+         * @param alias
+         * @returns {boolean}
+         */
         function filterRadarAvailability(candidate, alias) {
             return dataAvail[alias] !== undefined && dataAvail[alias].avail >= radarAvailabilityThreshold;
         }
 
+        /**
+         * @param candidate
+         * @param alias
+         * @returns {boolean}
+         */
         function filterSonarAvailability(candidate, alias) {
             return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
                 && dataFusion[alias].health_score.value > sonarAvailabilityThreshold;
@@ -245,7 +265,6 @@ function OpenmixApplication(settings) {
         // ASN override
         if (settings.asn_overrides[asn] !== undefined) {
             decisionProvider = settings.asn_overrides[asn];
-            cnameOverride = settings.default_settings.providers[decisionProvider].cname;
             decisionReasons.push(allReasons.asn_override);
         } else {
             // Provider eligibility check - filtering per Global_Settings or Geo_Settings
@@ -313,14 +332,20 @@ function OpenmixApplication(settings) {
                 }
             }
 
-            if (decisionProvider === undefined || selectedCandidates[decisionProvider] === undefined) {
+            if (decisionProvider === undefined) {
                 candidateAliases = Object.keys(settings.default_settings.providers);
                 decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
                 decisionReasons.push(allReasons.data_problem);
             }
         }
 
-        response.respond(decisionProvider, cnameOverride || selectedCandidates[decisionProvider].cname);
+        cname = selectedCandidates
+            && selectedCandidates[decisionProvider]
+            && selectedCandidates[decisionProvider].cname
+            ? selectedCandidates[decisionProvider].cname
+            : settings.providers[decisionProvider].cname;
+
+        response.respond(decisionProvider, cname);
         response.setTTL(decisionTtl);
         response.setReasonCode(decisionReasons.join(','));
     };

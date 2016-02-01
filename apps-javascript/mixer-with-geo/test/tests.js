@@ -3,11 +3,17 @@
     'use strict';
 
     var default_settings = {
-        providers: [
-            'foo',
-            'bar',
-            'baz'
-        ],
+        providers: {
+            'foo': {
+                cname: 'cn.foo.net'
+            },
+            'bar': {
+                cname: 'cn.bar.net'
+            },
+            'baz': {
+                cname: 'cn.baz.net'
+            }
+        },
         geo_order: ['state', 'region', 'country', 'market'],
         use_radar_availability_threshold: true,
         use_sonar_availability_threshold: true,
