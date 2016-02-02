@@ -25,8 +25,11 @@ var handler = new OpenmixApplication({
     market_overrides: {},
     // A mapping of ASN codes to provider aliases:  asn_overrides: { 123: 'baz', 124: 'bar' }
     asn_overrides: {},
+    // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
+    // The minimum availability score that providers must have in order to be considered available
     availability_threshold: 90,
+    //if the top 2 Throughput providers are within tieThreshold %, use Response time to break the tie
     tie_threshold: 0.95
 });
 

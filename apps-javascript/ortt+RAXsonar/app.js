@@ -16,6 +16,7 @@ var handler = new OpenmixApplication({
 
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
+    // The minimum availability score that providers must have in order to be considered available
     availability_threshold: 90,
     //Set Fusion Sonar threshold for availability for the platform to be included.
     // sonar values are between 0 - 5
