@@ -15,6 +15,28 @@ var handler = new OpenmixApplication({
     geo_order: ['state', 'region', 'country', 'market'],
     use_radar_availability_threshold: true,
     use_sonar_availability_threshold: true,
+    // default_settings is used to have providers and configuration options for all geos that aren't defined in geo_settings map.
+    default_settings: {
+        providers: {
+            'foo': {
+                cname: 'cn.foo.net',
+                kbps_padding: 0,
+                rtt_padding: 0
+            },
+            'bar': {
+                cname: 'cn.bar.net',
+                // kbps_padding - per normal, this penalizes by 10% in this example. Provider's http_kbps score of 1000kbps would be handled as if it were 900kbps.
+                kbps_padding: 0,
+                // rtt_padding - per normal, this penalizes by 15% in this example.  Provider's http_rtt score of 100ms would be handled as if it were 115ms.
+                rtt_padding: 0
+            }
+        },
+        default_ttl: 240,
+        radar_availability_threshold: 95,
+        sonar_availability_threshold: 2,
+        min_rtt: 5,
+        rtt_tp_mix: 0.95
+    },
     // Geo_settings is used to have different providers and configuration options according to the geo and geo type identified.
     // Any values defined here objects will override the higher level settings.
     // Hierarchy is Global > Market > Country > Region > State.
@@ -56,28 +78,6 @@ var handler = new OpenmixApplication({
             radar_availability_threshold: 80,
             rtt_tp_mix: 0.05
         }
-    },
-    // default_settings is used to have providers and configuration options for all geos that aren't defined in geo_settings map.
-    default_settings: {
-        providers: {
-            'foo': {
-                cname: 'cn.foo.net',
-                kbps_padding: 0,
-                rtt_padding: 0
-            },
-            'bar': {
-                cname: 'cn.bar.net',
-                // kbps_padding - per normal, this penalizes by 10% in this example. Provider's http_kbps score of 1000kbps would be handled as if it were 900kbps.
-                kbps_padding: 0,
-                // rtt_padding - per normal, this penalizes by 15% in this example.  Provider's http_rtt score of 100ms would be handled as if it were 115ms.
-                rtt_padding: 0
-            }
-        },
-        default_ttl: 240,
-        radar_availability_threshold: 95,
-        sonar_availability_threshold: 2,
-        min_rtt: 5,
-        rtt_tp_mix: 0.95
     },
     // A mapping of ASN codes to ONE provider alias:  asn_overrides: { 123: 'baz', 124: 'bar' },
     // The providers here should exists in the settings.providers

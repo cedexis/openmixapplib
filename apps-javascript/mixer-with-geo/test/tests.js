@@ -17,6 +17,25 @@
         geo_order: ['state', 'region', 'country', 'market'],
         use_radar_availability_threshold: true,
         use_sonar_availability_threshold: true,
+        default_settings: {
+            providers: {
+                'foo': {
+                    cname: 'cn.foo.net',
+                    kbps_padding: 0,
+                    rtt_padding: 0
+                },
+                'bar': {
+                    cname: 'cn.bar.net',
+                    kbps_padding: 0,
+                    rtt_padding: 0
+                }
+            },
+            default_ttl: 240,
+            radar_availability_threshold: 95,
+            sonar_availability_threshold: 2,
+            min_rtt: 5,
+            rtt_tp_mix: 0.95
+        },
         geo_settings: {
             'CN': { //Example of China Settings.
                 type: 'country', // Can be 'market', 'country', 'region', 'state'.
@@ -126,25 +145,6 @@
                 radar_availability_threshold: 80,
                 rtt_tp_mix: 0.05
             }
-        },
-        default_settings: {
-            providers: {
-                'foo': {
-                    cname: 'cn.foo.net',
-                    kbps_padding: 0,
-                    rtt_padding: 0
-                },
-                'bar': {
-                    cname: 'cn.bar.net',
-                    kbps_padding: 0,
-                    rtt_padding: 0
-                }
-            },
-            default_ttl: 240,
-            radar_availability_threshold: 95,
-            sonar_availability_threshold: 2,
-            min_rtt: 5,
-            rtt_tp_mix: 0.95
         },
         asn_overrides: {
             1234: 'bar'
