@@ -30,6 +30,11 @@ var handler = new OpenmixApplication({
     // The minimum availability score that providers must have in order to be considered available
     availability_threshold: 90,
     //if the top 2 Throughput providers are within tieThreshold %, use Response time to break the tie
+    //tie_theshold
+    //  value from 0.01 to 0.99
+    //when tie_theshold = 0.95, it will check if the difference between the best 2 providers is greater than 5%, OR,
+    //  if tie_theshold = 0.90, it will check if the difference between the best 2 providers is greater than 10%, and so on.
+    //if the dif is greater than x%, then the best one will be selected, but if it isn't, there will be a tie and 'lowest RTT' criteria should be used to break it.
     tie_threshold: 0.95
 });
 
@@ -145,7 +150,7 @@ function OpenmixApplication(settings) {
                 }
 
                 // We lack KBPS measurements so choose by RTT
-                if (decisionProvider === '' && Object.keys(dataRtt).length > 0) {
+                if ((decisionProvider === '' || decisionProvider === undefined) && Object.keys(dataRtt).length > 0) {
                     // Join rtt with available candidates
                     candidates = intersectObjects(dataRtt, candidates, 'avail');
                     decisionProvider = getLowest(candidates, 'http_rtt');
@@ -154,7 +159,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (decisionProvider === '') {
+        if (decisionProvider === '' || decisionProvider === undefined) {
             // If we get here because of some weird data problem, select randomly
             decisionProvider = aliases[Math.floor(Math.random() * aliases.length)];
             reasonCode = allReasons.data_problem;
