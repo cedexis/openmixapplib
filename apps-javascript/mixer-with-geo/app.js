@@ -166,8 +166,9 @@ function OpenmixApplication(settings) {
                 key = keys[i];
                 // Normalized
                 candidates[key].http_rtt = candidates[key].http_rtt / (totalRtt / candidates[key].http_rtt);
-                candidates[key].http_kbps = candidates[key].http_kbps / (totalKbps / candidates[key].http_kbps);
-
+                if (candidates[key].http_kbps !== 0 && totalKbps !== 0) {
+                    candidates[key].http_kbps = candidates[key].http_kbps / (totalKbps / candidates[key].http_kbps);
+                }
                 // Adding weighted values for RTT and TP
                 rttW = (rttTpMix-1) * candidates[key].http_rtt;
                 tpW = rttTpMix * candidates[key].http_kbps;
@@ -178,21 +179,22 @@ function OpenmixApplication(settings) {
 
         /**
          * This also update the totalRtt and totalKbps value
-         * @param {!Object.<string,{ http_rtt: number, http_kbps: number }>} candidates
+         * @param {!Object.<string,{ http_rtt: number, http_kbps: number, rtt_padding: number, kbps_padding: number }>} candidates
          */
         function addPadding(candidates) {
             var keys = Object.keys(candidates),
                 i = keys.length,
                 key,
                 rtt_padding,
-                kbps_padding;
+                kbps_padding,
+                kbpsDataLength = Object.keys(dataKbps).length;
 
             while (i --) {
                 key = keys[i];
                 rtt_padding = candidates[key].rtt_padding || 0;
                 kbps_padding = candidates[key].kbps_padding || 0;
                 candidates[key].http_rtt *= 1 + rtt_padding / 100;
-                candidates[key].http_kbps *= 1 - kbps_padding / 100;
+                candidates[key].http_kbps = (kbpsDataLength > 0 && candidates[key].http_kbps) ? candidates[key].http_kbps * (1 - kbps_padding / 100) : 0;
 
                 // Update the totals
                 totalRtt += candidates[key].http_rtt;
@@ -314,8 +316,10 @@ function OpenmixApplication(settings) {
                         candidates = filterObject(candidates, filterInvalidRttScores);
                     }
 
-                    // Join the kbps scores with the list of viable candidates
-                    candidates = intersectObjects(candidates, dataKbps, 'http_kbps');
+                    if (Object.keys(dataKbps).length > 0) {
+                        // Join the kbps scores with the list of viable candidates
+                        candidates = intersectObjects(candidates, dataKbps, 'http_kbps');
+                    }
 
                     candidateAliases = Object.keys(candidates);
                     if (candidateAliases.length > 0) {

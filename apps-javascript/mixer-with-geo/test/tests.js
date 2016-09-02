@@ -296,6 +296,81 @@
         }
     }));
 
+    test('optimum_server_chosen_No_KBPS', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({
+                    'foo': { avail: 100 },
+                    'bar': { avail: 100 },
+                    'baz': { avail: 100 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    'foo': { http_rtt: 60 },
+                    'bar': { http_rtt: 85 },
+                    'baz': { http_rtt: 90 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({});
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
+                });
+            Math.random.returns(0.9);
+            i.request.asn = 123;
+            i.request.state = 'a';
+            i.request.region = 'b';
+            i.request.country = 'c';
+            i.request.market = 'd';
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.foo.net', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'I,A', 'Verifying setReasonCode');
+        }
+    }));
+
     test('test 2 geo_override_on_state', test_handle_request({
         setup: function(i) {
             i.request
