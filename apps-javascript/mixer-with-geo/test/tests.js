@@ -37,114 +37,129 @@
             rtt_tp_mix: 0.95
         },
         geo_settings: {
-            'CN': { //Example of China Settings.
-                type: 'country', // Can be 'market', 'country', 'region', 'state'.
-                providers: {
-                    'foo': {
-                        cname: 'cn.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
+            state:{
+                'US-S-AR': { // Example of Arizona Settings.
+                    providers: {
+                        'foo': {
+                            cname: 'az.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'az.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
                     },
-                    'baz': {
-                        cname: 'cn.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    }
+                    default_ttl: 20,
+                    radar_availability_threshold: 80,
+                    rtt_tp_mix: 0.05
                 },
-                default_ttl: 240,
-                radar_availability_threshold: 90,
-                rtt_tp_mix: 0.60
+                'a1': {
+                    providers: {
+                        'foo': {
+                            cname: 'az.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'az.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
+                    },
+                    default_ttl: 20,
+                    radar_availability_threshold: 80,
+                    rtt_tp_mix: 0.05
+                }
             },
-            'US-S-AR': { // Example of Arizona Settings.
-                type: 'state',
-                providers: {
-                    'foo': {
-                        cname: 'az.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
+            region: {
+                'b1': {
+                    providers: {
+                        'foo': {
+                            cname: 'az.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'az.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
                     },
-                    'baz': {
-                        cname: 'az.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    }
-                },
-                default_ttl: 20,
-                radar_availability_threshold: 80,
-                rtt_tp_mix: 0.05
+                    default_ttl: 20,
+                    radar_availability_threshold: 80,
+                    rtt_tp_mix: 0.05
+                }
             },
-            'a1': {
-                type: 'state',
-                providers: {
-                    'foo': {
-                        cname: 'az.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
+            country: {
+                'CN': { //Example of China Settings.
+                    providers: {
+                        'foo': {
+                            cname: 'cn.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
                     },
-                    'baz': {
-                        cname: 'az.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
+                    default_ttl: 240,
+                    radar_availability_threshold: 90,
+                    rtt_tp_mix: 0.60,
+                    fallbackBehavior: {
+                        providers: {
+                            'baz': {
+                                cname: 'cn.baz.net',
+                                kbps_padding: 0,
+                                rtt_padding: 0
+                            },
+                            'bar': {
+                                cname: 'cn.bar.net',
+                                kbps_padding: 0,
+                                rtt_padding: 0
+                            }
+                        },
+                        default_ttl: 20,
+                        radar_availability_threshold: 85,
+                        rtt_tp_mix: 0.25
                     }
                 },
-                default_ttl: 20,
-                radar_availability_threshold: 80,
-                rtt_tp_mix: 0.05
+                'c1': {
+                    providers: {
+                        'foo': {
+                            cname: 'az.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'az.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
+                    },
+                    default_ttl: 20,
+                    radar_availability_threshold: 80,
+                    rtt_tp_mix: 0.05
+                }
             },
-            'b1': {
-                type: 'region',
-                providers: {
-                    'foo': {
-                        cname: 'az.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
+            market: {
+                'd1': {
+                    providers: {
+                        'foo': {
+                            cname: 'az.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'az.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        }
                     },
-                    'baz': {
-                        cname: 'az.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    }
-                },
-                default_ttl: 20,
-                radar_availability_threshold: 80,
-                rtt_tp_mix: 0.05
-            },
-            'c1': {
-                type: 'country',
-                providers: {
-                    'foo': {
-                        cname: 'az.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    },
-                    'baz': {
-                        cname: 'az.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    }
-                },
-                default_ttl: 20,
-                radar_availability_threshold: 80,
-                rtt_tp_mix: 0.05
-            },
-            'd1': {
-                type: 'market',
-                providers: {
-                    'foo': {
-                        cname: 'az.foo.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    },
-                    'baz': {
-                        cname: 'az.baz.net',
-                        kbps_padding: 5,
-                        rtt_padding: 10
-                    }
-                },
-                default_ttl: 20,
-                radar_availability_threshold: 80,
-                rtt_tp_mix: 0.05
+                    default_ttl: 20,
+                    radar_availability_threshold: 80,
+                    rtt_tp_mix: 0.05
+                }
             }
+
         },
         asn_overrides: {
             1234: 'bar'
@@ -1147,6 +1162,235 @@
             equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'I,L,A', 'Verifying setReasonCode');
+        }
+    }));
+
+    test('fallbackBehavior used best score chosen', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({
+                    'foo': { avail: 60 },
+                    'bar': { avail: 100 },
+                    'baz': { avail: 100 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    'foo': { http_rtt: 60 },
+                    'bar': { http_rtt: 85 },
+                    'baz': { http_rtt: 90 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({
+                    'foo': { http_kbps: 60 },
+                    'bar': { http_kbps: 85 },
+                    'baz': { http_kbps: 90 }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 0
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
+                });
+            Math.random.returns(0.9);
+            i.request.country = 'CN';
+            i.request.market = 'd';
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'D,G,M,A', 'Verifying setReasonCode');
+        }
+    }));
+
+
+    test('fallbackBehavior none avail choose highest avail', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({
+                    'foo': { avail: 40 },
+                    'bar': { avail: 50 },
+                    'baz': { avail: 60 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    'foo': { http_rtt: 60 },
+                    'bar': { http_rtt: 85 },
+                    'baz': { http_rtt: 90 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({
+                    'foo': { http_kbps: 60 },
+                    'bar': { http_kbps: 85 },
+                    'baz': { http_kbps: 90 }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
+                });
+            Math.random.returns(0.9);
+            i.request.country = 'CN';
+            i.request.market = 'd';
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.baz.net', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'D,G,M,G', 'Verifying setReasonCode');
+        }
+    }));
+
+    test('fallbackBehavior used only one provider avail', test_handle_request({
+        setup: function(i) {
+            i.request
+                .getProbe
+                .withArgs('avail')
+                .returns({
+                    'foo': { avail: 60 },
+                    'bar': { avail: 100 },
+                    'baz': { avail: 30 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_rtt')
+                .returns({
+                    'foo': { http_rtt: 60 },
+                    'bar': { http_rtt: 85 },
+                    'baz': { http_rtt: 90 }
+                });
+            i.request
+                .getProbe
+                .withArgs('http_kbps')
+                .returns({
+                    'foo': { http_kbps: 60 },
+                    'bar': { http_kbps: 85 },
+                    'baz': { http_kbps: 90 }
+                });
+            i.request
+                .getData
+                .withArgs('fusion')
+                .returns({
+                    "foo": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 0
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "bar": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    }),
+                    "baz": JSON.stringify({
+                        "status": "HTTP server is functioning normally",
+                        "state": "OK",
+                        "health_score": {
+                            "unit": "0-5",
+                            "value": 5
+                        },
+                        "bypass_data_points": true
+                    })
+                });
+            Math.random.returns(0.9);
+            i.request.country = 'CN';
+            i.request.market = 'd';
+        },
+        verify: function(i) {
+            equal(i.request.getProbe.callCount, 3, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+            equal(i.response.setReasonCode.args[0][0], 'D,G,M,J', 'Verifying setReasonCode');
         }
     }));
 

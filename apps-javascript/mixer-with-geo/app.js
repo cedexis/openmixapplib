@@ -41,43 +41,101 @@ var handler = new OpenmixApplication({
     // Any values defined here objects will override the higher level settings.
     // Hierarchy is Global > Market > Country > Region > State.
     // All settings are overridable, including providers, paddings, cnames, ttl, threshold, mix, etc.
+    //you can also define a 'fallbackBehavior' settings per each geo config to use in case geo config is not avail
+    // if you want to define e.g. a new country settings just put the config inside geo_settings -> country
+    /*Example of potential geo settings (in this case, country settings).
+     'CN': {
+         providers: {
+             'foo': {
+                 cname: 'cn.foo.net',
+                 kbps_padding: 0,
+                 rtt_padding: 0
+             },
+             'baz': {
+                 cname: 'cn.baz.net',
+                 kbps_padding: 5,
+                 rtt_padding: 10
+             }
+         },
+         default_ttl: 240,
+         radar_availability_threshold: 90,
+         rtt_tp_mix: 0.60,
+         fallbackBehavior: {
+             providers: {
+                 'baz': {
+                     cname: 'cn.baz.net',
+                     kbps_padding: 0,
+                     rtt_padding: 0
+                 },
+                 'bop': {
+                     cname: 'cn.bop.net',
+                     kbps_padding: 0,
+                     rtt_padding: 0
+                 }
+             },
+             default_ttl: 20,
+             radar_availability_threshold: 85,
+             rtt_tp_mix: 0.25
+         }
+     },*/
     geo_settings: {
-        'CN': { //Example of China Settings.
-            type: 'country', // Can be 'market', 'country', 'region', 'state'.
-            providers: {
-                'foo': {
-                    cname: 'cn.foo.net',
-                    kbps_padding: 5,
-                    rtt_padding: 10
+        state: {
+            'US-S-AR': { // Example of Arizona Settings.
+                providers: {
+                    'foo': {
+                        cname: 'az.foo.net',
+                        kbps_padding: 5,
+                        rtt_padding: 10
+                    },
+                    'baz': {
+                        cname: 'az.baz.net',
+                        kbps_padding: 5,
+                        rtt_padding: 10
+                    }
                 },
-                'baz': {
-                    cname: 'cn.baz.net',
-                    kbps_padding: 5,
-                    rtt_padding: 10
-                }
-            },
-            default_ttl: 240,
-            radar_availability_threshold: 90,
-            rtt_tp_mix: 0.60
+                default_ttl: 20,
+                radar_availability_threshold: 80,
+                rtt_tp_mix: 0.05
+            }
         },
-        'US-S-AR': { // Example of Arizona Settings.
-            type: 'state',
-            providers: {
-                'foo': {
-                    cname: 'az.foo.net',
-                    kbps_padding: 5,
-                    rtt_padding: 10
+        region: {},
+        country: {
+            'CN': { //Example of China Settings.
+                providers: {
+                    'foo': {
+                        cname: 'cn.foo.net',
+                        kbps_padding: 5,
+                        rtt_padding: 10
+                    },
+                    'baz': {
+                        cname: 'cn.baz.net',
+                        kbps_padding: 5,
+                        rtt_padding: 10
+                    }
                 },
-                'baz': {
-                    cname: 'az.baz.net',
-                    kbps_padding: 5,
-                    rtt_padding: 10
-                }
-            },
-            default_ttl: 20,
-            radar_availability_threshold: 80,
-            rtt_tp_mix: 0.05
-        }
+                default_ttl: 240,
+                radar_availability_threshold: 90,
+                rtt_tp_mix: 0.60/*,
+                fallbackBehavior: {
+                    providers: {
+                        'baz': {
+                            cname: 'cn.baz.net',
+                            kbps_padding: 0,
+                            rtt_padding: 0
+                        },
+                        'bop': {
+                            cname: 'cn.bop.net',
+                            kbps_padding: 0,
+                            rtt_padding: 0
+                        }
+                    },
+                    default_ttl: 20,
+                    radar_availability_threshold: 85,
+                    rtt_tp_mix: 0.25
+                }*/
+            }
+        },
+        market: {}
     },
     // A mapping of ASN codes to ONE provider alias:  asn_overrides: { 123: 'baz', 124: 'bar' },
     // The providers here should exists in the settings.providers
@@ -138,7 +196,8 @@ function OpenmixApplication(settings) {
             totalRtt = 0,
             totalKbps = 0,
             selectedCandidates,
-            cname;
+            cname,
+            fallbackBehavior;
 
         allReasons = {
             optimum_server_chosen: 'A',
@@ -152,7 +211,8 @@ function OpenmixApplication(settings) {
             geo_default: 'I',
             only_one_provider_avail: 'J',
             data_problem: 'K',
-            sonar_data_problem: 'L'
+            sonar_data_problem: 'L',
+            geo_fallback_behavior: 'M'
         };
 
         function calculateScore(candidates) {
@@ -238,14 +298,15 @@ function OpenmixApplication(settings) {
                 geotype = settings.geo_order[i];
                 geo = request[geotype];
 
-                if (settings.geo_settings[geo] !== undefined && settings.geo_settings[geo].type === geotype) {
+                if (settings.geo_settings[geotype] !== undefined && settings.geo_settings[geotype][geo] !== undefined) {
                     // Override the settings by the Geo or the default if it isn't defined
-                    candidates = settings.geo_settings[geo].providers || settings.default_settings.providers;
-                    decisionTtl = settings.geo_settings[geo].default_ttl || settings.default_settings.default_ttl;
-                    radarAvailabilityThreshold = settings.geo_settings[geo].radar_availability_threshold || settings.default_settings.radar_availability_threshold;
-                    sonarAvailabilityThreshold = settings.geo_settings[geo].sonar_availability_threshold || settings.default_settings.sonar_availability_threshold;
-                    minRtt = settings.geo_settings[geo].min_rtt || settings.default_settings.min_rtt;
-                    rttTpMix = settings.geo_settings[geo].rtt_tp_mix || settings.default_settings.rtt_tp_mix;
+                    candidates = settings.geo_settings[geotype][geo].providers || settings.default_settings.providers;
+                    decisionTtl = settings.geo_settings[geotype][geo].default_ttl || settings.default_settings.default_ttl;
+                    radarAvailabilityThreshold = settings.geo_settings[geotype][geo].radar_availability_threshold || settings.default_settings.radar_availability_threshold;
+                    sonarAvailabilityThreshold = settings.geo_settings[geotype][geo].sonar_availability_threshold || settings.default_settings.sonar_availability_threshold;
+                    minRtt = settings.geo_settings[geotype][geo].min_rtt || settings.default_settings.min_rtt;
+                    rttTpMix = settings.geo_settings[geotype][geo].rtt_tp_mix || settings.default_settings.rtt_tp_mix;
+                    fallbackBehavior = settings.geo_settings[geotype][geo].fallbackBehavior;
 
                     decisionReasons.push(allReasons['geo_override_on_' + geotype]);
                     return candidates;
@@ -264,6 +325,43 @@ function OpenmixApplication(settings) {
             return candidates;
         }
 
+
+        function overrideFallbackSettingsByGeo() {
+            // Override the fallback behavior by the Geo or use the default if it isn't defined
+            candidates = fallbackBehavior.providers || candidates;
+            decisionTtl = fallbackBehavior.default_ttl || decisionTtl;
+            radarAvailabilityThreshold = fallbackBehavior.radar_availability_threshold || radarAvailabilityThreshold;
+            sonarAvailabilityThreshold = fallbackBehavior.sonar_availability_threshold || sonarAvailabilityThreshold;
+            minRtt = fallbackBehavior.min_rtt || minRtt;
+            rttTpMix = fallbackBehavior.rtt_tp_mix || rttTpMix;
+
+            decisionReasons.push(allReasons.geo_fallback_behavior);
+        }
+
+        function filterAvailRadarSonar(candidates, filterRadarAvailability, filterSonarAvailability) {
+            if (settings.use_radar_availability_threshold) {
+                candidates = filterObject(candidates, filterRadarAvailability);
+                candidateAliases = Object.keys(candidates);
+                if (candidateAliases.length === 0) {
+                    decisionReasons.push(allReasons.all_providers_eliminated_radar);
+                }
+            }
+
+            if (candidateAliases.length > 0 && settings.use_sonar_availability_threshold) {
+                if (dataFusion[Object.keys(dataFusion)[0]].availability_override === undefined) {
+                    candidates = filterObject(candidates, filterSonarAvailability);
+                    candidateAliases = Object.keys(candidates);
+                    if (candidateAliases.length === 0) {
+                        decisionReasons.push(allReasons.all_providers_eliminated_sonar);
+                    }
+                } else {
+                    decisionReasons.push(allReasons.sonar_data_problem);
+                }
+            }
+
+            return candidates;
+        }
+
         // ASN override
         if (settings.asn_overrides[asn] !== undefined) {
             decisionProvider = settings.asn_overrides[asn];
@@ -278,24 +376,15 @@ function OpenmixApplication(settings) {
                 && ((settings.use_radar_availability_threshold === true && Object.keys(dataAvail).length > 0) || settings.use_radar_availability_threshold === false)
                 && Object.keys(dataRtt).length > 0) {
 
-                if (settings.use_radar_availability_threshold) {
-                    candidates = filterObject(candidates, filterRadarAvailability);
-                    candidateAliases = Object.keys(candidates);
-                    if (candidateAliases.length === 0) {
-                        decisionReasons.push(allReasons.all_providers_eliminated_radar);
-                    }
-                }
+                candidates = filterAvailRadarSonar(candidates, filterRadarAvailability, filterSonarAvailability); //filter by radar and sonar avail
+                candidateAliases = Object.keys(candidates);
 
-                if (candidateAliases.length > 0 && settings.use_sonar_availability_threshold) {
-                    if (dataFusion[Object.keys(dataFusion)[0]].availability_override === undefined) {
-                        candidates = filterObject(candidates, filterSonarAvailability);
-                        candidateAliases = Object.keys(candidates);
-                        if (candidateAliases.length === 0) {
-                            decisionReasons.push(allReasons.all_providers_eliminated_sonar);
-                        }
-                    } else {
-                        decisionReasons.push(allReasons.sonar_data_problem);
-                    }
+                if (candidateAliases.length === 0 && fallbackBehavior !== undefined &&
+                    fallbackBehavior.providers !== undefined && Object.keys(fallbackBehavior.providers).length > 0 ) {
+                    overrideFallbackSettingsByGeo(); //override fallback behavior settings
+                    selectedCandidates = cloneObject(candidates);
+                    candidates = filterAvailRadarSonar(candidates, filterRadarAvailability, filterSonarAvailability);
+                    candidateAliases = Object.keys(candidates);
                 }
 
                 if (candidateAliases.length === 0) {
