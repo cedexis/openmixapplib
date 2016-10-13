@@ -426,7 +426,8 @@ function OpenmixApplication(settings) {
             }
 
             if (decisionProvider === undefined) {
-                candidateAliases = Object.keys(settings.default_settings.providers);
+                candidates = fallbackBehavior && fallbackBehavior.providers && Object.keys(fallbackBehavior.providers).length > 0 ? fallbackBehavior.providers : settings.default_settings.providers;
+                candidateAliases = Object.keys(candidates);
                 decisionProvider = candidateAliases[Math.floor(Math.random() * candidateAliases.length)];
                 decisionReasons.push(allReasons.data_problem);
             }
