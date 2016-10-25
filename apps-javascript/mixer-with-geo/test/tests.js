@@ -14,7 +14,7 @@
                 cname: 'cn.baz.net'
             }
         },
-        geo_order: ['state', 'region', 'country', 'market'],
+        geo_order: ['asn', 'state', 'region', 'country', 'market'],
         use_radar_availability_threshold: true,
         use_sonar_availability_threshold: true,
         default_settings: {
@@ -158,11 +158,43 @@
                     radar_availability_threshold: 80,
                     rtt_tp_mix: 0.05
                 }
+            },
+            asn: {
+                '7922': { //Example of Comcast ASN Settings.
+                    providers: {
+                        'foo': {
+                            cname: 'cn.foo.net',
+                            kbps_padding: 5,
+                            rtt_padding: 10
+                        },
+                        'baz': {
+                            cname: 'cn.baz.net',
+                            kbps_padding: 5,
+                            rtt_padding: 100
+                        }
+                    },
+                    default_ttl: 240,
+                    radar_availability_threshold: 90,
+                    rtt_tp_mix: 0.60,
+                    fallbackBehavior: {
+                        providers: {
+                            'baz': {
+                                cname: 'cn.baz.net',
+                                kbps_padding: 0,
+                                rtt_padding: 0
+                            },
+                            'foo': {
+                                cname: 'cn.foo.net',
+                                kbps_padding: 0,
+                                rtt_padding: 0
+                            }
+                        },
+                        default_ttl: 20,
+                        radar_availability_threshold: 85,
+                        rtt_tp_mix: 0.25
+                    }
+                }
             }
-
-        },
-        asn_overrides: {
-            1234: 'bar'
         }
     };
 
@@ -757,7 +789,7 @@
                     })
                 });
             Math.random.returns(0.9);
-            i.request.asn = 1234;
+            i.request.asn = 7922;
             i.request.state = 'a';
             i.request.region = 'b';
             i.request.country = 'c';
@@ -769,10 +801,10 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'cn.bar.net', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'cn.foo.net', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 240, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying setReasonCode');
+            equal(i.response.setReasonCode.args[0][0], 'F,A', 'Verifying setReasonCode');
         }
     }));
 
