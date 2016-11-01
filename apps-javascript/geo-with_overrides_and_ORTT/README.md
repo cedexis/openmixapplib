@@ -1,6 +1,6 @@
-# Application: **Geo Weighted Round Robin and ORTT**
+# Application: **Geo override and ORTT**
 
-A GEO weighted round robin application that takes Radar availability scores into account. On non-geo matches, it does ORTT
+A GEO override application that takes Radar availability scores into account. On non-geo matches, it does ORTT
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
