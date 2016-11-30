@@ -257,9 +257,9 @@ function OpenmixApplication(settings) {
             while (i --) {
                 key = keys[i];
                 // Normalized
-                candidates[key].http_rtt = candidates[key].http_rtt / (totalRtt / candidates[key].http_rtt);
+                candidates[key].http_rtt = candidates[key].http_rtt / (totalRtt / keys.length);
                 if (candidates[key].http_kbps !== 0 && totalKbps !== 0) {
-                    candidates[key].http_kbps = candidates[key].http_kbps / (totalKbps / candidates[key].http_kbps);
+                    candidates[key].http_kbps = candidates[key].http_kbps / (totalKbps / keys.length);
                 }
                 // Adding weighted values for RTT and TP
                 rttW = (rttTpMix-1) * candidates[key].http_rtt;
