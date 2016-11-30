@@ -227,6 +227,8 @@ function OpenmixApplication(settings) {
             rttTpMix,
             totalRtt = 0,
             totalKbps = 0,
+            meanRtt = 1,
+            meanKbps = 1,
             selectedCandidates,
             cname,
             fallbackBehavior;
@@ -257,9 +259,9 @@ function OpenmixApplication(settings) {
             while (i --) {
                 key = keys[i];
                 // Normalized
-                candidates[key].http_rtt = candidates[key].http_rtt / (totalRtt / keys.length);
+                candidates[key].http_rtt = candidates[key].http_rtt / meanRtt;
                 if (candidates[key].http_kbps !== 0 && totalKbps !== 0) {
-                    candidates[key].http_kbps = candidates[key].http_kbps / (totalKbps / keys.length);
+                    candidates[key].http_kbps = candidates[key].http_kbps / meanKbps;
                 }
                 // Adding weighted values for RTT and TP
                 rttW = (rttTpMix-1) * candidates[key].http_rtt;
@@ -292,6 +294,10 @@ function OpenmixApplication(settings) {
                 totalRtt += candidates[key].http_rtt;
                 totalKbps += candidates[key].http_kbps;
             }
+
+            meanRtt = totalRtt / keys.length;
+            meanKbps = totalKbps / keys.length;
+
             return candidates;
         }
 
@@ -441,9 +447,10 @@ function OpenmixApplication(settings) {
                 if (candidateAliases.length > 0) {
 
                     // Add kbps and rtt padding
+                    // mean-normalized RTT and TP
                     candidates = addPadding(candidates);
 
-                    // mean-normalized RTT and TP and calculate scores
+                    // calculate scores
                     candidates = calculateScore(candidates);
 
                     decisionProvider = getHighest(candidates, 'score');
