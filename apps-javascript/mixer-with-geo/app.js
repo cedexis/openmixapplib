@@ -295,8 +295,12 @@ function OpenmixApplication(settings) {
                 totalKbps += candidates[key].http_kbps;
             }
 
-            meanRtt = totalRtt / keys.length;
-            meanKbps = totalKbps / keys.length;
+            if (totalRtt !== 0) {
+                meanRtt = totalRtt / keys.length;
+            }
+            if (totalKbps !== 0) {
+                meanKbps = totalKbps / keys.length;
+            }
 
             return candidates;
         }
