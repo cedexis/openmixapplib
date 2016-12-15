@@ -340,9 +340,10 @@ function OpenmixApplication(settings) {
             for (i = 0; i < settings.geo_order.length; i ++) {
                 geotype = settings.geo_order[i];
                 geo = request[geotype];
-                geoSettings = settings.geo_settings[geotype][geo];
 
-                if (settings.geo_settings[geotype] !== undefined && geoSettings !== undefined) {
+                if (settings.geo_settings[geotype] !== undefined && settings.geo_settings[geotype][geo] !== undefined) {
+
+                    geoSettings = settings.geo_settings[geotype][geo];
                     // Override the settings by the Geo or the default if it isn't defined
                     candidates = geoSettings.providers || settings.default_settings.providers;
                     decisionTtl = geoSettings.default_ttl !== undefined  ? geoSettings.default_ttl : settings.default_settings.default_ttl;
