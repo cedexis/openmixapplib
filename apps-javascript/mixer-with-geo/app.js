@@ -334,21 +334,23 @@ function OpenmixApplication(settings) {
         // Override the settings if geo mapping is defined, if not use the default geo settings
         function overrideSettingByGeo() {
             var geotype, geo, i,
-                candidates;
+                candidates,
+                geoSettings;
 
             for (i = 0; i < settings.geo_order.length; i ++) {
                 geotype = settings.geo_order[i];
                 geo = request[geotype];
+                geoSettings = settings.geo_settings[geotype][geo];
 
-                if (settings.geo_settings[geotype] !== undefined && settings.geo_settings[geotype][geo] !== undefined) {
+                if (settings.geo_settings[geotype] !== undefined && geoSettings !== undefined) {
                     // Override the settings by the Geo or the default if it isn't defined
-                    candidates = settings.geo_settings[geotype][geo].providers || settings.default_settings.providers;
-                    decisionTtl = settings.geo_settings[geotype][geo].default_ttl || settings.default_settings.default_ttl;
-                    radarAvailabilityThreshold = settings.geo_settings[geotype][geo].radar_availability_threshold || settings.default_settings.radar_availability_threshold;
-                    sonarAvailabilityThreshold = settings.geo_settings[geotype][geo].sonar_availability_threshold || settings.default_settings.sonar_availability_threshold;
-                    minRtt = settings.geo_settings[geotype][geo].min_rtt || settings.default_settings.min_rtt;
-                    rttTpMix = settings.geo_settings[geotype][geo].rtt_tp_mix || settings.default_settings.rtt_tp_mix;
-                    fallbackBehavior = settings.geo_settings[geotype][geo].fallbackBehavior;
+                    candidates = geoSettings.providers || settings.default_settings.providers;
+                    decisionTtl = geoSettings.default_ttl !== undefined  ? geoSettings.default_ttl : settings.default_settings.default_ttl;
+                    radarAvailabilityThreshold = geoSettings.radar_availability_threshold !== undefined ? geoSettings.radar_availability_threshold : settings.default_settings.radar_availability_threshold;
+                    sonarAvailabilityThreshold = geoSettings.sonar_availability_threshold  !== undefined ? geoSettings.sonar_availability_threshold : settings.default_settings.sonar_availability_threshold;
+                    minRtt = geoSettings.min_rtt !== undefined ? geoSettings.min_rtt : settings.default_settings.min_rtt;
+                    rttTpMix = geoSettings.rtt_tp_mix !== undefined ? geoSettings.rtt_tp_mix : settings.default_settings.rtt_tp_mix;
+                    fallbackBehavior = geoSettings.fallbackBehavior;
 
                     decisionReasons.push(allReasons['geo_override_on_' + geotype]);
                     return candidates;
@@ -372,10 +374,10 @@ function OpenmixApplication(settings) {
             // Override the fallback behavior by the Geo or use the default if it isn't defined
             candidates = fallbackBehavior.providers || candidates;
             decisionTtl = fallbackBehavior.default_ttl || decisionTtl;
-            radarAvailabilityThreshold = fallbackBehavior.radar_availability_threshold || radarAvailabilityThreshold;
-            sonarAvailabilityThreshold = fallbackBehavior.sonar_availability_threshold || sonarAvailabilityThreshold;
-            minRtt = fallbackBehavior.min_rtt || minRtt;
-            rttTpMix = fallbackBehavior.rtt_tp_mix || rttTpMix;
+            radarAvailabilityThreshold = fallbackBehavior.radar_availability_threshold !== undefined ? fallbackBehavior.radar_availability_threshold : radarAvailabilityThreshold;
+            sonarAvailabilityThreshold = fallbackBehavior.sonar_availability_threshold !== undefined ? fallbackBehavior.sonar_availability_threshold : sonarAvailabilityThreshold;
+            minRtt = fallbackBehavior.min_rtt !== undefined ? fallbackBehavior.min_rtt : minRtt;
+            rttTpMix = fallbackBehavior.rtt_tp_mix !== undefined ? fallbackBehavior.rtt_tp_mix : rttTpMix;
 
             decisionReasons.push(allReasons.geo_fallback_behavior);
         }
