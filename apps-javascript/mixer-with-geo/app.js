@@ -506,15 +506,7 @@ function OpenmixApplication(settings) {
      * @param {!Object} object
      */
     function cloneObject(object) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            data = {},
-            key;
-        while (i --) {
-            key = keys[i];
-            data[key] = object[key];
-        }
-        return data;
+        return JSON.parse(JSON.stringify(object));
     }
 
     /**
