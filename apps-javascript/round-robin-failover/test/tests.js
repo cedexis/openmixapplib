@@ -19,7 +19,7 @@
                 cname: 'www.bar_f.com'
             }
         },
-        default_provider: 'foo',
+        default_provider: 'foo_f',
         default_ttl: 20,
         fusion_sonar_threshold: 2
     };
@@ -485,8 +485,8 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
         }

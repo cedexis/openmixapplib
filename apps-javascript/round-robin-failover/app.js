@@ -135,6 +135,12 @@ function OpenmixApplication(settings) {
         if (!decisionProvider) {
             decisionProvider = settings.default_provider;
             decisionReason = allReasons.default_selected;
+
+            if (settings.providers[decisionProvider] !== undefined) {
+                decisionCname = settings.providers[decisionProvider].cname;
+            } else {
+                decisionCname = settings.failover_providers[decisionProvider].cname;
+            }
         }
 
         response.respond(decisionProvider, decisionCname || settings.providers[decisionProvider].cname);
