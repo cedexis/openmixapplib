@@ -27,9 +27,8 @@ var handler = new OpenmixApplication({
 
     // The DNS TTL to be applied to DNS responses in seconds.
     default_ttl: 20,
-    //Set Fusion Sonar threshold for availability for the platform to be included.
-    // sonar values are between 0 - 5
-    fusion_sonar_threshold: 2
+    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
+    fusion_sonar_threshold: 1
 });
 
 function init(config) {
@@ -88,7 +87,7 @@ function OpenmixApplication(settings) {
          * @param key
          */
         function filterFusionSonar(candidate, key) {
-            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value > settings.fusion_sonar_threshold;
+            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value >= settings.fusion_sonar_threshold;
         }
 
         /**

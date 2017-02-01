@@ -29,9 +29,8 @@ var handler = new OpenmixApplication({
     // country_to_provider_roundrobin: { 'UK': ['bar','foo'], 'ES': ['baz','faa']},
     // flip to true if the platform will be considered unavailable if it does not have sonar data
     require_sonar_data: false,
-    //Set Fusion Sonar threshold for availability for the platform to be included.
-    // sonar values are between 0 - 5
-    fusion_sonar_threshold: 2
+    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
+    fusion_sonar_threshold: 1
 });
 
 function init(config) {
@@ -81,14 +80,14 @@ function OpenmixApplication(settings) {
             no_passed_candidates_default_selected: 'D'
         };
 
-        // determine which providers have a sonar value above threshold
+        // determine which providers have a sonar value on or above threshold
         /**
          * @param alias
          * @returns {boolean}
          */
         function aboveSonarThreshold(alias) {
             if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
-                return dataFusion[alias].health_score.value > settings.fusion_sonar_threshold;
+                return dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold;
             }
             return !settings.require_sonar_data;
         }
@@ -110,7 +109,7 @@ function OpenmixApplication(settings) {
             // Else origin
         } else {
             // Check origin sonar decision
-            if (dataFusion.origin !== undefined && dataFusion.origin.health_score.value > settings.fusion_sonar_threshold && dataFusion.origin.availability_override === undefined) {
+            if (dataFusion.origin !== undefined && dataFusion.origin.health_score.value >= settings.fusion_sonar_threshold && dataFusion.origin.availability_override === undefined) {
                 decisionProvider = 'origin';
                 decisionReason = allReasons.default_selected;
             } else {
