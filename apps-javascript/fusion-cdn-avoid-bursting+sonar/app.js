@@ -47,7 +47,8 @@ var handler = new OpenmixApplication({
     error_ttl: 20,
     min_valid_rtt_score: 5,
     availability_threshold: 90,
-    fusion_sonar_threshold: 2,
+    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
+    fusion_sonar_threshold: 1,
     //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
     //both options can be set to true or false.
     use_radar_avail: true,
@@ -193,7 +194,7 @@ function OpenmixApplication(settings) {
         function filterFusionSonar(candidate, alias) {
             return dataFusion[candidate.sonar] !== undefined &&
                 dataFusion[candidate.sonar].health_score !== undefined &&
-                (dataFusion[candidate.sonar].health_score.value > settings.fusion_sonar_threshold || dataFusion[candidate.sonar].availability_override !== undefined );
+                (dataFusion[candidate.sonar].health_score.value >= settings.fusion_sonar_threshold || dataFusion[candidate.sonar].availability_override !== undefined );
         }
 
         /**

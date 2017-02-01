@@ -16,9 +16,8 @@ var handler = new OpenmixApplication({
     // when set true if one of the provider has not data it will be removed,
     // when set to false, sonar data is optional, so a provider with no sonar data will be used
     require_sonar_data: true,
-    //Set Fusion Sonar threshold for availability for the platform to be included.
-    // sonar values are between 0 - 5
-    fusion_sonar_threshold: 2
+    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
+    fusion_sonar_threshold: 1
 });
 
 function init(config) {
@@ -82,7 +81,7 @@ function OpenmixApplication(settings) {
         function filterSonar(alias) {
             // let the flag determine if the provider is available when we don't have sonar data for the provider
             if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
-                return dataFusion[alias].health_score.value > settings.fusion_sonar_threshold;
+                return dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold;
             }
             return !settings.require_sonar_data;
         }
