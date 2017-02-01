@@ -136,7 +136,7 @@ function OpenmixApplication(settings) {
             //check if "Big Red Button" isn't activated
             if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
                 // filter candidates by  fusion sonar threshold,
-                // remove all the provider with fusion sonar data <= than settings.fusion_sonar_threshold
+                // remove all the provider with fusion sonar data < than settings.fusion_sonar_threshold
                 candidates = filterObject(dataFusion, filterFusionSonar);
                 candidateAliases = Object.keys(candidates);
 

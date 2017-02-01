@@ -644,7 +644,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 2
+                            "value": 0
                         },
                         "bypass_data_points": true
                     }),
@@ -653,7 +653,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 1
+                            "value": 0
                         },
                         "bypass_data_points": true
                     })
@@ -732,7 +732,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 2
+                            "value": 0
                         },
                         "bypass_data_points": true
                     }),
@@ -820,7 +820,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 2
+                            "value": 0
                         },
                         "bypass_data_points": true
                     }),
@@ -963,7 +963,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 4
+                            "value": 5
                         },
                         "bypass_data_points": true,
                         "availability_override": true
@@ -1108,7 +1108,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 4
+                            "value": 5
                         },
                         "bypass_data_points": true
                     }),
@@ -1251,7 +1251,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 1
+                            "value": 0
                         },
                         "bypass_data_points": true
                     }),
@@ -1260,7 +1260,7 @@
                         "state": "OK",
                         "health_score": {
                             "unit": "0-5",
-                            "value": 1
+                            "value": 0
                         },
                         "bypass_data_points": true
                     })
