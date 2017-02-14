@@ -31,7 +31,7 @@ var handler = new OpenmixApplication({
                 rtt_padding: 0
             }
         },
-        default_ttl: 240,
+        default_ttl: 20,
         radar_availability_threshold: 95,
         sonar_availability_threshold: 2,
         min_rtt: 5,
