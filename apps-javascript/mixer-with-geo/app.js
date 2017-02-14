@@ -57,7 +57,7 @@ var handler = new OpenmixApplication({
                  rtt_padding: 10
              }
          },
-         default_ttl: 240,
+         default_ttl: 20,
          radar_availability_threshold: 90,
          rtt_tp_mix: 0.60,
          fallbackBehavior: {
@@ -113,7 +113,7 @@ var handler = new OpenmixApplication({
                         rtt_padding: 10
                     }
                 },
-                default_ttl: 240,
+                default_ttl: 20,
                 radar_availability_threshold: 90,
                 rtt_tp_mix: 0.60/*,
                 fallbackBehavior: {
@@ -150,7 +150,7 @@ var handler = new OpenmixApplication({
                         rtt_padding: 10
                     }
                 },
-                default_ttl: 240,
+                default_ttl: 20,
                 radar_availability_threshold: 90,
                 rtt_tp_mix: 0.60,
                 fallbackBehavior: {
