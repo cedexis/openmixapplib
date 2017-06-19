@@ -81,7 +81,7 @@
         };
     }
 
-    test('geo country overrides', test_handle_request({
+    test('geo_override_on_market', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -94,54 +94,19 @@
                     cname: 'www.baz.com'
                 }
             },
+            geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
+            state_to_provider: {},
+            asn_to_provider: {},
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
         },
         setup: function(i) {
             console.log(i);
-            i.request.country = 'UK';
-            i.request.market = 'EG';
-        },
-        verify: function(i) {
-            console.log(i);
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying reason code');
-        }
-    }));
-
-    test('geo markets', test_handle_request({
-        settings: {
-            providers: {
-                'foo': {
-                    cname: 'www.foo.com'
-                },
-                'bar': {
-                    cname: 'www.bar.com'
-                },
-                'baz': {
-                    cname: 'www.baz.com'
-                }
-            },
-            availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            default_provider: 'foo',
-            default_ttl: 20,
-            error_ttl: 10
-        },
-        setup: function(i) {
-            console.log(i);
-            i.request.country = 'US';
+            i.request.country = 'UX';
             i.request.market = 'EG';
         },
         verify: function(i) {
@@ -157,7 +122,7 @@
         }
     }));
 
-    test('unexpected market', test_handle_request({
+    test('geo_override_on_country', test_handle_request({
         settings: {
             providers: {
                 'foo': {
@@ -170,17 +135,20 @@
                     cname: 'www.baz.com'
                 }
             },
+            geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
             country_to_provider: { 'UK': 'bar' },
             market_to_provider: { 'EG': 'foo' },
-            default_provider: 'baz',
+            state_to_provider: {},
+            asn_to_provider: {},
+            default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
         },
         setup: function(i) {
             console.log(i);
-            i.request.country = 'US';
-            i.request.market = 'FR';
+            i.request.country = 'UK';
+            i.request.market = 'XX';
         },
         verify: function(i) {
             console.log(i);
@@ -188,10 +156,138 @@
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying selected alias');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
-            equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_on_state', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            geo_order: ['asn', 'state', 'country', 'market'],
+            availability_threshold: 90,
+            country_to_provider: { 'UK': 'bar' },
+            market_to_provider: { 'EG': 'foo' },
+            state_to_provider: { 'US-S-AR': 'bar' },
+            asn_to_provider: {},
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.request.country = 'XX';
+            i.request.market = 'XX';
+            i.request.state = 'US-S-AR';
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
             equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+        }
+    }));
+
+    test('geo_override_on_asn', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            geo_order: ['asn', 'state', 'country', 'market'],
+            availability_threshold: 90,
+            country_to_provider: { 'UK': 'bar' },
+            market_to_provider: { 'EG': 'foo' },
+            state_to_provider: { 'US-S-AR': 'bar' },
+            asn_to_provider: { '1234': 'foo' },
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.request.country = 'XX';
+            i.request.market = 'XX';
+            i.request.state = 'US-S-XX';
+            i.request.asn = 1234;
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying reason code');
+        }
+    }));
+
+    test('default_provider', test_handle_request({
+        settings: {
+            providers: {
+                'foo': {
+                    cname: 'www.foo.com'
+                },
+                'bar': {
+                    cname: 'www.bar.com'
+                },
+                'baz': {
+                    cname: 'www.baz.com'
+                }
+            },
+            geo_order: ['asn', 'state', 'country', 'market'],
+            availability_threshold: 90,
+            country_to_provider: { 'UK': 'bar' },
+            market_to_provider: { 'EG': 'foo' },
+            state_to_provider: { 'US-S-AR': 'bar' },
+            asn_to_provider: { '1234': 'foo' },
+            default_provider: 'foo',
+            default_ttl: 20,
+            error_ttl: 10
+        },
+        setup: function(i) {
+            console.log(i);
+            i.request.country = 'XX';
+            i.request.market = 'XX';
+            i.request.state = 'US-S-XX';
+            i.request.asn = 1235;
+        },
+        verify: function(i) {
+            console.log(i);
+            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+            equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
+            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
+            equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying reason code');
         }
     }));
 
