@@ -96,10 +96,12 @@
             },
             geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            state_to_provider: {},
-            asn_to_provider: {},
+            geo_override: {
+                'market': { 'EG': 'foo' },
+                'country': { 'UK': 'bar' },
+                'state': {},
+                'asn': {}
+            },
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
@@ -137,10 +139,12 @@
             },
             geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            state_to_provider: {},
-            asn_to_provider: {},
+            geo_override: {
+                'market': { 'EG': 'foo' },
+                'country': { 'UK': 'bar' },
+                'state': {},
+                'asn': {}
+            },
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
@@ -178,10 +182,12 @@
             },
             geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            state_to_provider: { 'US-S-AR': 'bar' },
-            asn_to_provider: {},
+            geo_override: {
+                'market': { 'EG': 'foo' },
+                'country': { 'UK': 'bar' },
+                'state': { 'US-S-AR': 'bar' },
+                'asn': {}
+            },
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
@@ -220,10 +226,12 @@
             },
             geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            state_to_provider: { 'US-S-AR': 'bar' },
-            asn_to_provider: { '1234': 'foo' },
+            geo_override: {
+                'market': { 'EG': 'foo' },
+                'country': { 'UK': 'bar' },
+                'state': { 'US-S-AR': 'bar' },
+                'asn': { '1234': 'foo' }
+            },
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10
@@ -263,10 +271,12 @@
             },
             geo_order: ['asn', 'state', 'country', 'market'],
             availability_threshold: 90,
-            country_to_provider: { 'UK': 'bar' },
-            market_to_provider: { 'EG': 'foo' },
-            state_to_provider: { 'US-S-AR': 'bar' },
-            asn_to_provider: { '1234': 'foo' },
+            geo_override: {
+                'market': { 'EG': 'foo' },
+                'country': { 'UK': 'bar' },
+                'state': { 'US-S-AR': 'bar' },
+                'asn': { '1234': 'foo' }
+            },
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10

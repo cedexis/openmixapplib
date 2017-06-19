@@ -14,6 +14,20 @@ var handler = new OpenmixApplication({
         }
     },
     geo_order: ['asn', 'state', 'country', 'market'],
+    geo_override: {
+        // A mapping of market codes to provider aliases
+        // market: { 'EG': 'foo' }
+        'market': {},
+        // A mapping of ISO 3166-1 country codes to provider aliases
+        // country: { 'UK': 'bar', 'ES': 'baz' },
+        'country': {},
+        // A mapping of state codes to provider aliases
+        // state: { 'US-S-AR': 'bar' },
+        'state': {},
+        // A mapping of ASN codes to provider aliases
+        // asn: { '1234': 'bar', '4567': 'baz' },
+        'asn': {}
+    },
     // A mapping of market codes to provider aliases
     //market_to_provider: { 'EG': 'foo' }
     market_to_provider: {},
@@ -80,16 +94,16 @@ function OpenmixApplication(settings) {
         };
 
         function getGeoOverride() {
-            var i, geotype, geo;
+            var i, geoType, geo, geoOverride;
 
             for (i = 0; i < settings.geo_order.length; i ++) {
-                geotype = settings.geo_order[i];
-                geo = request[geotype];
+                geoType = settings.geo_order[i];
+                geo = request[geoType];
+                geoOverride = settings.geo_override[geoType];
 
-                if (settings[geotype + '_to_provider'] !== undefined && settings[geotype + '_to_provider'][geo] !== undefined) {
-
-                    decisionReason = allReasons['geo_override_on_' + geotype];
-                    return settings[geotype + '_to_provider'][geo];
+                if (geoOverride !== undefined && geoOverride[geo] !== undefined) {
+                    decisionReason = allReasons['geo_override_on_' + geoType];
+                    return geoOverride[geo];
                 }
             }
             return false;
