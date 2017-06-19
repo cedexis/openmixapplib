@@ -28,18 +28,6 @@ var handler = new OpenmixApplication({
         // asn: { '1234': 'bar', '4567': 'baz' },
         'asn': {}
     },
-    // A mapping of market codes to provider aliases
-    //market_to_provider: { 'EG': 'foo' }
-    market_to_provider: {},
-    // A mapping of ISO 3166-1 country codes to provider aliases
-    //country_to_provider: { 'UK': 'bar', 'ES': 'baz' },
-    country_to_provider: {},
-    // A mapping of state codes to provider aliases
-    //state_to_provider: { 'US-S-AR': 'bar' },
-    state_to_provider: {},
-    // A mapping of ASN codes to provider aliases
-    //asn_to_provider: { '1234': 'bar', '4567': 'baz' },
-    asn_to_provider: {},
     // Selected if a provider can't be determined
     default_provider: 'foo',
     // The TTL to be set when the application chooses a geo provider.
