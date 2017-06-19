@@ -13,12 +13,21 @@ var handler = new OpenmixApplication({
             cname: 'www.baz.com'
         }
     },
-    // A mapping of ISO 3166-1 country codes to provider aliases
-    //country_to_provider: { 'UK': 'bar', 'ES': 'baz' },
-    country_to_provider: {},
-    // A mapping of market codes to provider aliases
-    //market_to_provider: { 'EG': 'foo' }
-    market_to_provider: {},
+    geo_order: ['asn', 'state', 'country', 'market'],
+    geo_override: {
+        // A mapping of market codes to provider aliases
+        // market: { 'EG': 'foo' }
+        'market': {},
+        // A mapping of ISO 3166-1 country codes to provider aliases
+        // country: { 'UK': 'bar', 'ES': 'baz' },
+        'country': {},
+        // A mapping of state codes to provider aliases
+        // state: { 'US-S-AR': 'bar' },
+        'state': {},
+        // A mapping of ASN codes to provider aliases
+        // asn: { '1234': 'bar', '4567': 'baz' },
+        'asn': {}
+    },
     // Selected if a provider can't be determined
     default_provider: 'foo',
     // The TTL to be set when the application chooses a geo provider.
@@ -62,35 +71,39 @@ function OpenmixApplication(settings) {
         var allReasons,
             decisionProvider,
             decisionReason,
-            decisionTtl;
+            decisionTtl = settings.default_ttl;
 
         allReasons = {
-            got_expected_market: 'A',
+            geo_override_on_market: 'A',
             geo_override_on_country: 'B',
-            unexpected_market: 'C'
+            geo_override_on_state: 'C',
+            geo_override_on_asn: 'D',
+            default_provider: 'E'
         };
 
-        /* jshint laxbreak:true */
-        if (settings.country_to_provider !== undefined
-            && settings.country_to_provider[request.country] !== undefined) {
-            // Override based on the request country
-            decisionProvider = settings.country_to_provider[request.country];
-            decisionTtl = decisionTtl || settings.default_ttl;
-            decisionReason = allReasons.geo_override_on_country;
+        function getGeoOverride() {
+            var i, geoType, geo, geoOverride;
+
+            for (i = 0; i < settings.geo_order.length; i ++) {
+                geoType = settings.geo_order[i];
+                geo = request[geoType];
+                geoOverride = settings.geo_override[geoType];
+
+                if (geoOverride !== undefined && geoOverride[geo] !== undefined) {
+                    decisionReason = allReasons['geo_override_on_' + geoType];
+                    return geoOverride[geo];
+                }
+            }
+            return false;
         }
-        else if (settings.market_to_provider !== undefined
-            && settings.market_to_provider[request.market] !== undefined) {
-            // Override based on the request market
-            decisionProvider = settings.market_to_provider[request.market];
-            decisionTtl = decisionTtl || settings.default_ttl;
-            decisionReason = allReasons.got_expected_market;
-        }
-        else {
+
+        decisionProvider = getGeoOverride();
+
+        if (!decisionProvider) {
             decisionProvider = settings.default_provider;
-            decisionTtl = decisionTtl || settings.error_ttl;
-            decisionReason = allReasons.unexpected_market;
+            decisionTtl = settings.error_ttl;
+            decisionReason = allReasons.default_provider;
         }
-        /* jshint laxbreak:false */
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(decisionTtl);
