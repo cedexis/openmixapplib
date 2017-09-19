@@ -2,19 +2,15 @@ var handler = new OpenmixApplication({
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            base_padding: 0,
-            sonar: 'foo_sonar'  //Alias of platform created to get sonar data from same URL as provider 'foo'
+            base_padding: 0
         },
         'bar': {
             cname: 'www.bar.com',
-            base_padding: 0,
-            sonar: 'bar_sonar'
-
+            base_padding: 0
         },
         'baz': {
             cname: 'www.baz.com',
-            base_padding: 0,
-            sonar: 'baz_sonar'
+            base_padding: 0
         }
     },
     burstable_cdns: {
@@ -77,7 +73,6 @@ function OpenmixApplication(settings) {
 
         while (i --) {
             config.requireProvider(aliases[i]);
-            config.requireProvider(settings.providers[aliases[i]].sonar);
         }
 
     };
@@ -188,7 +183,7 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function filterSonarAvailability(candidate, alias) {
-            return dataSonar[candidate.sonar] !== undefined && dataSonar[candidate.sonar].avail > 0;
+            return dataSonar[alias] !== undefined && dataSonar[alias].avail > 0;
         }
 
         /**

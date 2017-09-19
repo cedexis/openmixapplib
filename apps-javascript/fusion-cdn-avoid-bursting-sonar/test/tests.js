@@ -6,19 +6,15 @@
         providers: {
             'foo': {
                 cname: 'www.foo.com',
-                base_padding: 0,
-                sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                base_padding: 0
             },
             'bar': {
                 cname: 'www.bar.com',
-                base_padding: 0,
-                sonar: 'bar_sonar'
-
+                base_padding: 0
             },
             'baz': {
                 cname: 'www.baz.com',
-                base_padding: 0,
-                sonar: 'baz_sonar'
+                base_padding: 0
             }
         },
         burstable_cdns: {
@@ -84,12 +80,9 @@
     test('default', test_do_init({
         setup: function() { return; },
         verify: function(i) {
-            equal(i.config.requireProvider.callCount, 6, 'Verifying requireProvider call count');
-            equal(i.config.requireProvider.args[5][0], 'foo_sonar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[4][0], 'foo', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[3][0], 'bar_sonar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[2][0], 'bar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[1][0], 'baz_sonar', 'Verirying provider alias');
+            equal(i.config.requireProvider.callCount, 3, 'Verifying requireProvider call count');
+            equal(i.config.requireProvider.args[2][0], 'foo', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[1][0], 'bar', 'Verirying provider alias');
             equal(i.config.requireProvider.args[0][0], 'baz', 'Verirying provider alias');
         }
     }));
@@ -185,10 +178,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 1
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -258,10 +251,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 1
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -324,10 +317,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 1
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -636,10 +629,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 0
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 0
 					})
 				});
@@ -717,10 +710,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 0
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -798,10 +791,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 0
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -825,19 +818,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -933,10 +922,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 1
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -960,19 +949,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -1068,10 +1053,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 1
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 1
 					})
 				});
@@ -1095,19 +1080,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -1203,10 +1184,10 @@
 				.getData
 				.onCall(1)
 				.returns({
-					'foo_sonar': JSON.stringify({
+					'foo': JSON.stringify({
 						"avail": 0
 					}),
-					'bar_sonar': JSON.stringify({
+					'bar': JSON.stringify({
 						"avail": 0
 					})
 				});
