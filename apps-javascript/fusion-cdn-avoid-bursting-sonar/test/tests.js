@@ -6,19 +6,15 @@
         providers: {
             'foo': {
                 cname: 'www.foo.com',
-                base_padding: 0,
-                sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                base_padding: 0
             },
             'bar': {
                 cname: 'www.bar.com',
-                base_padding: 0,
-                sonar: 'bar_sonar'
-
+                base_padding: 0
             },
             'baz': {
                 cname: 'www.baz.com',
-                base_padding: 0,
-                sonar: 'baz_sonar'
+                base_padding: 0
             }
         },
         burstable_cdns: {
@@ -51,7 +47,6 @@
         error_ttl: 20,
         min_valid_rtt_score: 5,
         availability_threshold: 90,
-        fusion_sonar_threshold: 2,
         //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
         //both options can be set to true or false.
         use_radar_avail: true,
@@ -85,12 +80,9 @@
     test('default', test_do_init({
         setup: function() { return; },
         verify: function(i) {
-            equal(i.config.requireProvider.callCount, 6, 'Verifying requireProvider call count');
-            equal(i.config.requireProvider.args[5][0], 'foo_sonar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[4][0], 'foo', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[3][0], 'bar_sonar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[2][0], 'bar', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[1][0], 'baz_sonar', 'Verirying provider alias');
+            equal(i.config.requireProvider.callCount, 3, 'Verifying requireProvider call count');
+            equal(i.config.requireProvider.args[2][0], 'foo', 'Verirying provider alias');
+            equal(i.config.requireProvider.args[1][0], 'bar', 'Verirying provider alias');
             equal(i.config.requireProvider.args[0][0], 'baz', 'Verirying provider alias');
         }
     }));
@@ -180,30 +172,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 1
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -260,30 +245,23 @@
                             "unit": "Mbps",
                             "value": "5001.31"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 1
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -333,30 +311,23 @@
                     "foo": JSON.stringify({
                     }),
                     "bar": JSON.stringify({
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 1
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -414,6 +385,10 @@
                         }
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({});
             Math.random.returns(0);
         },
         verify: function(i) {
@@ -470,6 +445,10 @@
                         }
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({});
             Math.random.returns(0);
         },
         verify: function(i) {
@@ -514,9 +493,11 @@
             i.request
                 .getData
                 .onCall(0)
-                .returns({
-
-                });
+                .returns({});
+			i.request
+				.getData
+				.onCall(1)
+				.returns({});
             Math.random.returns(0);
         },
         verify: function(i) {
@@ -575,6 +556,10 @@
                         }
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({});
             Math.random.returns(0);
         },
         verify: function(i) {
@@ -638,30 +623,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 0
+					}),
+					'bar': JSON.stringify({
+						"avail": 0
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -726,30 +704,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 0
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -814,30 +785,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 0
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -854,19 +818,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -899,7 +859,6 @@
             error_ttl: 20,
             min_valid_rtt_score: 5,
             availability_threshold: 90,
-            fusion_sonar_threshold: 2,
             //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
             //both options can be set to true or false.
             use_radar_avail: false,
@@ -957,32 +916,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 1
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -999,19 +949,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -1044,7 +990,6 @@
             error_ttl: 20,
             min_valid_rtt_score: 5,
             availability_threshold: 90,
-            fusion_sonar_threshold: 2,
             //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
             //both options can be set to true or false.
             use_radar_avail: false,
@@ -1102,30 +1047,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 1
+					}),
+					'bar': JSON.stringify({
+						"avail": 1
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
@@ -1142,19 +1080,15 @@
             providers: {
                 'foo': {
                     cname: 'www.foo.com',
-                    base_padding: 0,
-                    sonar: 'foo_sonar'  //Alias of platform created to get sonar data from provider 'foo'
+                    base_padding: 0
                 },
                 'bar': {
                     cname: 'www.bar.com',
-                    base_padding: 0,
-                    sonar: 'bar_sonar'
-
+                    base_padding: 0
                 },
                 'baz': {
                     cname: 'www.baz.com',
-                    base_padding: 0,
-                    sonar: 'baz_sonar'
+                    base_padding: 0
                 }
             },
             burstable_cdns: {
@@ -1187,7 +1121,6 @@
             error_ttl: 20,
             min_valid_rtt_score: 5,
             availability_threshold: 90,
-            fusion_sonar_threshold: 2,
             //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
             //both options can be set to true or false.
             use_radar_avail: true,
@@ -1245,30 +1178,23 @@
                             "unit": "GB",
                             "value": "6.64"
                         }
-                    }),
-                    "foo_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "bar_sonar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
                     })
                 });
+			i.request
+				.getData
+				.onCall(1)
+				.returns({
+					'foo': JSON.stringify({
+						"avail": 0
+					}),
+					'bar': JSON.stringify({
+						"avail": 0
+					})
+				});
             Math.random.returns(0.9);
         },
         verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+            equal(i.request.getData.callCount, 2, 'Verifying getData call count');
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');
             equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
             equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');

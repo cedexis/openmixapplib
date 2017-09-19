@@ -127,11 +127,8 @@ function OpenmixApplication(settings) {
         }
 
         function filterCandidates(alias) {
-            if (candidateHasPerfAvailScores(alias, 'countries', request.country) ||
-                candidateHasPerfAvailScores(alias, 'markets', request.market)) {
-                return true;
-            }
-            return false;
+            return candidateHasPerfAvailScores(alias, 'countries', request.country) ||
+                candidateHasPerfAvailScores(alias, 'markets', request.market);
         }
 
         function selectBestPerformingProvider(node, geo_location) {
@@ -194,21 +191,19 @@ function OpenmixApplication(settings) {
         response.setReasonCode(decisionReason);
     };
 
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
-
-        while (i --) {
-            key = keys[i];
-
-            if (!filter(key)) {
-                delete object[key];
-            }
-        }
-
-        return object;
-    }
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidate = {};
+		while (i --) {
+			key = keys[i];
+			if (filter(key)) {
+				candidate[key] = object[key];
+			}
+		}
+		return candidate;
+	}
 
     
     /**

@@ -23,9 +23,7 @@ var handler = new OpenmixApplication({
     },
     default_provider: 'foo',
     // The TTL to be set when the application chooses a geo provider.
-    default_ttl: 20,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0
-    fusion_sonar_threshold: 1
+    default_ttl: 20
 });
 
 function init(config) {
@@ -66,9 +64,8 @@ function OpenmixApplication(settings) {
      */
     this.handle_request = function(request, response) {
         var allReasons,
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
-            dataFusionAliases = Object.keys(dataFusion),
+            dataSonar = parseSonarData(request.getData('sonar')),
+            dataSonarAliases = Object.keys(dataSonar),
             decisionProvider,
             candidates,
             candidateAliases,
@@ -86,9 +83,8 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function filterPrimaryCandidates(alias) {
-            return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
-                && dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold
-                && (settings.providers[alias] !== undefined);
+            return dataSonar[alias] !== undefined && dataSonar[alias].avail > 0
+                && settings.providers[alias] !== undefined;
         }
 
         /**
@@ -96,14 +92,12 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function filterFailoverCandidates(alias) {
-            return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
-                && dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold
-                && (settings.failover_providers[alias] !== undefined);
+            return dataSonar[alias] !== undefined && dataSonar[alias].avail > 0
+                && settings.failover_providers[alias] !== undefined;
         }
 
-        // Check if "Big Red Button" isn't activated
-        if (dataFusionAliases.length > 0 && dataFusion[dataFusionAliases[0]].availability_override === undefined) {
-            candidates = filterObject(dataFusion, filterPrimaryCandidates);
+        if (dataSonarAliases.length > 0) {
+            candidates = filterObject(dataSonar, filterPrimaryCandidates);
             candidateAliases = Object.keys(candidates);
 
             if (candidateAliases.length === 1) {
@@ -115,7 +109,7 @@ function OpenmixApplication(settings) {
             }
 
             if (!decisionProvider) {
-                candidates = filterObject(dataFusion, filterFailoverCandidates);
+                candidates = filterObject(dataSonar, filterFailoverCandidates);
 
                 candidateAliases = Object.keys(candidates);
 
@@ -164,7 +158,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

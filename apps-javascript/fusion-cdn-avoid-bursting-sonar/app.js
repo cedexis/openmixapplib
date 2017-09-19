@@ -2,19 +2,15 @@ var handler = new OpenmixApplication({
     providers: {
         'foo': {
             cname: 'www.foo.com',
-            base_padding: 0,
-            sonar: 'foo_sonar'  //Alias of platform created to get sonar data from same URL as provider 'foo'
+            base_padding: 0
         },
         'bar': {
             cname: 'www.bar.com',
-            base_padding: 0,
-            sonar: 'bar_sonar'
-
+            base_padding: 0
         },
         'baz': {
             cname: 'www.baz.com',
-            base_padding: 0,
-            sonar: 'baz_sonar'
+            base_padding: 0
         }
     },
     burstable_cdns: {
@@ -47,8 +43,6 @@ var handler = new OpenmixApplication({
     error_ttl: 20,
     min_valid_rtt_score: 5,
     availability_threshold: 90,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1,
     //set it true if you want to filter the candidates by avail techniques, otherwise set it to false
     //both options can be set to true or false.
     use_radar_avail: true,
@@ -79,7 +73,6 @@ function OpenmixApplication(settings) {
 
         while (i --) {
             config.requireProvider(aliases[i]);
-            config.requireProvider(settings.providers[aliases[i]].sonar);
         }
 
     };
@@ -116,15 +109,14 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var dataAvail = filterObject(request.getProbe('avail'), filterEmpty),
             dataRtt = filterObject(request.getProbe('http_rtt'), filterInvalidRttScores),
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataFusion = parseData(request.getData('fusion')),
+			dataSonar = parseData(request.getData('sonar')),
             decisionProvider,
             decisionTtl = settings.default_ttl,
             decisionReason = [],
             candidates = settings.providers,
             candidatesAliases = Object.keys(candidates);
 
-        /* jshint laxbreak:true */
         function getPaddingPercent(alias, metric, error_reason) {
             var value,
                 thresholds,
@@ -142,7 +134,6 @@ function OpenmixApplication(settings) {
 
                     for (i = 0, len = thresholds.length; i < len; i ++) {
                         if (value >= thresholds[i].threshold) {
-                            //console.log('hit threshold: ' + JSON.stringify(thresholds[i]));
                             return (value / thresholds[i].threshold - 1) * thresholds[i].multiplier;
                         }
                     }
@@ -185,16 +176,14 @@ function OpenmixApplication(settings) {
         }
 
 
-        // determine which providers have a sonar value below threshold
+        // determine which providers have a sonar available
         /**
          * @param candidate
          * @param alias
          * @returns {boolean}
          */
-        function filterFusionSonar(candidate, alias) {
-            return dataFusion[candidate.sonar] !== undefined &&
-                dataFusion[candidate.sonar].health_score !== undefined &&
-                (dataFusion[candidate.sonar].health_score.value >= settings.fusion_sonar_threshold || dataFusion[candidate.sonar].availability_override !== undefined );
+        function filterSonarAvailability(candidate, alias) {
+            return dataSonar[alias] !== undefined && dataSonar[alias].avail > 0;
         }
 
         /**
@@ -215,8 +204,7 @@ function OpenmixApplication(settings) {
         }
         else {
             if (settings.use_sonar_avail) {
-                //filter the candidates with RAX sonar
-                candidates = filterObject(candidates, filterFusionSonar);
+                candidates = filterObject(candidates, filterSonarAvailability);
                 candidatesAliases = Object.keys(candidates);
             }
             if (candidatesAliases.length === 0) {
@@ -264,7 +252,6 @@ function OpenmixApplication(settings) {
                 candidates[key] = object[key];
             }
         }
-
         return candidates;
     }
 
@@ -297,7 +284,6 @@ function OpenmixApplication(settings) {
             candidate,
             min = Infinity,
             value;
-
         while (i --) {
             key = keys[i];
             value = source[key][property];
@@ -307,53 +293,47 @@ function OpenmixApplication(settings) {
                 min = value;
             }
         }
-
         return candidate;
     }
 
-    /**
-     * @param {!Object} target
-     * @param {Object} source
-     * @param {string} property
-     */
-    function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
+	/**
+	 * @param {!Object} target
+	 * @param {Object} source
+	 * @param {string} property
+	 */
+	function intersectObjects(target, source, property) {
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
 
-        while (i --) {
-            key = keys[i];
+	/**
+	 * @param {!Object} data
+	 */
+	function parseData(data) {
+		var keys = Object.keys(data),
+			i = keys.length,
+			key;
+		while (i --) {
+			key = keys[i];
 
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
+			try {
+				data[key] = JSON.parse(data[key]);
+			}
+			catch (e) {
+				delete data[key];
+			}
+		}
+		return data;
+	}
 
-        return target;
-    }
-
-    /**
-     * @param {!Object} data
-     */
-    function parseFusionData(data) {
-        var keys = Object.keys(data),
-            i = keys.length,
-            key;
-
-        while (i --) {
-            key = keys[i];
-
-            try {
-                data[key] = JSON.parse(data[key]);
-            }
-            catch (e) {
-                delete data[key];
-            }
-        }
-
-        return data;
-    }
 }

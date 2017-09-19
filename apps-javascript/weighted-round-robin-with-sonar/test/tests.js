@@ -17,8 +17,7 @@
                 weight: 20
             }
         },
-        default_ttl: 20,
-        fusion_sonar_threshold: 2
+        default_ttl: 20
     };
 
     module('do_init');
@@ -91,37 +90,19 @@
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "provider1": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "provider2": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "provider3": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     })
                 });
-            Math.random.returns(0.999);
+            Math.random.returns(0);
         },
         verify: function(i) {
             equal(i.request.getData.callCount, 1, 'Verifying getData call count');
@@ -140,34 +121,16 @@
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "provider1": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "provider2": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "provider3": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     })
                 });
             Math.random.returns(0);
@@ -185,7 +148,7 @@
         }
     }));
 
-   test('most_available_platform_chosen', test_handle_request({
+   test('only_one_platform_available', test_handle_request({
         settings: {
             providers: {
                 'provider1': {
@@ -201,106 +164,21 @@
                     weight: 0
                 }
             },
-            default_ttl: 20,
-            fusion_sonar_threshold: 2
+            default_ttl: 20
         },
         setup: function(i) {
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "provider1": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 4
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "provider2": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "provider3": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 3
-                        },
-                        "bypass_data_points": true
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'provider2', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'cname2.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-        }
-    }));
-
-    test('most_available_platform_chosen-2', test_handle_request({
-        settings: {
-            providers: {
-                'provider1': {
-                    cname: 'cname1.foo.com',
-                    weight: 0
-                },
-                'provider2': {
-                    cname: 'cname2.foo.com',
-                    weight: 0
-                },
-                'provider3': {
-                    cname: 'cname3.foo.com',
-                    weight: 0
-                }
-            },
-            default_ttl: 20,
-            fusion_sonar_threshold: 2
-        },
-        setup: function(i) {
-            i.request
-                .getData
-                .withArgs('fusion')
-                .returns({
-                    "provider1": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "provider2": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
-                    }),
-                    "provider3": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     })
                 });
         },

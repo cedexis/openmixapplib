@@ -17,9 +17,7 @@ var handler = new OpenmixApplication({
     // The TTL to be set when the application chooses a geo provider.
     default_ttl: 20,
     // The minimum availability score that providers must have in order to be considered available
-    availability_threshold: 90,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    availability_threshold: 90
 });
 
 function init(config) {
@@ -56,9 +54,7 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var dataAvail = request.getProbe('avail'),
             dataRtt = request.getProbe('http_rtt'),
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
-            dataFusionAliases,
+            dataSonar = parseSonarData(request.getData('sonar')),
             allReasons,
             decisionProvider,
             decisionReason = '',
@@ -74,8 +70,8 @@ function OpenmixApplication(settings) {
          * @param candidate
          * @param key
          */
-        function filterFusionSonar(candidate, key) {
-            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value >= settings.fusion_sonar_threshold;
+        function filterSonar(candidate, key) {
+            return dataSonar[key] !== undefined && dataSonar[key].avail > 0;
         }
 
         /**
@@ -90,13 +86,9 @@ function OpenmixApplication(settings) {
         if (Object.keys(candidates).length > 0) {
             // Select the best performing provider that meets its minimum
             // availability score, if given
-            if (Object.keys(dataFusion).length > 0) {
-                dataFusionAliases = Object.keys(dataFusion);
-                //check if "Big Red Button" isn't activated
-                if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
-                    // remove any that don't meet the RAX Sonar threshold
-                    candidates = filterObject(candidates, filterFusionSonar);
-                }
+            if (Object.keys(dataSonar).length > 0) {
+                // remove any sonar unavailable
+                candidates = filterObject(candidates, filterSonar);
             }
             if (Object.keys(candidates).length > 0 && Object.keys(dataAvail).length > 0) {
                 candidates = filterObject(candidates, filterAvailability);
@@ -123,18 +115,22 @@ function OpenmixApplication(settings) {
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
-            if (!filter(object[key], key)) {
-                delete(object[key]);
-            }
-        }
-        return object;
-    }
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
+
+		while (i --) {
+			key = keys[i];
+
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
+
+		return candidates;
+	}
 
     /**
      * @param {!Object} source
@@ -186,7 +182,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

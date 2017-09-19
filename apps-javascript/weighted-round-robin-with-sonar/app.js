@@ -26,9 +26,7 @@ var handler = new OpenmixApplication({
     },
 
     // The DNS TTL to be applied to DNS responses in seconds.
-    default_ttl: 20,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    default_ttl: 20
 });
 
 function init(config) {
@@ -65,10 +63,7 @@ function OpenmixApplication(settings) {
      * @param {OpenmixResponse} response
      */
     this.handle_request = function(request, response) {
-        //get the sonar data
-        var /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
-            dataFusionAliases,
+        var dataSonar = parseSonarData(request.getData('sonar')),
             allReasons,
             decisionProvider,
             candidates,
@@ -78,7 +73,7 @@ function OpenmixApplication(settings) {
 
         allReasons = {
             routed_randomly_by_weight: 'A',
-            most_available_platform_chosen: 'B',
+            only_one_platform_available: 'B',
             choose_random_platform: 'C'
         };
 
@@ -86,8 +81,8 @@ function OpenmixApplication(settings) {
          * @param candidate
          * @param key
          */
-        function filterFusionSonar(candidate, key) {
-            return dataFusion[key] !== undefined && dataFusion[key].health_score !== undefined && dataFusion[key].health_score.value >= settings.fusion_sonar_threshold;
+        function filterSonarAvailability(candidate, key) {
+            return dataSonar[key] !== undefined && dataSonar[key].avail > 0;
         }
 
         /**
@@ -131,32 +126,22 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (Object.keys(dataFusion).length > 0) {
-            dataFusionAliases = Object.keys(dataFusion);
-            //check if "Big Red Button" isn't activated
-            if (dataFusion[dataFusionAliases[0]].availability_override === undefined) {
-                // filter candidates by  fusion sonar threshold,
-                // remove all the provider with fusion sonar data < than settings.fusion_sonar_threshold
-                candidates = filterObject(dataFusion, filterFusionSonar);
-                candidateAliases = Object.keys(candidates);
+        if (Object.keys(dataSonar).length > 0) {
+            // filter candidates by Sonar threshold,
+            candidates = filterObject(dataSonar, filterSonarAvailability);
+            candidateAliases = Object.keys(candidates);
 
-                if (candidateAliases.length > 0) {
-                    if (candidateAliases.length === 1) {
-                        decisionProvider = candidateAliases[0];
-                        decisionReason = allReasons.most_available_platform_chosen;
-                    }
-                    else {
-                        // Respond with a weighted random selection
-                        totalWeight = getTotalWeight(candidates);
-                        if (totalWeight > 0) {
-                            decisionProvider = getWeightedRandom(candidates, totalWeight);
-                            decisionReason = allReasons.routed_randomly_by_weight;
-                        }
-                        // Respond with most available from sonar
-                        else {
-                            decisionProvider = getHighest(candidates);
-                            decisionReason = allReasons.most_available_platform_chosen;
-                        }
+            if (candidateAliases.length > 0) {
+                if (candidateAliases.length === 1) {
+                    decisionProvider = candidateAliases[0];
+                    decisionReason = allReasons.only_one_platform_available;
+                }
+                else {
+                    // Respond with a weighted random selection
+                    totalWeight = getTotalWeight(candidates);
+                    if (totalWeight > 0) {
+                        decisionProvider = getWeightedRandom(candidates, totalWeight);
+                        decisionReason = allReasons.routed_randomly_by_weight;
                     }
                 }
             }
@@ -177,46 +162,27 @@ function OpenmixApplication(settings) {
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
-        return object;
-    }
+		while (i --) {
+			key = keys[i];
 
-    /**
-     * @param {!Object} source
-     */
-    function getHighest(source) {
-        var keys = Object.keys(source),
-            i = keys.length,
-            key,
-            candidate,
-            max = -Infinity,
-            value;
-        while (i --) {
-            key = keys[i];
-            value = source[key].health_score.value;
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
 
-            if (value > max) {
-                candidate = key;
-                max = value;
-            }
-        }
-        return candidate;
-    }
+		return candidates;
+	}
 
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

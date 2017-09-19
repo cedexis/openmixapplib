@@ -105,20 +105,22 @@ function OpenmixApplication(settings) {
      * @param object
      * @param filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
-        return object;
-    }
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
+
+		return candidates;
+	}
     
     /**
     * @param {!Object} source
