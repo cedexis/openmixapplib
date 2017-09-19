@@ -70,7 +70,7 @@ function OpenmixApplication(settings) {
          * @param candidate
          * @param key
          */
-        function filterSonarSonar(candidate, key) {
+        function filterSonar(candidate, key) {
             return dataSonar[key] !== undefined && dataSonar[key].avail > 0;
         }
 
@@ -88,7 +88,7 @@ function OpenmixApplication(settings) {
             // availability score, if given
             if (Object.keys(dataSonar).length > 0) {
                 // remove any sonar unavailable
-                candidates = filterObject(candidates, filterSonarSonar);
+                candidates = filterObject(candidates, filterSonar);
             }
             if (Object.keys(candidates).length > 0 && Object.keys(dataAvail).length > 0) {
                 candidates = filterObject(candidates, filterAvailability);
