@@ -19,8 +19,7 @@
         default_provider: 'foo',
         default_ttl: 20,
         error_ttl: 10,
-        require_sonar_data: false,
-        fusion_sonar_threshold: 2
+        require_sonar_data: false
     };
 
     module('do_init');
@@ -150,8 +149,7 @@
             default_provider: 'foo',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -193,8 +191,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -236,8 +233,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -248,22 +244,10 @@
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     })
                 });
         },
@@ -298,8 +282,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -310,31 +293,13 @@
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     })
                 });
         },
@@ -369,8 +334,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -381,31 +345,13 @@
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     })
                 });
         },
@@ -440,8 +386,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: true,
-            fusion_sonar_threshold: 2
+            require_sonar_data: true
         },
         setup: function(i) {
             console.log(i);
@@ -452,34 +397,13 @@
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
+                        "avail": 0
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
+                        "avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
+                        "avail": 0
                     })
                 });
         },
@@ -514,8 +438,7 @@
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -526,31 +449,13 @@
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     })
                 });
         },
@@ -585,8 +490,7 @@ test('geo country fails sonar, select next available sonar provider', test_handl
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: false,
-            fusion_sonar_threshold: 2
+            require_sonar_data: false
         },
         setup: function(i) {
             console.log(i);
@@ -597,31 +501,13 @@ test('geo country fails sonar, select next available sonar provider', test_handl
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 1
-                        },
-                        "bypass_data_points": true
+                        "avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     })
                 });
         },
@@ -656,8 +542,7 @@ test('test sonar_data_required flag returns only available platform', test_handl
             default_provider: 'baz',
             default_ttl: 20,
             error_ttl: 10,
-            require_sonar_data: true,
-            fusion_sonar_threshold: 2
+            require_sonar_data: true
         },
         setup: function(i) {
             console.log(i);
@@ -668,13 +553,7 @@ test('test sonar_data_required flag returns only available platform', test_handl
                 .onCall(0)
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     })
                 });
         },

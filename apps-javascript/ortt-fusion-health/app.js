@@ -14,7 +14,7 @@ var handler = new OpenmixApplication({
     default_ttl: 90,
     min_valid_rtt_score: 5,
 
-    // when set to false, all providers must have fusion data.  when set to true, fusion data is optional
+    // when set to false, all providers must have sonar data.  when set to true, sonar data is optional
     no_health_score_ok: false
 });
 
@@ -54,12 +54,7 @@ function OpenmixApplication(settings) {
             candidateAliases,
             decisionReason,
             allReasons,
-            /**
-             * A data object to store data from Fusion
-             *
-             * @type { !Object.<string, { health_score: { value:string } }> }
-             */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataSonar = parseSonarData(request.getData('sonar')),
             dataRtt = filterObject(request.getProbe('http_rtt'), filterEmpty);
         
         allReasons = {
@@ -67,39 +62,38 @@ function OpenmixApplication(settings) {
             one_acceptable_provider: 'B',
             best_provider_selected: 'C',
             error_condition: 'D',
-            fusion_data_not_robust: 'E',
+            sonar_data_not_robust: 'E',
             radar_rtt_not_robust: 'F',
-            no_available_fusion_providers: 'G'
+            no_available_sonar_providers: 'G'
 
         };
 
-        function fusionHealthScoreOk(provider) {
-            // let the flag determine if the provider is available when we don't have fusion data for the provider
-            if (dataFusion[provider] === undefined) {
+        function sonarHealthScoreOk(provider) {
+            // let the flag determine if the provider is available when we don't have sonar data for the provider
+            if (dataSonar[provider] === undefined) {
                 return settings.no_health_score_ok;
             }
 
-            // normally, the fusion recipe returns a health score of 3 or greater when the server is available
-            return dataFusion[provider].health_score !== undefined
-                && dataFusion[provider].health_score.value !== undefined
-                && dataFusion[provider].health_score.value > 2;
+            // normally, the sonar recipe returns a health score of 3 or greater when the server is available
+            return dataSonar[provider].avail !== undefined
+                && dataSonar[provider].avail > 0;
         }
 
-        // radar or fusion health_score data not available, select any fusion available provider
+        // radar or sonar health_score data not available, select any sonar available provider
         function selectAnyProvider(reason) {
             var i = aliases.length,
                 n = 0,
                 candidates = [];
 
             while (i --) {
-                if (fusionHealthScoreOk(aliases[i])) {
+                if (sonarHealthScoreOk(aliases[i])) {
                     candidates[n ++] = aliases[i];
                 }
             }
 
             if (n === 0) {
                 decisionProvider = settings.default_provider;
-                decisionReason = allReasons.no_available_fusion_providers + allReasons.default_provider;
+                decisionReason = allReasons.no_available_sonar_providers + allReasons.default_provider;
             }
             else if (n === 1) {
                 decisionProvider = candidates[0];
@@ -111,21 +105,21 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (Object.keys(dataFusion).length !== aliases.length && !settings.no_health_score_ok){
-            selectAnyProvider(allReasons.fusion_data_not_robust);
+        if (Object.keys(dataSonar).length !== aliases.length && !settings.no_health_score_ok){
+            selectAnyProvider(allReasons.sonar_data_not_robust);
         }
-        // if we don't have rtt, return any fusion available provider
+        // if we don't have rtt, return any sonar available provider
         else if (Object.keys(dataRtt).length !== aliases.length) {
             selectAnyProvider(allReasons.radar_rtt_not_robust);
         }
         else {
-            // we've got radar and fusion data for all providers, filter out any unavailable fusion providers
-            candidates = filterObject(dataRtt, fusionHealthScoreOk);
+            // we've got radar and sonar data for all providers, filter out any unavailable sonar providers
+            candidates = filterObject(dataRtt, sonarHealthScoreOk);
             candidateAliases = Object.keys(candidates);
 
             if (candidateAliases.length === 0) {
                 // No available providers
-                selectAnyProvider(allReasons.no_available_fusion_providers);
+                selectAnyProvider(allReasons.no_available_sonar_providers);
             }
             else if (candidateAliases.length === 1) {
                 decisionProvider = candidateAliases[0];
@@ -143,21 +137,22 @@ function OpenmixApplication(settings) {
         response.setReasonCode(decisionReason);
     };
 
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(key)) {
-                delete object[key];
-            }
-        }
+			if (filter(key)) {
+				candidates[key] = object[key];
+			}
+		}
 
-        return object;
-    }
+		return candidates;
+	}
 
     /**
      * @param {Object} candidate
@@ -194,7 +189,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

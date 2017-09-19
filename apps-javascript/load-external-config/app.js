@@ -125,34 +125,34 @@ function OpenmixApplication(settings) {
 
     };
 
-    /**
-     * @param {!Object} object
-     * @param {Function} filter
-     */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
-        return object;
-    }
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidate = {};
+		while (i --) {
+			key = keys[i];
+			if (filter(object[key], key)) {
+				candidate[key] = object[key];
+			}
+		}
+		return candidate;
+	}
+
     /**
      * @param {Object} candidate
      */
     function filterInvalidRttScores(candidate) {
         return candidate.http_rtt >= settings.min_valid_rtt_score;
     }
+
     /**
      * @param {{avail:number}} candidate
      */
     function filterAvailability(candidate) {
         return candidate.avail >= settings.availability_threshold;
     }
+
     /**
      * @param {Object} candidate
      */
@@ -163,6 +163,7 @@ function OpenmixApplication(settings) {
         }
         return false;
     }
+    
     /**
      * @param {!Object} source
      * @param {string} property
@@ -184,26 +185,27 @@ function OpenmixApplication(settings) {
         }
         return candidate;
     }
+
     /**
      * @param {!Object} target
      * @param {Object} source
      * @param {string} property
      */
-    function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
-        return target;
-    }
+	function intersectObjects(target, source, property) {
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
+
     /**
      * @param {string} data
      */

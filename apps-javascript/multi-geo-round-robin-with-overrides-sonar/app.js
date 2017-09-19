@@ -28,9 +28,7 @@ var handler = new OpenmixApplication({
     // Provide a multi geolocalized roundrobin
     // country_to_provider_roundrobin: { 'UK': ['bar','foo'], 'ES': ['baz','faa']},
     // flip to true if the platform will be considered unavailable if it does not have sonar data
-    require_sonar_data: false,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    require_sonar_data: false
 });
 
 function init(config) {
@@ -66,8 +64,7 @@ function OpenmixApplication(settings) {
 
         // Initiate variables
         var allReasons,
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataSonar = parseSonarData(request.getData('sonar')),
             decisionProvider,
             decisionReason,
             passedCandidates,
@@ -86,8 +83,8 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function aboveSonarThreshold(alias) {
-            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
-                return dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold;
+            if (dataSonar[alias] !== undefined && dataSonar[alias].avail !== undefined) {
+                return dataSonar[alias].avail > 0;
             }
             return !settings.require_sonar_data;
         }
@@ -109,7 +106,7 @@ function OpenmixApplication(settings) {
             // Else origin
         } else {
             // Check origin sonar decision
-            if (dataFusion.origin !== undefined && dataFusion.origin.health_score.value >= settings.fusion_sonar_threshold && dataFusion.origin.availability_override === undefined) {
+            if (dataSonar.origin !== undefined && dataSonar.origin.avail > 0) {
                 decisionProvider = 'origin';
                 decisionReason = allReasons.default_selected;
             } else {
@@ -182,7 +179,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

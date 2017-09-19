@@ -143,21 +143,21 @@ function OpenmixApplication(settings) {
         response.setReasonCode(decisionReason);
     };
 
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(key)) {
-                delete object[key];
-            }
-        }
-
-        return object;
-    }
+			if (filter(key)) {
+				candidates[key] = object[key];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {Object} candidate

@@ -102,19 +102,13 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+                        "avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     })
                 });
         },
@@ -142,25 +136,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "baz": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     })
                 });
         },
@@ -192,25 +177,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "0"
-                        }
+						"avail": 0
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "0"
-                        }
+						"avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "0"
-                        }
+						"avail": 0
                     })
                 });
         },
@@ -242,25 +218,16 @@
                 });
             i.request
                 .getData
-                .onCall(0)
+				.withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "0"
-                        }
+						"avail": 0
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "baz": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "0"
-                        }
+						"avail": 0
                     })
 
                 });
@@ -292,25 +259,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "baz": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     })
                 });
         },
@@ -340,25 +298,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "2"
-                        }
+						"avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     })
                 });
         },
@@ -406,7 +355,7 @@ test('test fusion health scores not required, return best rtt', test_handle_requ
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({});
         },
         verify: function(i) {
@@ -452,19 +401,13 @@ test('test fusion health scores not required, return best rtt', test_handle_requ
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": "5"
-                        }
+						"avail": 1
                     })
                 });
         },

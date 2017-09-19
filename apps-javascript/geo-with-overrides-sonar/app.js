@@ -26,9 +26,7 @@ var handler = new OpenmixApplication({
     // The TTL to be set when the application chooses the default provider.
     error_ttl: 20,
     // flip to true if the platform will be considered unavailable if it does not have sonar data
-    require_sonar_data: false,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    require_sonar_data: false
 });
 
 function init(config) {
@@ -64,8 +62,7 @@ function OpenmixApplication(settings) {
      */
     this.handle_request = function(request, response) {
         var allReasons,
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+			dataSonar = parseFusionData(request.getData('sonar')),
             decisionProvider,
             decisionReason,
             failedCandidates,
@@ -84,8 +81,8 @@ function OpenmixApplication(settings) {
          * @param alias
          */
         function belowSonarThreshold(alias) {
-            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
-                return dataFusion[alias].health_score.value < settings.fusion_sonar_threshold;
+            if (dataSonar[alias] !== undefined && dataSonar[alias].avail !== undefined) {
+                return dataSonar[alias].avail === 0;
             }
             return settings.require_sonar_data;
         }
@@ -134,7 +131,6 @@ function OpenmixApplication(settings) {
 
         failedCandidates = filterObject(settings.providers, belowSonarThreshold);
 
-        /* jshint laxbreak:true */
         if (settings.country_to_provider !== undefined
             && settings.country_to_provider[request.country] !== undefined
             && failedCandidates[settings.country_to_provider[request.country]] === undefined) {
@@ -162,7 +158,6 @@ function OpenmixApplication(settings) {
                 }
             }
         }
-        /* jshint laxbreak:false */
 
         response.respond(decisionProvider, settings.providers[decisionProvider].cname);
         response.setTTL(decisionTtl);

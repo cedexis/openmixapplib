@@ -16,10 +16,7 @@
         },
         default_provider: 'foo',
         default_ttl: 20,
-        availability_threshold: 80,
-        //Set Fusion Sonar threshold for availability for the platform to be included.
-        // sonar values are between 0 - 5
-        fusion_sonar_threshold: 2
+        availability_threshold: 80
     };
 
     module('do_init');
@@ -119,34 +116,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+                        "avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     })
                 });
         },
@@ -195,34 +174,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     })
                 });
         },
@@ -261,34 +222,16 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     })
                 });
         },
@@ -327,34 +270,16 @@
                 .returns({});
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({
                     "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true
+						"avail": 1
                     }),
                     "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     }),
                     "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true
+						"avail": 0
                     })
                 });
         },
@@ -403,87 +328,8 @@
                 });
             i.request
                 .getData
-                .withArgs('fusion')
+                .withArgs('sonar')
                 .returns({});
-        },
-        verify: function(i) {
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying reason code');
-        }
-    }));
-    
-    test('data_problem - 4', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getProbe
-                .withArgs('http_kbps')
-                .returns({
-                    "foo": {
-                        "http_kbps": 190
-                    },
-                    "bar": {
-                        "http_kbps": 180
-                    },
-                    "baz": {
-                        "http_kbps": 100
-                    }
-                });
-            i.request
-                .getProbe
-                .withArgs('avail')
-                .returns({
-                    "foo": {
-                        "avail": 70
-                    },
-                    "bar": {
-                        "avail": 90
-                    },
-                    "baz": {
-                        "avail": 100
-                    }
-                });
-            i.request
-                .getData
-                .withArgs('fusion')
-                .returns({
-                    "foo": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 5
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
-                    }),
-                    "bar": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
-                    }),
-                    "baz": JSON.stringify({
-                        "status": "HTTP server is functioning normally",
-                        "state": "OK",
-                        "health_score": {
-                            "unit": "0-5",
-                            "value": 0
-                        },
-                        "bypass_data_points": true,
-                        "availability_override": true
-                    })
-                });
         },
         verify: function(i) {
             equal(i.response.respond.callCount, 1, 'Verifying respond call count');

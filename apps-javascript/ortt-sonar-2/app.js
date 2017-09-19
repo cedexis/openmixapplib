@@ -15,9 +15,7 @@ var handler = new OpenmixApplication({
     min_valid_rtt_score: 5,
     // when set true if one of the provider has not data it will be removed,
     // when set to false, sonar data is optional, so a provider with no sonar data will be used
-    require_sonar_data: true,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    require_sonar_data: true
 });
 
 function init(config) {
@@ -51,8 +49,7 @@ function OpenmixApplication(settings) {
      */
     this.handle_request = function(request, response) {
         var candidates,
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataSonar = parseSonarData(request.getData('sonar')),
             dataRtt = request.getProbe('http_rtt'),
             decisionProvider,
             decisionReason,
@@ -80,8 +77,8 @@ function OpenmixApplication(settings) {
          */
         function filterSonar(alias) {
             // let the flag determine if the provider is available when we don't have sonar data for the provider
-            if (dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined && dataFusion[alias].availability_override === undefined) {
-                return dataFusion[alias].health_score.value >= settings.fusion_sonar_threshold;
+            if (dataSonar[alias] !== undefined && dataSonar[alias].avail !== undefined) {
+                return dataSonar[alias].avail > 0;
             }
             return !settings.require_sonar_data;
         }
@@ -113,7 +110,7 @@ function OpenmixApplication(settings) {
             }
         }
 
-        if (Object.keys(dataFusion).length !== aliases.length && settings.require_sonar_data) {
+        if (Object.keys(dataSonar).length !== aliases.length && settings.require_sonar_data) {
             selectAnyProvider(allReasons.sonar_data_not_robust);
         } else if (Object.keys(dataRtt).length !== aliases.length) {
             // if we don't have rtt, return any sonar available provider
@@ -150,19 +147,22 @@ function OpenmixApplication(settings) {
      * @param object
      * @param filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-            if (!filter(key)) {
-                delete object[key];
-            }
-        }
-        return object;
-    }
+		while (i --) {
+			key = keys[i];
+
+			if (filter(key)) {
+				candidates[key] = object[key];
+			}
+		}
+
+		return candidates;
+	}
 
     /**
      * @param source
@@ -190,7 +190,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
