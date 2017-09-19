@@ -1,6 +1,0 @@
-name: Weighted Round Robin with Sonar
-author: Cedexis
-last_updated: 09/19/2012
-categories: 
-description: |
-  A weighted round robin application that takes Sonar availability scores into account.

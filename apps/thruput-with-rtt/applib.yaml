@@ -1,6 +1,0 @@
-name: Throughput with RTT Tie Breaker 
-author: Cedexis
-last_updated: 03/26/2012
-categories: Performance
-description: |
-  Choose the best provider based on HTTP Throughput. If the top 2 are with 5% of each other, use HTTP Response time to break the tie.

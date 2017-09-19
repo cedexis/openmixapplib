@@ -1,6 +1,0 @@
-name: Selectively Enable Platforms based on Day and Time 
-author: Cedexis
-last_updated: 02/12/2013
-categories: 
-description: |
-    This application selectively enables different platforms based on the time of day and day of week. It can be used with Fusion Custom to make it easy to update which platforms are included at different days and times.

@@ -1,6 +1,0 @@
-name: Session Persistence
-author: Cedexis
-last_updated: 02/19/2013
-categories: 
-description: |
-    Demonstrates how to use Radar performance data to reduce end-user latency while still ensuring session persistence by network.

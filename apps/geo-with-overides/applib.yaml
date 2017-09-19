@@ -1,8 +1,0 @@
-name: Route Based on Geography
-author: Jake Maul of Mozilla
-last_updated: 01/31/2012
-categories: Geography
-description: |
-  Demonstrates the basic use of geographic market and country data. Use Market data for most decsisions, but override certain countries.
-
-  Contributed by Jake Maul of Mozilla
