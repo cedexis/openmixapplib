@@ -1,6 +1,7 @@
 var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced (all the providers that can be used)
     // keys are the Openmix aliases set in the Portal
+    // All providers used on "default_settings" or "geo_settings" should be listed here.
     providers: {
         'foo': {
             cname: 'cn.foo.net'
@@ -15,7 +16,10 @@ var handler = new OpenmixApplication({
     geo_order: ['asn', 'state', 'region', 'country', 'market'],
     use_radar_availability_threshold: true,
     use_sonar_availability_threshold: true,
+
     // default_settings is used to have providers and configuration options for all geos that aren't defined in geo_settings map.
+    // All providers used here should be defined in the "providers" list Above, if not, the app will throw an error.
+
     default_settings: {
         providers: {
             'foo': {
@@ -66,8 +70,8 @@ var handler = new OpenmixApplication({
                      kbps_padding: 0,
                      rtt_padding: 0
                  },
-                 'bop': {
-                     cname: 'cn.bop.net',
+                 'bar': {
+                     cname: 'cn.bar.net',
                      kbps_padding: 0,
                      rtt_padding: 0
                  }
@@ -77,6 +81,8 @@ var handler = new OpenmixApplication({
              rtt_tp_mix: 0.25
          }
      },*/
+
+	// All providers used here should be defined in the "providers" list Above, if not, the app will throw an error.
     geo_settings: {
         state: {
             'US-S-AR': { // Example of Arizona Settings.
@@ -122,8 +128,8 @@ var handler = new OpenmixApplication({
                             kbps_padding: 0,
                             rtt_padding: 0
                         },
-                        'bop': {
-                            cname: 'cn.bop.net',
+                        'bar': {
+                            cname: 'cn.bar.net',
                             kbps_padding: 0,
                             rtt_padding: 0
                         }
@@ -159,8 +165,8 @@ var handler = new OpenmixApplication({
                             kbps_padding: 0,
                             rtt_padding: 0
                         },
-                        'bop': {
-                            cname: 'cn.bop.net',
+                        'bar': {
+                            cname: 'cn.bar.net',
                             kbps_padding: 0,
                             rtt_padding: 0
                         }
