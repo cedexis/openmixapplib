@@ -300,7 +300,7 @@
             equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'E', 'Verifying reason code');
         }
     }));
 
@@ -346,7 +346,7 @@
             equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying reason code');
         }
     }));
 
@@ -394,7 +394,7 @@
             equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'E,A', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'F,C', 'Verifying reason code');
         }
     }));
 
@@ -444,7 +444,7 @@
             equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'E,H,B', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'F,G,B', 'Verifying reason code');
         }
     }));
 
@@ -506,7 +506,7 @@
             equal(i.response.respond.args[0][0], 'blah', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.blah.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'E,H,A', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'F,G,A', 'Verifying reason code');
         }
     }));
 
@@ -554,7 +554,7 @@
             equal(i.response.respond.args[0][0], 'bar', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'G', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'I', 'Verifying reason code');
         }
     }));
 
@@ -604,7 +604,7 @@
             equal(i.response.respond.args[0][0], 'foo', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'H', 'Verifying reason code');
         }
     }));
 
@@ -1147,7 +1147,7 @@
             equal(i.response.respond.args[0][0], 'baz', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'H', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'J', 'Verifying reason code');
         }
     }));
 
@@ -1209,7 +1209,7 @@
             equal(i.response.respond.args[0][0], 'baz', 'Verifying selected alias');
             equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying CNAME');
             equal(i.response.setTTL.args[0][0], 10, 'Verifying TTL');
-            equal(i.response.setReasonCode.args[0][0], 'I,A', 'Verifying reason code');
+            equal(i.response.setReasonCode.args[0][0], 'K,A', 'Verifying reason code');
         }
     }));
 
