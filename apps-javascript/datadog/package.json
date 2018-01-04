@@ -2,14 +2,20 @@
     "title": "Datadog Alert using Fusion",
     "description": "Uses a Datadog Alert Fusion feed that provides health data along with RTT for selecting among healthy servers. Demonstrates how to input a Datadog Alert feed into Openmix applications and use that data in the decision making process.",
     "lastUpdated": "01/03/2018",
-    "keywords": ["Fusion", "Datadog"],
+    "keywords": [
+        "Fusion",
+        "Datadog"
+    ],
     "author": "Cedexis",
     "devDependencies": {
-        "karma": "0.10.x",
-        "karma-qunit": "0.1.x",
-        "karma-phantomjs-launcher": "0.1.x",
-        "karma-junit-reporter": "0.2.x",
-        "jshint": "2.5.x"
+        "jshint": "^2.9.5",
+        "karma": "^2.0.0",
+        "karma-junit-reporter": "^1.2.0",
+        "karma-phantomjs-launcher": "^1.0.4",
+        "karma-qunit": "^1.2.1",
+        "karma-sinon": "^1.0.5",
+        "qunitjs": "^2.4.1",
+        "sinon": "^4.1.3"
     },
     "repository": {
         "type": "git",

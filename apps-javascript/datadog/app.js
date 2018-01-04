@@ -101,7 +101,7 @@ function OpenmixApplication(settings) {
                 decisionProvider = candidates[0];
                 decisionReason = reason;
             } else {
-                decisionProvider = getHighest(dataFusion);
+                decisionProvider = getLowest(dataRtt, 'http_rtt');
                 decisionReason = reason;
             }
         }
@@ -125,7 +125,7 @@ function OpenmixApplication(settings) {
             candidates = filterObject(dataRtt, fusionHealthScoreOk);
             candidateAliases = Object.keys(candidates);
 
-            var alert = (candidates.length != candidateAliases.length);
+            var alert = (dataRtt.length != candidates.length);
 
             if (candidateAliases.length === 0) {
                 selectAnyProvider(reasons.no_available_fusion_providers);
@@ -142,10 +142,10 @@ function OpenmixApplication(settings) {
             } else {  
                 // Check if there are platforms excluded due to Fusion data              
                 if (alert) {
-                    decisionReason = reasons.monitoring_alert;
+                    decisionReason = reasons.monitoring_alert + ', ' + reasons.best_provider_selected;
                 }
 
-                decisionReason = decisionReason + ', ' + reasons.best_provider_selected;
+                decisionReason = reasons.best_provider_selected;
 
                 // TODO we've got more than 1 available provider, this template app routes on best rtt.
                 // Change here if you want to insert additional logic such as rtt handicap based on fusion custom data score
@@ -206,6 +206,7 @@ function OpenmixApplication(settings) {
 
         return candidate;
     }
+
     // used for determining the provider with the best fusion health score
     function getHighest(source) {
         var keys = Object.keys(source),
