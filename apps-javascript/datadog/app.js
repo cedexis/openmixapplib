@@ -38,13 +38,13 @@ function OpenmixApplication(settings) {
     var aliases = settings.providers === undefined ? [] : Object.keys(settings.providers);
 
     var reasons = {
-        default_provider: 'A',
-        one_acceptable_provider: 'B',
-        best_provider_selected: 'C',
-        fusion_data_not_robust: 'D',
-        no_available_fusion_providers: 'E',
-        fusion_data_error: 'F',
-        radar_rtt_not_robust: 'G',
+        default_provider: 'Default Provider',
+        one_acceptable_provider: 'Only One Platform',
+        best_provider_selected: 'Optimal Selected',
+        fusion_data_not_robust: 'No Fusion Data',
+        no_available_fusion_providers: 'No Available Fusion Platforms',
+        fusion_data_error: 'Fusion Data Error',
+        radar_rtt_not_robust: 'No Radar Data',
         monitoring_alert: 'Alert Down'
     };
 
