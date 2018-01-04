@@ -1,6 +1,7 @@
 var handler = new OpenmixApplication({
     // `providers` contains a list of the providers to be load-balanced (all the providers that can be used)
     // keys are the Openmix aliases set in the Portal
+    // All providers used on "default_settings" or "geo_settings" should be listed here.
     providers: {
         'foo': {
             cname: 'cn.foo.net'
@@ -15,7 +16,10 @@ var handler = new OpenmixApplication({
     geo_order: ['asn', 'state', 'region', 'country', 'market'],
     use_radar_availability_threshold: true,
     use_sonar_availability_threshold: true,
+
     // default_settings is used to have providers and configuration options for all geos that aren't defined in geo_settings map.
+    // All providers used here should be defined in the "providers" list Above, if not, the app will throw an error.
+
     default_settings: {
         providers: {
             'foo': {
@@ -33,7 +37,6 @@ var handler = new OpenmixApplication({
         },
         default_ttl: 20,
         radar_availability_threshold: 95,
-        sonar_availability_threshold: 2,
         min_rtt: 5,
         rtt_tp_mix: 0.95
     },
@@ -67,8 +70,8 @@ var handler = new OpenmixApplication({
                      kbps_padding: 0,
                      rtt_padding: 0
                  },
-                 'bop': {
-                     cname: 'cn.bop.net',
+                 'bar': {
+                     cname: 'cn.bar.net',
                      kbps_padding: 0,
                      rtt_padding: 0
                  }
@@ -78,6 +81,8 @@ var handler = new OpenmixApplication({
              rtt_tp_mix: 0.25
          }
      },*/
+
+	// All providers used here should be defined in the "providers" list Above, if not, the app will throw an error.
     geo_settings: {
         state: {
             'US-S-AR': { // Example of Arizona Settings.
@@ -123,8 +128,8 @@ var handler = new OpenmixApplication({
                             kbps_padding: 0,
                             rtt_padding: 0
                         },
-                        'bop': {
-                            cname: 'cn.bop.net',
+                        'bar': {
+                            cname: 'cn.bar.net',
                             kbps_padding: 0,
                             rtt_padding: 0
                         }
@@ -160,8 +165,8 @@ var handler = new OpenmixApplication({
                             kbps_padding: 0,
                             rtt_padding: 0
                         },
-                        'bop': {
-                            cname: 'cn.bop.net',
+                        'bar': {
+                            cname: 'cn.bar.net',
                             kbps_padding: 0,
                             rtt_padding: 0
                         }
@@ -213,8 +218,7 @@ function OpenmixApplication(settings) {
         var dataAvail = request.getProbe('avail'),
             dataRtt = request.getProbe('http_rtt'),
             dataKbps = request.getProbe('http_kbps'),
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataSonar = parseSonarData(request.getData('sonar')),
             candidates,
             candidateAliases,
             allReasons,
@@ -222,7 +226,6 @@ function OpenmixApplication(settings) {
             decisionReasons = [],
             decisionTtl = settings.default_settings.default_ttl,
             radarAvailabilityThreshold,
-            sonarAvailabilityThreshold,
             minRtt,
             rttTpMix,
             totalRtt = 0,
@@ -245,8 +248,7 @@ function OpenmixApplication(settings) {
             geo_default: 'I',
             only_one_provider_avail: 'J',
             data_problem: 'K',
-            sonar_data_problem: 'L',
-            geo_fallback_behavior: 'M'
+            geo_fallback_behavior: 'L'
         };
 
         function calculateScore(candidates) {
@@ -327,8 +329,7 @@ function OpenmixApplication(settings) {
          * @returns {boolean}
          */
         function filterSonarAvailability(candidate, alias) {
-            return dataFusion[alias] !== undefined && dataFusion[alias].health_score !== undefined
-                && dataFusion[alias].health_score.value > sonarAvailabilityThreshold;
+            return dataSonar[alias] !== undefined && dataSonar[alias].avail > 0;
         }
 
         // Override the settings if geo mapping is defined, if not use the default geo settings
@@ -348,7 +349,6 @@ function OpenmixApplication(settings) {
                     candidates = geoSettings.providers || settings.default_settings.providers;
                     decisionTtl = geoSettings.default_ttl !== undefined  ? geoSettings.default_ttl : settings.default_settings.default_ttl;
                     radarAvailabilityThreshold = geoSettings.radar_availability_threshold !== undefined ? geoSettings.radar_availability_threshold : settings.default_settings.radar_availability_threshold;
-                    sonarAvailabilityThreshold = geoSettings.sonar_availability_threshold  !== undefined ? geoSettings.sonar_availability_threshold : settings.default_settings.sonar_availability_threshold;
                     minRtt = geoSettings.min_rtt !== undefined ? geoSettings.min_rtt : settings.default_settings.min_rtt;
                     rttTpMix = geoSettings.rtt_tp_mix !== undefined ? geoSettings.rtt_tp_mix : settings.default_settings.rtt_tp_mix;
                     fallbackBehavior = geoSettings.fallbackBehavior;
@@ -362,7 +362,6 @@ function OpenmixApplication(settings) {
             candidates = settings.default_settings.providers;
             decisionTtl = settings.default_settings.default_ttl;
             radarAvailabilityThreshold = settings.default_settings.radar_availability_threshold;
-            sonarAvailabilityThreshold = settings.default_settings.sonar_availability_threshold;
             minRtt = settings.default_settings.min_rtt;
             rttTpMix = settings.default_settings.rtt_tp_mix;
 
@@ -376,7 +375,6 @@ function OpenmixApplication(settings) {
             candidates = fallbackBehavior.providers || candidates;
             decisionTtl = fallbackBehavior.default_ttl || decisionTtl;
             radarAvailabilityThreshold = fallbackBehavior.radar_availability_threshold !== undefined ? fallbackBehavior.radar_availability_threshold : radarAvailabilityThreshold;
-            sonarAvailabilityThreshold = fallbackBehavior.sonar_availability_threshold !== undefined ? fallbackBehavior.sonar_availability_threshold : sonarAvailabilityThreshold;
             minRtt = fallbackBehavior.min_rtt !== undefined ? fallbackBehavior.min_rtt : minRtt;
             rttTpMix = fallbackBehavior.rtt_tp_mix !== undefined ? fallbackBehavior.rtt_tp_mix : rttTpMix;
 
@@ -393,14 +391,10 @@ function OpenmixApplication(settings) {
             }
 
             if (candidateAliases.length > 0 && settings.use_sonar_availability_threshold) {
-                if (dataFusion[Object.keys(dataFusion)[0]].availability_override === undefined) {
-                    candidates = filterObject(candidates, filterSonarAvailability);
-                    candidateAliases = Object.keys(candidates);
-                    if (candidateAliases.length === 0) {
-                        decisionReasons.push(allReasons.all_providers_eliminated_sonar);
-                    }
-                } else {
-                    decisionReasons.push(allReasons.sonar_data_problem);
+                candidates = filterObject(candidates, filterSonarAvailability);
+                candidateAliases = Object.keys(candidates);
+                if (candidateAliases.length === 0) {
+                    decisionReasons.push(allReasons.all_providers_eliminated_sonar);
                 }
             }
 
@@ -412,7 +406,7 @@ function OpenmixApplication(settings) {
         selectedCandidates = cloneObject(candidates);
         candidateAliases = Object.keys(selectedCandidates);
 
-        if (((settings.use_sonar_availability_threshold === true && Object.keys(dataFusion).length > 0) || settings.use_sonar_availability_threshold === false)
+        if (((settings.use_sonar_availability_threshold === true && Object.keys(dataSonar).length > 0) || settings.use_sonar_availability_threshold === false)
             && ((settings.use_radar_availability_threshold === true && Object.keys(dataAvail).length > 0) || settings.use_radar_availability_threshold === false)
             && Object.keys(dataRtt).length > 0) {
 
@@ -537,29 +531,25 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
-
-        while (i --) {
-            key = keys[i];
-
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
-
-        return target;
-    }
+	function intersectObjects(target, source, property) {
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

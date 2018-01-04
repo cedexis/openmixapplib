@@ -180,16 +180,13 @@ function OpenmixApplication(settings) {
             i = keys.length,
             key,
             candidates = {};
-
         while (i --) {
             key = keys[i];
-
             if (source[key] !== undefined && source[key][property] !== undefined) {
                 candidates[key] = target[key];
                 candidates[key][property] = source[key][property];
             }
         }
-
         return candidates;
     }
 

@@ -12,9 +12,7 @@ var handler = new OpenmixApplication({
     },
     default_provider: 'foo',
     default_ttl: 20,
-    availability_threshold: 80,
-    // To enforce a Sonar health-check, set this threshold value to 1. To ignore the health-check, set this value to 0.
-    fusion_sonar_threshold: 1
+    availability_threshold: 80
 });
 
 function init(config) {
@@ -49,8 +47,7 @@ function OpenmixApplication(settings) {
     this.handle_request = function(request, response) {
         var dataAvail = request.getProbe('avail'),
             dataKbps = request.getProbe('http_kbps'),
-            /** @type { !Object.<string, { health_score: { value:string }, availability_override:string}> } */
-            dataFusion = parseFusionData(request.getData('fusion')),
+            dataSonar = parseSonarData(request.getData('sonar')),
             allReasons,
             decisionProvider,
             decisionReason = '',
@@ -70,9 +67,8 @@ function OpenmixApplication(settings) {
         */
         function filterAvailability(candidate, key) {
             // Filter sonar and radar availability
-            return dataFusion[key] !== undefined
-                && dataFusion[key].health_score !== undefined
-                && dataFusion[key].health_score.value >= settings.fusion_sonar_threshold
+            return dataSonar[key] !== undefined
+                && dataSonar[key].avail > 0
                 && dataAvail[key] !== undefined
                 && dataAvail[key].avail >= settings.availability_threshold;
         }
@@ -80,12 +76,11 @@ function OpenmixApplication(settings) {
         // Check is there is not data problem
         if (Object.keys(candidates).length > 0
             && Object.keys(dataAvail).length > 0
-            && Object.keys(dataFusion).length > 0
-            && dataFusion[Object.keys(dataFusion)[0]].availability_override === undefined) {
+            && Object.keys(dataSonar).length > 0) {
             // Select the highest kbps provider
             // availability score, if given
             
-            // Remove any that don't meet the Fusion Sonar threshold and Radar sonar threshold
+            // Remove any that don't meet the Sonar threshold and Radar sonar threshold
             candidates = filterObject(candidates, filterAvailability);
             candidateAliases = Object.keys(candidates);
             
@@ -115,20 +110,22 @@ function OpenmixApplication(settings) {
      * @param object
      * @param filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
-        return object;
-    }
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
+
+		return candidates;
+	}
     
     /**
     * @param {!Object} source
@@ -156,7 +153,7 @@ function OpenmixApplication(settings) {
     /**
     * @param {!Object} data
     */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;

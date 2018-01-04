@@ -109,7 +109,6 @@ function OpenmixApplication(settings) {
             decisionReason = [],
             candidates;
 
-        /* jshint laxbreak:true */
         function getPaddingPercent(alias, metric, error_reason) {
             var value,
                 thresholds,
@@ -127,7 +126,6 @@ function OpenmixApplication(settings) {
 
                     for (i = 0, len = thresholds.length; i < len; i ++) {
                         if (value >= thresholds[i].threshold) {
-                            //console.log('hit threshold: ' + JSON.stringify(thresholds[i]));
                             return (value / thresholds[i].threshold - 1) * thresholds[i].multiplier;
                         }
                     }
@@ -198,25 +196,25 @@ function OpenmixApplication(settings) {
         response.setReasonCode(decisionReason.join(','));
     };
 
-    /**
-     * @param {!Object} object
-     * @param {Function} filter
-     */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	/**
+	 * @param {!Object} object
+	 * @param {Function} filter
+	 */
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
-
-        return object;
-    }
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {Object} candidate
@@ -269,28 +267,24 @@ function OpenmixApplication(settings) {
     }
 
     /**
-     * @param {!Object} target
-     * @param {Object} source
-     * @param {string} property
-     */
+	 * @param {!Object} target
+	 * @param {Object} source
+	 * @param {string} property
+	 */
     function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
-
-        while (i --) {
-            key = keys[i];
-
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
-
-        return target;
-    }
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {!Object} data
@@ -299,7 +293,6 @@ function OpenmixApplication(settings) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
-
         while (i --) {
             key = keys[i];
 
@@ -310,7 +303,6 @@ function OpenmixApplication(settings) {
                 delete data[key];
             }
         }
-
         return data;
     }
 }

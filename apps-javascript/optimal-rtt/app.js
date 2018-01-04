@@ -122,14 +122,15 @@ function OpenmixApplication(settings) {
         allReasons = {
             optimum_server_chosen: 'A',
             no_available_servers: 'B',
-            geo_override_on_country: 'C',
-            geo_override_on_market: 'D',
-            geo_override_not_available_country: 'E',
-            geo_override_not_available_market: 'H',
-            geo_default_on_country: 'F',
-            geo_default_on_market: 'G',
-            asn_override: 'H',
-            asn_override_not_available: 'I'
+			one_available_provider: 'C',
+            geo_override_on_country: 'D',
+            geo_override_on_market: 'E',
+            geo_override_not_available_country: 'F',
+            geo_override_not_available_market: 'G',
+            geo_default_on_country: 'H',
+            geo_default_on_market: 'I',
+            asn_override: 'J',
+            asn_override_not_available: 'K'
         };
 
         /* jslint laxbreak:true */
@@ -179,7 +180,7 @@ function OpenmixApplication(settings) {
 
             if (candidateAliases.length === 1) {
                 decisionProvider = candidateAliases[0];
-                decisionReasons.push(allReasons.optimum_server_chosen);
+                decisionReasons.push(allReasons.one_available_provider);
                 decisionTtl = decisionTtl || settings.default_ttl;
             }
             else if (candidateAliases.length !== 0) {
@@ -226,21 +227,22 @@ function OpenmixApplication(settings) {
      * @param {!Object} object
      * @param {Function} filter
      */
-    function filterObject(object, filter) {
-        var keys = Object.keys(object),
-            i = keys.length,
-            key;
+	function filterObject(object, filter) {
+		var keys = Object.keys(object),
+			i = keys.length,
+			key,
+			candidates = {};
 
-        while (i --) {
-            key = keys[i];
+		while (i --) {
+			key = keys[i];
 
-            if (!filter(object[key], key)) {
-                delete object[key];
-            }
-        }
+			if (filter(object[key], key)) {
+				candidates[key] = object[key];
+			}
+		}
 
-        return object;
-    }
+		return candidates;
+	}
 
     /**
      * @param {!Object} source
@@ -272,24 +274,20 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
-
-        while (i --) {
-            key = keys[i];
-
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
-
-        return target;
-    }
+	function intersectObjects(target, source, property) {
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {!Object.<string,{ http_rtt: number }>} data

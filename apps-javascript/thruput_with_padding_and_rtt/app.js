@@ -242,21 +242,20 @@ function OpenmixApplication(settings) {
      * @param {Object} source
      * @param {string} property
      */
-    function intersectObjects(target, source, property) {
-        var keys = Object.keys(target),
-            i = keys.length,
-            key;
-        while (i --) {
-            key = keys[i];
-            if (source[key] !== undefined && source[key][property] !== undefined) {
-                target[key][property] = source[key][property];
-            }
-            else {
-                delete target[key];
-            }
-        }
-        return target;
-    }
+	function intersectObjects(target, source, property) {
+		var keys = Object.keys(target),
+			i = keys.length,
+			key,
+			candidates = {};
+		while (i --) {
+			key = keys[i];
+			if (source[key] !== undefined && source[key][property] !== undefined) {
+				candidates[key] = target[key];
+				candidates[key][property] = source[key][property];
+			}
+		}
+		return candidates;
+	}
 
     /**
      * @param {!Object} source
