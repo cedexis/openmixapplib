@@ -125,7 +125,7 @@ function OpenmixApplication(settings) {
             candidates = filterObject(dataRtt, fusionHealthScoreOk);
             candidateAliases = Object.keys(candidates);
 
-            var alert = (dataRtt.length != candidates.length);
+            var alert = (Object.keys(dataRtt).length != Object.keys(candidates).length);
 
             if (candidateAliases.length === 0) {
                 selectAnyProvider(reasons.no_available_fusion_providers);
