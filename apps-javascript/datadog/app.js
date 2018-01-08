@@ -96,7 +96,7 @@ function OpenmixApplication(settings) {
             // no candidates with good fusion data, select default_provider
             if (n === 0) {
                 decisionProvider = settings.default_provider;
-                decisionReason = reasons.no_available_fusion_providers + reasons.default_provider;
+                decisionReason = reasons.no_available_fusion_providers + ', ' + reasons.default_provider;
             } else if (n === 1) {
                 decisionProvider = candidates[0];
                 decisionReason = reason;

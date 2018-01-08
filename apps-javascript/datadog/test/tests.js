@@ -129,7 +129,7 @@
                 assert.equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'Optimal Selected', 'Verifying setReasonCode');
             }
         })();
     });
@@ -187,7 +187,7 @@
                 assert.equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'Optimal Selected', 'Verifying setReasonCode');
             }
         })();
     });
@@ -261,7 +261,7 @@
                 assert.equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'Optimal Selected', 'Verifying setReasonCode');
             }
         })();
     });
@@ -335,7 +335,7 @@
                 assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'EA', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'No Available Fusion Platforms, Default Provider', 'Verifying setReasonCode');
             }
         })();
     });
@@ -409,7 +409,7 @@
                 assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'Optimal Selected', 'Verifying setReasonCode');
             }
         })();
     });
@@ -475,7 +475,7 @@
                 assert.equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'D', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'No Fusion Data', 'Verifying setReasonCode');
             }
         })();
     });
@@ -543,7 +543,7 @@
                 assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'G', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'No Radar Data', 'Verifying setReasonCode');
             }
         })();
     });
@@ -592,7 +592,7 @@
                 assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
                 assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
                 assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
-                assert.equal(i.response.setReasonCode.args[0][0], 'F', 'Verifying setReasonCode');
+                assert.equal(i.response.setReasonCode.args[0][0], 'Fusion Data Error', 'Verifying setReasonCode');
             }
         })();
     });
