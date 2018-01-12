@@ -9,8 +9,10 @@
 openmixapplib.iml
 
 node_modules/
+PhantomJS_2.1.1_(Linux_0.0.0)/
 # Symlinks
 node_modules
+PhantomJS_2.1.1_(Linux_0.0.0)
 karma.app.results.xml
 .jshintrc
 npm-debug.log

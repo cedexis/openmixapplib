@@ -18,14 +18,14 @@
         default_ttl: 20
     };
 
-    module('do_init');
+    QUnit.module('do_init');
 
     function test_do_init(i) {
         return function() {
 
             var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
-                    requireProvider: this.stub()
+                    requireProvider: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
@@ -42,28 +42,30 @@
         };
     }
 
-    test('default', test_do_init({
-        setup: function() { return; },
-        verify: function(i) {
-            equal(i.config.requireProvider.callCount, 3);
-            equal(i.config.requireProvider.args[2][0], 'foo');
-            equal(i.config.requireProvider.args[1][0], 'bar');
-            equal(i.config.requireProvider.args[0][0], 'baz');
-        }
-    }));
+	QUnit.test('default', function(assert) {
+		test_do_init({
+			setup: function() { return; },
+			verify: function(i) {
+				assert.equal(i.config.requireProvider.callCount, 3);
+				assert.equal(i.config.requireProvider.args[2][0], 'foo');
+				assert.equal(i.config.requireProvider.args[1][0], 'bar');
+				assert.equal(i.config.requireProvider.args[0][0], 'baz');
+			}
+		})();
+	});
 
-    module('handle_request');
+	QUnit.module('handle_request');
 
     function test_handle_request(i) {
         return function() {
             var sut = new OpenmixApplication(i.settings || default_settings),
                 request = {
-                    getProbe: this.stub()
+                    getProbe: sinon.stub()
                 },
                 response = {
-                    respond: this.stub(),
-                    setTTL: this.stub(),
-                    setReasonCode: this.stub()
+                    respond: sinon.stub(),
+                    setTTL: sinon.stub(),
+                    setReasonCode: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
@@ -71,7 +73,7 @@
                     response: response
                 };
 
-            this.stub(Math, 'random');
+            var random = sinon.stub(Math, 'random');
 
             i.setup(test_stuff);
 
@@ -80,39 +82,44 @@
 
             // Assert
             i.verify(test_stuff);
+			random.restore();
         };
     }
 
-    test('random_selection_1', test_handle_request({
-        setup: function() {
-            Math.random.returns(0);
-        },
-        verify: function(i) {
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+	QUnit.test('random_selection_1', function(assert) {
+		test_handle_request({
+			setup: function() {
+				Math.random.returns(0);
+			},
+			verify: function(i) {
+				assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+				assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+				assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-        }
-    }));
+				assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+				assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+				assert.equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+				assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+			}
+		})();
+	});
 
-    test('random_selection_2', test_handle_request({
-        setup: function() {
-            Math.random.returns(0.9);
-        },
-        verify: function(i) {
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+	QUnit.test('random_selection_2', function(assert) {
+		test_handle_request({
+			setup: function() {
+				Math.random.returns(0.9);
+			},
+			verify: function(i) {
+				assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+				assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+				assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-        }
-    }));
+				assert.equal(i.response.respond.args[0][0], 'baz', 'Verifying respond provider');
+				assert.equal(i.response.respond.args[0][1], 'www.baz.com', 'Verifying respond CNAME');
+				assert.equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+				assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+			}
+		})();
+	});
 
 }());
