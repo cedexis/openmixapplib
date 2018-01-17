@@ -5,10 +5,11 @@ module.exports = function(config) {
     basePath: '',
 
     // frameworks to use
-    frameworks: [ 'qunit' ],
+    frameworks: [ 'qunit', 'sinon' ],
 
     plugins: [
         'karma-qunit',
+        'karma-sinon',
         'karma-phantomjs-launcher',
         'karma-junit-reporter'
     ],
