@@ -1,8 +1,8 @@
 {
-    "title": "Static Routing By IP",
-    "description": "Routes to platforms based on a list of IP blocks",
-    "lastUpdated": "07/23/2015",
-    "keywords": [ "CIDR", "IP" ],
+    "title": "Throughput and Availability, Sticky Winner",
+    "description": "Routes requests to the highest throughput available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. \n\nStickiness may optionally be limited to specific countries.",
+    "lastUpdated": "04/01/2015",
+    "keywords": ["Throughput"],
     "author": "Cedexis",
     "devDependencies": {
         "jshint": "^2.9.5",
@@ -12,8 +12,7 @@
         "karma-qunit": "^1.2.1",
         "karma-sinon": "^1.0.5",
         "qunitjs": "^2.4.1",
-        "sinon": "^4.1.3",
-        "coffee-script": ">=1.9.3"
+        "sinon": "^4.1.3"
     },
     "repository": {
         "type": "git",

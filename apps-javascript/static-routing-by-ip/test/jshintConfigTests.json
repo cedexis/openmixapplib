@@ -1,0 +1,17 @@
+{
+    "undef": true,
+    "unused": true,
+    "predef": [
+        "sinon",
+        "module",
+        "OpenmixApplication",
+        "test",
+        "console",
+        "equal",
+        "notEqual",
+        "deepEqual",
+        "strictEqual",
+        "ok",
+        "QUnit"
+    ]
+}
