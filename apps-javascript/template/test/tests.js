@@ -13,14 +13,14 @@
         default_ttl: 20
     };
 
-    module('do_init');
+    QUnit.module('do_init');
 
     function test_do_init(i) {
         return function() {
 
             var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
-                    requireProvider: this.stub()
+                    requireProvider: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
@@ -37,31 +37,34 @@
         };
     }
 
-    test('change me', test_do_init({
-        setup: function(i) {
-            // Setup code here
-        },
-        verify: function(i) {
-            // Assertion code here
-        }
-    }));
+    QUnit.test('change me', function(assert) {
+        test_do_init({
+            setup: function(i) {
+                // Setup code here
+            },
+            verify: function(i) {
+                // Assertion code here
+                assert.equal(1, 1);
+            }
+        })();
+    });
 
-    module('handle_request');
+    QUnit.module('handle_request');
 
     function test_handle_request(i) {
         return function() {
             var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
-                    requireProvider: this.stub()
+                    requireProvider: sinon.stub()
                 },
                 request = {
-                    getData: this.stub(),
-                    getProbe: this.stub()
+                    getData: sinon.stub(),
+                    getProbe: sinon.stub()
                 },
                 response = {
-                    respond: this.stub(),
-                    setTTL: this.stub(),
-                    setReasonCode: this.stub()
+                    respond: sinon.stub(),
+                    setTTL: sinon.stub(),
+                    setReasonCode: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
@@ -79,13 +82,16 @@
         };
     }
 
-    test('change me', test_handle_request({
-        setup: function(i) {
-            // Setup code here
-        },
-        verify: function(i) {
-            // Assertion code here
-        }
-    }));
+    QUnit.test('change me', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                // Setup code here
+            },
+            verify: function(i) {
+                // Assertion code here
+                assert.equal(1, 1);
+            }
+        })();
+    });
 
 }());

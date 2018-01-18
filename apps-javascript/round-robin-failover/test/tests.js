@@ -23,14 +23,14 @@
         default_ttl: 20
     };
 
-    module('do_init');
+    QUnit.module('do_init');
 
     function test_do_init(i) {
         return function() {
 
             var sut = new OpenmixApplication(i.settings || default_settings),
                 config = {
-                    requireProvider: this.stub()
+                    requireProvider: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
@@ -47,38 +47,40 @@
         };
     }
 
-    test('default', test_do_init({
-        setup: function() { return; },
-        verify: function(i) {
-            equal(i.config.requireProvider.callCount, 4, 'Verifying requireProvider call count');
-            equal(i.config.requireProvider.args[3][0], 'foo_f', 'Verirying failover provider alias');
-            equal(i.config.requireProvider.args[2][0], 'bar_f', 'Verirying failover provider alias');
-            equal(i.config.requireProvider.args[1][0], 'foo', 'Verirying provider alias');
-            equal(i.config.requireProvider.args[0][0], 'bar', 'Verirying provider alias');
-        }
-    }));
+    QUnit.test('default', function(assert) {
+        test_do_init({
+            setup: function() { return; },
+            verify: function(i) {
+                assert.equal(i.config.requireProvider.callCount, 4, 'Verifying requireProvider call count');
+                assert.equal(i.config.requireProvider.args[3][0], 'foo_f', 'Verirying failover provider alias');
+                assert.equal(i.config.requireProvider.args[2][0], 'bar_f', 'Verirying failover provider alias');
+                assert.equal(i.config.requireProvider.args[1][0], 'foo', 'Verirying provider alias');
+                assert.equal(i.config.requireProvider.args[0][0], 'bar', 'Verirying provider alias');
+            }
+        })();
+    });
 
-    module('handle_request');
+    QUnit.module('handle_request');
 
     function test_handle_request(i) {
         return function() {
             var sut = new OpenmixApplication(i.settings || default_settings),
                 request = {
-                    getData: this.stub(),
-                    getProbe: this.stub()
+                    getData: sinon.stub(),
+                    getProbe: sinon.stub()
                 },
                 response = {
-                    respond: this.stub(),
-                    setTTL: this.stub(),
-                    setReasonCode: this.stub()
+                    respond: sinon.stub(),
+                    setTTL: sinon.stub(),
+                    setReasonCode: sinon.stub()
                 },
                 test_stuff = {
                     instance: sut,
                     request: request,
                     response: response
                 };
-            
-            this.stub(Math,"random");
+
+            var random = sinon.stub(Math,"random");
 
             i.setup(test_stuff);
 
@@ -87,274 +89,291 @@
 
             // Assert
             i.verify(test_stuff);
+            random.restore();
         };
     }
 
-    test('test 1', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .withArgs('sonar')
-                .returns({
-                    "foo": JSON.stringify({
-                        "avail": 1
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 1
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-            Math.random.returns(0.9);
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 1', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .withArgs('sonar')
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+                Math.random.returns(0.9);
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 2', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 1
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 2', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'bar', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.bar.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 3', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 3', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'A', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 4', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-            Math.random.returns(0.9);
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 4', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+                Math.random.returns(0.9);
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 5', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 0
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 5', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 0
+                        })
+                    });
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 6', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 6', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'bar_f', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.bar_f.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'bar_f', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.bar_f.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('test 7', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 0
-                    })
-                });
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('test 7', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 0
+                        })
+                    });
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'C', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
-    test('Failover; alias reset', test_handle_request({
-        setup: function(i) {
-            i.request
-                .getData
-                .onCall(0)
-                .returns({
-                    "foo": JSON.stringify({
-						"avail": 0
-                    }),
-                    "bar": JSON.stringify({
-						"avail": 0
-                    }),
-                    "foo_f": JSON.stringify({
-						"avail": 1
-                    }),
-                    "bar_f": JSON.stringify({
-						"avail": 1
-                    })
-                });
-            Math.random.returns(0.9);
-        },
-        verify: function(i) {
-            equal(i.request.getData.callCount, 1, 'Verifying getData call count');
-            equal(i.response.respond.callCount, 1, 'Verifying respond call count');
-            equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
-            equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+    QUnit.test('Failover; alias reset', function(assert) {
+        test_handle_request({
+            setup: function(i) {
+                i.request
+                    .getData
+                    .onCall(0)
+                    .returns({
+                        "foo": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "bar": JSON.stringify({
+                            "avail": 0
+                        }),
+                        "foo_f": JSON.stringify({
+                            "avail": 1
+                        }),
+                        "bar_f": JSON.stringify({
+                            "avail": 1
+                        })
+                    });
+                Math.random.returns(0.9);
+            },
+            verify: function(i) {
+                assert.equal(i.request.getData.callCount, 1, 'Verifying getData call count');
+                assert.equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+                assert.equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+                assert.equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
 
-            equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
-            equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
-            equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
-            equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
-        }
-    }));
+                assert.equal(i.response.respond.args[0][0], 'foo_f', 'Verifying respond provider');
+                assert.equal(i.response.respond.args[0][1], 'www.foo_f.com', 'Verifying respond CNAME');
+                assert.equal(i.response.setTTL.args[0][0], 20, 'Verifying setTTL');
+                assert.equal(i.response.setReasonCode.args[0][0], 'B', 'Verifying setReasonCode');
+            }
+        })();
+    });
 
 }());

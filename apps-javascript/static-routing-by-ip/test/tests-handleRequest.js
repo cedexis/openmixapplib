@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    module('handleRequest');
+    QUnit.module('handleRequest');
 
     function testFun(i) {
         return function() {
@@ -9,9 +9,9 @@
                 request: new OpenmixRequest(),
                 response: new OpenmixResponse()
             };
-            this.stub(testStuff.response, 'respond');
-            this.stub(testStuff.response, 'setReasonCode');
-            this.stub(testStuff.response, 'setTTL');
+            sinon.stub(testStuff.response, 'respond');
+            sinon.stub(testStuff.response, 'setReasonCode');
+            sinon.stub(testStuff.response, 'setTTL');
             testStuff.request.ip_address = i.ip_address;
 
             testStuff.sut = new OpenmixApplication(i.appConfig || productionConfig);
@@ -24,30 +24,36 @@
         };
     }
 
-    test('route on exact IP', testFun({
-        ip_address: '216.240.32.100',
-        verify: function(i) {
-            deepEqual(i.response.respond.args, [[ 'provider-d', 'd.foo.com']]);
-            deepEqual(i.response.setTTL.args, [[ 20 ]]);
-            deepEqual(i.response.setReasonCode.args, [[ 'mapped' ]]);
-        }
-    }));
+    QUnit.test('route on exact IP', function(assert) {
+        testFun({
+            ip_address: '216.240.32.100',
+            verify: function(i) {
+                assert.deepEqual(i.response.respond.args, [[ 'provider-d', 'd.foo.com']]);
+                assert.deepEqual(i.response.setTTL.args, [[ 20 ]]);
+                assert.deepEqual(i.response.setReasonCode.args, [[ 'mapped' ]]);
+            }
+        })();
+    });
 
-    test('route on block', testFun({
-        ip_address: '216.240.32.101',
-        verify: function(i) {
-            deepEqual(i.response.respond.args, [[ 'provider-b', 'b.foo.com']]);
-            deepEqual(i.response.setTTL.args, [[ 20 ]]);
-            deepEqual(i.response.setReasonCode.args, [[ 'mapped' ]]);
-        }
-    }));
+    QUnit.test('route on block', function(assert) {
+        testFun({
+            ip_address: '216.240.32.101',
+            verify: function(i) {
+                assert.deepEqual(i.response.respond.args, [[ 'provider-b', 'b.foo.com']]);
+                assert.deepEqual(i.response.setTTL.args, [[ 20 ]]);
+                assert.deepEqual(i.response.setReasonCode.args, [[ 'mapped' ]]);
+            }
+        })();
+    });
 
-    test('route to default', testFun({
-        ip_address: '1.1.1.1',
-        verify: function(i) {
-            deepEqual(i.response.respond.args, [[ 'provider-a', 'a.foo.com']]);
-            deepEqual(i.response.setTTL.args, [[ 20 ]]);
-            deepEqual(i.response.setReasonCode.args, [[ 'default' ]]);
-        }
-    }));
+    QUnit.test('route to default', function(assert) {
+        testFun({
+            ip_address: '1.1.1.1',
+            verify: function(i) {
+                assert.deepEqual(i.response.respond.args, [[ 'provider-a', 'a.foo.com']]);
+                assert.deepEqual(i.response.setTTL.args, [[ 20 ]]);
+                assert.deepEqual(i.response.setReasonCode.args, [[ 'default' ]]);
+            }
+        })();
+    });
 }());

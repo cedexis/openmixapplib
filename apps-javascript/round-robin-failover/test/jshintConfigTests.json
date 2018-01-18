@@ -11,6 +11,7 @@
         "notEqual",
         "deepEqual",
         "strictEqual",
-        "ok"
+        "ok",
+        "QUnit"
     ]
 }

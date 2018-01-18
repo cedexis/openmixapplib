@@ -10,12 +10,6 @@ no_color='\033[0m'
 # Change to the project root directory
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
-echo
-echo -e "${cyan}Validating with Google Closure Compiler${red}"
-echo
-java -jar test/compiler.jar --js app.js --externs test/custom-externs.js --externs test/openmix-externs.js --compilation_level ADVANCED --js_output_file /dev/null --warning_level VERBOSE --language_in ECMASCRIPT5
-echo -e "${no_color}"
-
 echo -e "${cyan}Validating with JSHint${red}"
 echo
 node_modules/jshint/bin/jshint --config jshintConfig.json app.js
