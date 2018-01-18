@@ -1,8 +1,5 @@
-# Application: **Throughput and Availability, Sticky Winner**
+# Application: **Static Routing By IP**
 
-Routes requests to the highest throughput available platform, applying an optional handicap to each.  Once a choice is made, stick with that choice until an alternative is significantly better or the original choice no longer exceeds the availability threshold. 
-
-Stickiness may optionally be limited to specific countries.
 # Openmix Application Library
 
 [Cedexis Openmix](http://www.cedexis.com/products/openmix.html) applications give you dynamic, flexible, and automatic control over where your traffic is routed so that your business goals are achieved. Openmix applications are programmed in JavaScript, a commonly used server-side language accessible to most web programmers and network administrators.
