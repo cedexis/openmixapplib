@@ -70,11 +70,13 @@ function OpenmixApplication(settings) {
 
         for (var i = 0; i < l; i++) {
             var currentBlock = addressBlocks[i];
-            if (currentBlock[2].contains(request.ip_address)) {
-                alias = currentBlock[1];
-                reason = 'mapped';
-                break;
-            }
+            try {
+				if (currentBlock[2].contains(request.ip_address)) {
+					alias = currentBlock[1];
+					reason = 'mapped';
+					break;
+				}
+			} catch(err) {}
         }
         response.respond(alias, this.providers[alias].cname);
         response.setTTL(settings.responseTTL);

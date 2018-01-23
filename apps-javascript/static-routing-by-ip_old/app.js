@@ -85,11 +85,13 @@ OpenmixApplication.prototype.handleRequest = function(request, response) {
     var l = this.addressBlocks.length;
     for (var i = 0; i < l; i++) {
         var currentBlock = this.addressBlocks[i];
-        if (currentBlock[2].contains(request.ip_address)) {
-            alias = currentBlock[1];
-            reason = 'mapped';
-            break;
-        }
+        try {
+			if (currentBlock[2].contains(request.ip_address)) {
+				alias = currentBlock[1];
+				reason = 'mapped';
+				break;
+			}
+		} catch(err) {}
     }
     response.respond(alias, this.providers[alias].cname);
     response.setTTL(this.responseTTL);
