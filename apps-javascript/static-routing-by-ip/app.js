@@ -133,6 +133,7 @@ ip2long = function(ip) {
     return ((b[0] || 0) << 24 | (b[1] || 0) << 16 | (b[2] || 0) << 8 | (b[3] || 0)) >>> 0;
 };
 
+/* jshint ignore:start */
 Netmask = (function() {
     function Netmask(net, mask) {
         var error, i, j, ref;
@@ -234,3 +235,4 @@ Netmask = (function() {
     return Netmask;
 
 })();
+/* jshint ignore:end */
