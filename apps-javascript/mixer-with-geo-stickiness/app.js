@@ -488,37 +488,43 @@ function OpenmixApplication(settings) {
 					prefix = 'kbps';
 			}
 
-			if (property === 'http_rtt') {
-				best = getLowest(source, property, '');
-				second = getLowest(source, property, best);
-				worst = getHighest(source, property, '');
+			//when there is only 1 provider elegible, all radar log values will be 0
+			if (i === 1) {
+				benMin = benAvg = benMax = 0;
 			}
 			else {
-				best = getHighest(source, property, '');
-				second = getHighest(source, property, best);
-				worst = getLowest(source, property, '');
-			}
+				if (property === 'http_rtt') {
+					best = getLowest(source, property, '');
+					second = getLowest(source, property, best);
+					worst = getHighest(source, property, '');
+				}
+				else {
+					best = getHighest(source, property, '');
+					second = getHighest(source, property, best);
+					worst = getLowest(source, property, '');
+				}
 
-			best = source[best][property];
-			second = source[second][property];
-			worst = source[worst][property];
+				best = source[best][property];
+				second = source[second][property];
+				worst = source[worst][property];
 
-			while (i --) {
-				key = keys[i];
-				values.push(source[key][property]);
-			}
+				while (i--) {
+					key = keys[i];
+					values.push(source[key][property]);
+				}
 
-			avg = average(values);
+				avg = average(values);
 
-			if (property === 'http_rtt') {
-				benMin = second - best;
-				benAvg = avg - best;
-				benMax = worst - best;
-			}
-			else {
-				benMin = best - second;
-				benAvg = best - avg;
-				benMax = best - worst;
+				if (property === 'http_rtt') {
+					benMin = second - best;
+					benAvg = avg - best;
+					benMax = worst - best;
+				}
+				else {
+					benMin = best - second;
+					benAvg = best - avg;
+					benMax = best - worst;
+				}
 			}
 
 			logs.push(prefix + 'BenMin:'+ benMin);
@@ -537,10 +543,10 @@ function OpenmixApplication(settings) {
 			var value,
 				candidates = {};
 
-			if (Object.keys(radarData).length > 1) {
+			if (Object.keys(radarData).length > 0) {
 				candidates = intersectObjects(source, radarData, property);
 
-				if (Object.keys(candidates).length > 1) {
+				if (Object.keys(candidates).length > 0) {
 					value = getRadarLogs(candidates, property);
 				}
 			}
@@ -588,6 +594,8 @@ function OpenmixApplication(settings) {
 		if (decisionProvider) {
 			decisionReasons.push(allReasons.ip_override);
 			reasonLog.push(allReasons.ip_override + ':' + decisionProvider);
+			// adding benefits rtt, kbps, avail logs
+			calculateRadarBenefits(settings.default_settings.providers);
 		} else {
 			// Provider eligibility check - filtering per Global_Settings or Geo_Settings
 			candidates = overrideSettingByGeo();
@@ -650,6 +658,8 @@ function OpenmixApplication(settings) {
 					decisionProvider = candidateAliases[0];
 					decisionReasons.push(allReasons.one_provider_available);
 					reasonLog.push(allReasons.one_provider_available + ':' + decisionProvider);
+					// adding benefits rtt, kbps, avail logs
+					calculateRadarBenefits(candidates);
 				} else {
 					if (useRandomThreshold && random <= randomThreshold) {
 						//x% of times, logic will enter here to keep GEO cdns warm
@@ -743,6 +753,8 @@ function OpenmixApplication(settings) {
 								decisionProvider = candidateAliases[0];
 								decisionReasons.push(allReasons.one_provider_available);
 								reasonLog.push(allReasons.one_provider_available + ':' + decisionProvider);
+								// adding benefits rtt, kbps, avail logs
+								calculateRadarBenefits(candidates);
 							}
 						}
 					}

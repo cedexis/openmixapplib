@@ -320,6 +320,148 @@
 		}
     }));
 
+	test('one provider available', test_handle_request({
+		setup: function(i) {
+			console.log(i);
+			i.request
+			.getProbe
+			.onCall(0)
+			.returns({
+				'azure_front_door': { avail: 100 },
+				'msft_akamai_win10': { avail: 50 }
+			});
+			i.request
+			.getProbe
+			.onCall(1)
+			.returns({
+				'azure_front_door': { http_rtt: 60 },
+				'msft_akamai_win10': {}
+			});
+			i.request
+			.getProbe
+			.onCall(2)
+			.returns({
+				'azure_front_door': { http_kbps: 90 },
+				'msft_akamai_win10': { http_kbps: 30 }
+			});
+			i.request
+			.getData
+			.onCall(0)
+			.returns({});
+			Math.random.returns(0);
+			i.request.asn = 123;
+			i.request.country = 'CN';
+			i.sut.cache.set('CN-123', 'azure_front_door');
+
+		},
+		verify: function(i) {
+			console.log(i);
+			equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+			equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+			equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+			equal(i.response.respond.args[0][0], 'azure_front_door', 'Verifying selected alias');
+			equal(i.response.respond.args[0][1], 'msv-xboxlive-com.c-0007.c-msedge.net', 'Verifying CNAME');
+			equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
+			equal(i.response.setReasonCode.args[0][0], 'Geo Override-Country,Geo Default,Optimal Provider Available,Stickiness Considered-static', 'Verifying reason code');
+			equal(i.response.log.args[0][0], 'Geo Override-Country,Geo Default,One Provider Available:azure_front_door,rttBenMin:0-rttBenAvg:0-rttBenMax:0,kbpsBenMin:0-kbpsBenAvg:0-kbpsBenMax:0,availBenMin:0-availBenAvg:0-availBenMax:0,numElegible:1', 'Verifying reason code');
+		}
+	}));
+
+	test('one provider available_2', test_handle_request({
+		setup: function(i) {
+			console.log(i);
+			i.request
+			.getProbe
+			.onCall(0)
+			.returns({
+				'azure_front_door': { avail: 100 }
+			});
+			i.request
+			.getProbe
+			.onCall(1)
+			.returns({
+				'azure_front_door': { http_rtt: 60 },
+				'msft_akamai_win10': { http_rtt: 35 }
+			});
+			i.request
+			.getProbe
+			.onCall(2)
+			.returns({
+				'azure_front_door': { http_kbps: 90 },
+				'msft_akamai_win10': {}
+			});
+			i.request
+			.getData
+			.onCall(0)
+			.returns({});
+			Math.random.returns(0);
+			i.request.asn = 123;
+			i.request.country = 'CN';
+			i.sut.cache.set('CN-123', 'azure_front_door');
+
+		},
+		verify: function(i) {
+			console.log(i);
+			equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+			equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+			equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+			equal(i.response.respond.args[0][0], 'azure_front_door', 'Verifying selected alias');
+			equal(i.response.respond.args[0][1], 'msv-xboxlive-com.c-0007.c-msedge.net', 'Verifying CNAME');
+			equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
+			equal(i.response.setReasonCode.args[0][0], 'Geo Override-Country,Geo Default,Optimal Provider Available,Stickiness Considered-static', 'Verifying reason code');
+			equal(i.response.log.args[0][0], 'Geo Override-Country,Geo Default,One Provider Available:azure_front_door,rttBenMin:0-rttBenAvg:0-rttBenMax:0,kbpsBenMin:0-kbpsBenAvg:0-kbpsBenMax:0,availBenMin:0-availBenAvg:0-availBenMax:0,numElegible:1', 'Verifying reason code');
+		}
+	}));
+
+	test('one provider available + no rtt data', test_handle_request({
+		setup: function(i) {
+			console.log(i);
+			i.request
+			.getProbe
+			.onCall(0)
+			.returns({
+				'azure_front_door': { avail: 100 }
+			});
+			i.request
+			.getProbe
+			.onCall(1)
+			.returns({
+				'azure_front_door': {},
+				'msft_akamai_win10': {}
+			});
+			i.request
+			.getProbe
+			.onCall(2)
+			.returns({
+				'azure_front_door': { http_kbps: 90 },
+				'msft_akamai_win10': {}
+			});
+			i.request
+			.getData
+			.onCall(0)
+			.returns({});
+			Math.random.returns(0);
+			i.request.asn = 123;
+			i.request.country = 'CN';
+			i.sut.cache.set('CN-123', 'azure_front_door');
+
+		},
+		verify: function(i) {
+			console.log(i);
+			equal(i.response.respond.callCount, 1, 'Verifying respond call count');
+			equal(i.response.setTTL.callCount, 1, 'Verifying setTTL call count');
+			equal(i.response.setReasonCode.callCount, 1, 'Verifying setReasonCode call count');
+
+			equal(i.response.respond.args[0][0], 'azure_front_door', 'Verifying selected alias');
+			equal(i.response.respond.args[0][1], 'msv-xboxlive-com.c-0007.c-msedge.net', 'Verifying CNAME');
+			equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
+			equal(i.response.setReasonCode.args[0][0], 'Geo Override-Country,Geo Default,Optimal Provider Available,Stickiness Considered-static', 'Verifying reason code');
+			equal(i.response.log.args[0][0], 'Geo Override-Country,Geo Default,One Provider Available:azure_front_door,kbpsBenMin:0-kbpsBenAvg:0-kbpsBenMax:0,availBenMin:0-availBenAvg:0-availBenMax:0,numElegible:1', 'Verifying reason code');
+		}
+	}));
+
     test('country_cdns_randomly_selected_keeping_them_warm_with-country_asn_geo', test_handle_request({
         setup: function(i) {
             console.log(i);
@@ -1119,7 +1261,7 @@
 			equal(i.response.respond.args[0][1], 'msxbassets.vo.llnwd.net', 'Verifying CNAME');
 			equal(i.response.setTTL.args[0][0], 20, 'Verifying TTL');
 			equal(i.response.setReasonCode.args[0][0], 'I,CP:data issue', 'Verifying reason code');
-			equal(i.response.log.args[0][0], 'Geo Override-Country,Geo Default,Optimal Provider Available:azure_front_door_score:1.724-msft_akamai_win10_score:1.303,Stickiness Considered:-static;:azure_front_door:6.034', 'Verifying reason code');
+			equal(i.response.log.args[0][0], 'Geo Default,Data Issue,kbpsBenMin:0-kbpsBenAvg:0-kbpsBenMax:0,availBenMin:30-availBenAvg:15-availBenMax:30,numElegible:2', 'Verifying reason code');
 		}
 	}));
 
