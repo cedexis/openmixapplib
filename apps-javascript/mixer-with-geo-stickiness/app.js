@@ -179,14 +179,14 @@ function OpenmixApplication(settings) {
 			benefitValues;
 
 		allReasons = {
-			optimal_provider_available: 'Optimal Provider Available',
+			optimal_avail: 'Optimal Avail',
 			geo_override_state: 'Geo Override-State',
 			geo_override_region: 'Geo Override-Region',
 			geo_override_country: 'Geo Override-Country',
 			geo_override_market: 'Geo Override-Market',
 			geo_override_asn: 'Geo Override-ASN',
-			all_providers_unavailable_radar: 'All Providers Unavailable-Radar',
-			all_providers_unavailable_sonar: ' All Providers Unavailable-Sonar',
+			all_unavail_radar: 'All Unavail-Radar',
+			all_unavail_sonar: ' All Unavail-Sonar',
 			geo_default: 'Geo Default',
 			one_provider_available: 'One Provider Available',
 			data_issue: 'Data Issue',
@@ -198,9 +198,9 @@ function OpenmixApplication(settings) {
 			geo_override_country_asn: 'Geo Override-Country+ASN',
 			geo_override_market_asn: 'Geo Override-Market+ASN',
 			perf_weighted_round_robin: 'Perf Weighted Round Robin',
-			optimal_provider_unavailable_radar: 'Optimal Provider Unavailable-Radar',
-			optimal_provider_unavailable_sonar: 'Optimal Provider Unavailable-Sonar',
-			optimal_provider_unavailable_radar_sonar: 'Optimal Provider Unavailable-Radar+Sonar',
+			optimal_unavail_radar: 'Optimal Unavail-Radar',
+			Optimal_unavail_sonar: 'Optimal Unavail-Sonar',
+			optimal_unavail_radar_sonar: 'Optimal Unavail-Radar+Sonar',
 			round_robin_provider_unavailable_radar_sonar: 'Round Robin Provider Unavailable:Radar+Sonar'
 		};
 
@@ -616,8 +616,8 @@ function OpenmixApplication(settings) {
 					candidates = filterObject(candidates, filterRadarAvailability);
 					candidateAliases = Object.keys(candidates);
 					if (candidateAliases.length === 0) {
-						decisionReasons.push(allReasons.all_providers_unavailable_radar);
-						reasonLog.push(allReasons.all_providers_unavailable_radar);
+						decisionReasons.push(allReasons.all_unavail_radar);
+						reasonLog.push(allReasons.all_unavail_radar);
 					}
 				}
 
@@ -625,8 +625,8 @@ function OpenmixApplication(settings) {
 					candidates = filterObject(candidates, filterSonarAvailability);
 					candidateAliases = Object.keys(candidates);
 					if (candidateAliases.length === 0) {
-						decisionReasons.push(allReasons.all_providers_unavailable_sonar);
-						reasonLog.push(allReasons.all_providers_unavailable_sonar);
+						decisionReasons.push(allReasons.all_unavail_sonar);
+						reasonLog.push(allReasons.all_unavail_sonar);
 					}
 				}
 
@@ -720,9 +720,9 @@ function OpenmixApplication(settings) {
 								}
 								if (decisionProvider === undefined) {
 									decisionProvider = getHighest(candidates, 'score', '');
-									decisionReasons.push(allReasons.optimal_provider_available);
+									decisionReasons.push(allReasons.optimal_avail);
 									scoreValues = getLogs(candidates, 'score');
-									reasonLog.push(allReasons.optimal_provider_available + ':' + scoreValues);
+									reasonLog.push(allReasons.optimal_avail + ':' + scoreValues);
 									// adding benefits rtt, kbps, avail logs
 									calculateRadarBenefits(candidates);
 
@@ -812,16 +812,16 @@ function OpenmixApplication(settings) {
 				reasonLog.push(allReasons.round_robin_provider_unavailable_radar_sonar);
 			}
 			else if (isNotAvailRadar && isNotAvailSonar) {
-				decisionReasons.push(allReasons.optimal_provider_unavailable_radar_sonar);
-				reasonLog.push(allReasons.optimal_provider_unavailable_radar_sonar);
+				decisionReasons.push(allReasons.optimal_unavail_radar_sonar);
+				reasonLog.push(allReasons.optimal_unavail_radar_sonar);
 			}
 			else if (isNotAvailRadar) {
-				decisionReasons.push(allReasons.optimal_provider_unavailable_radar);
-				reasonLog.push(allReasons.optimal_provider_unavailable_radar);
+				decisionReasons.push(allReasons.optimal_unavail_radar);
+				reasonLog.push(allReasons.optimal_unavail_radar);
 			}
 			else if (isNotAvailSonar) {
-				decisionReasons.push(allReasons.optimal_provider_unavailable_sonar);
-				reasonLog.push(allReasons.optimal_provider_unavailable_sonar);
+				decisionReasons.push(allReasons.Optimal_unavail_sonar);
+				reasonLog.push(allReasons.Optimal_unavail_sonar);
 			}
 
 		}
