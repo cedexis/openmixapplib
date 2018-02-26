@@ -4,6 +4,8 @@
 
 Performances / Availability load balancing
 
+The application has several capabilities that allows customers to have greater control over application functionality. The capabilities of the application include options to enable/disable geo-blocking, performance weighted round robin, stickiness, RTT and Kbps mixing (using either or both RTT and Kbps to influence provider decision), and random threshold (keeping CDNs warm). The application is also using the updated Reason Codes/Reason Logs in order to provide better visibility on decisions.
+
 ## Validating the Code
 
 The validate-js.sh script looks for possible errors in the application and test
