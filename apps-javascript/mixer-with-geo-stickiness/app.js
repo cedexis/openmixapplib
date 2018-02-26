@@ -28,11 +28,16 @@ var handler = new OpenmixApplication({
 		//values true (turned on), false (turned off)
 		use_sticky: true,
 		// Only change a decision if there's a 15% change in score in a given country-asn map since last decision was issued.
-		stickiness_percentage: 250, //e.g. 15 = 15%
+		stickiness_percentage: 15, //e.g. 15 = 15%
 		default_ttl: 240,
 		use_radar_availability_threshold: true,
+		//Will need to activate Sonar on platforms for this to work
 		use_sonar_availability_threshold: false, //set to true if you want Sonar healthchecks to be considered
 		radar_availability_threshold: 90,
+		//Sliding bar for how to consider both RTT and throughput
+		//Set to 0 to only consider RTT
+		//Set to 1 to only consider Throughput
+		//set to 0.5 to consider both 50% of the time, etc.
 		rtt_tp_mix: 0.9,
 		// to enable this feature's routing logic
 		use_perfWeightRoundRobin: true,
