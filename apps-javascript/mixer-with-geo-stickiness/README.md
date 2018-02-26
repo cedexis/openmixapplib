@@ -1,5 +1,3 @@
-# a.bximg.net
-
 ## Description
 
 Performances / Availability load balancing
