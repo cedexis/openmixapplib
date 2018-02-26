@@ -1,6 +1,0 @@
-{
-    "undef": true,
-    "unused": true,
-    "laxbreak": true,
-    "exported": [ "init", "onRequest" ]
-}
