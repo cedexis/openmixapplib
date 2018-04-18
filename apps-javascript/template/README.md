@@ -99,7 +99,3 @@ package.json file, which npm uses to download and install software locally.
 From the directory containing package.json:
 
     $ npm install
-
-In addition, you need to install qunit manually:
-
-    $ npm install qunit
