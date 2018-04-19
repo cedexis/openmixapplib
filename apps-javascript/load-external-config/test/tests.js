@@ -57,7 +57,7 @@
                 assert.equal(i.config.requireProvider.args[1][0], 'bar', 'Verirying provider alias');
                 assert.equal(i.config.requireProvider.args[0][0], 'baz', 'Verirying provider alias');
             }
-        })
+        })();
     });
 
     QUnit.module('handle_request');

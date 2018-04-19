@@ -9,6 +9,10 @@
 openmixapplib.iml
 *.jar
 node_modules/
+
+# package-lock.json is usually included in source control. Although this .gitignore causes it to be ignored within the template library, when users copy a template it will have its own .gitignore file that will not ignore package-lock.json.
+package-lock.json
+
 PhantomJS_2.1.1_(Linux_0.0.0)/
 # Symlinks
 node_modules

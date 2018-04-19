@@ -2,20 +2,24 @@
     "title": "Load External Config",
     "description": "Demonstrates how to manage provider destination hostnames outside of the Openmix PHP. App uses Fusion Custom (AKA Pulse Load) to pull in a list of destinations linked to unique site names. Then, if a subdomain is appended to the Openmix name, it checks the subdomain against the site names in the file and modifies the destination returned.",
     "lastUpdated": "03/31/2015",
-    "keywords": ["Fusion"],
+    "keywords": [
+        "Fusion"
+    ],
     "author": "Cedexis",
     "devDependencies": {
         "jshint": "^2.9.5",
         "karma": "^2.0.0",
         "karma-junit-reporter": "^1.2.0",
         "karma-phantomjs-launcher": "^1.0.4",
-        "karma-qunit": "^1.2.1",
-        "karma-sinon": "^1.0.5",
-        "qunitjs": "^2.4.1",
-        "sinon": "^4.1.3"
+        "karma-qunit": "^2.0.1",
+        "karma-sinon": "^1.0.5"
     },
     "repository": {
         "type": "git",
         "url": "http://code.example.com/git/example.git"
+    },
+    "dependencies": {
+        "qunit": "^2.6.0",
+        "sinon": "^4.5.0"
     }
 }

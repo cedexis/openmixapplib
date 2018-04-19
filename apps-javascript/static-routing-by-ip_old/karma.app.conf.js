@@ -16,8 +16,10 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'app.js',
-        'test/tests.js'
+        'build/app.js',
+        'test/testExterns.js',
+        'test/tests-doInit.js',
+        'test/tests-handleRequest.js'
     ],
 
     // list of files to exclude
