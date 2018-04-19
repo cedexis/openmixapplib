@@ -2,20 +2,25 @@
     "title": "Throughput with Availability override",
     "description": "Choose the best provider based on HTTP Throughput. Use Sonar for Availability override",
     "lastUpdated": "04/16/2015",
-    "keywords": ["Throughput", "Sonar"],
+    "keywords": [
+        "Throughput",
+        "Sonar"
+    ],
     "author": "Cedexis",
     "devDependencies": {
         "jshint": "^2.9.5",
         "karma": "^2.0.0",
         "karma-junit-reporter": "^1.2.0",
         "karma-phantomjs-launcher": "^1.0.4",
-        "karma-qunit": "^1.2.1",
-        "karma-sinon": "^1.0.5",
-        "qunitjs": "^2.4.1",
-        "sinon": "^4.1.3"
+        "karma-qunit": "^2.0.1",
+        "karma-sinon": "^1.0.5"
     },
     "repository": {
         "type": "git",
         "url": "http://code.example.com/git/example.git"
+    },
+    "dependencies": {
+        "qunit": "^2.6.0",
+        "sinon": "^4.5.0"
     }
 }
