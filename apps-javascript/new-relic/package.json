@@ -2,20 +2,24 @@
     "title": "Use New Relic APM data to improve end-user experience",
     "description": "New Relic and Cedexis have partnered to provide [New Relic Standard](http://newrelic.com/pricing/details) to Cedexis customers at no charge. That's right — free application monitoring and troubleshooting for your applications when using Cedexis. [Find out more and sign up now](http://www.cedexis.com/partners/new-relic.html). \n\nNew Relic is a SaaS-based cloud application performance management provider that offers rich application performance data as part of its service. Cedexis Openmix can use this data to take action on the current state of your application as measured by New Relic. For example, if New Relic reports high CPU load on an application you can have Openmix direct traffic to a less loaded instance of your application. \n\nThis sample application demonstrates the use of New Relic data in an Openmix application.",
     "lastUpdated": "04/01/2015",
-    "keywords": ["Fusion"],
+    "keywords": [
+        "Fusion"
+    ],
     "author": "Cedexis",
     "devDependencies": {
         "jshint": "^2.9.5",
         "karma": "^2.0.0",
         "karma-junit-reporter": "^1.2.0",
         "karma-phantomjs-launcher": "^1.0.4",
-        "karma-qunit": "^1.2.1",
-        "karma-sinon": "^1.0.5",
-        "qunitjs": "^2.4.1",
-        "sinon": "^4.1.3"
+        "karma-qunit": "^2.0.1",
+        "karma-sinon": "^1.0.5"
     },
     "repository": {
         "type": "git",
         "url": "http://code.example.com/git/example.git"
+    },
+    "dependencies": {
+        "qunit": "^2.6.0",
+        "sinon": "^4.5.0"
     }
 }
