@@ -62,7 +62,7 @@ function OpenmixApplication(settings) {
      */
     this.handle_request = function(request, response) {
         var allReasons,
-			dataSonar = parseFusionData(request.getData('sonar')),
+			dataSonar = parseSonarData(request.getData('sonar')),
             decisionProvider,
             decisionReason,
             failedCandidates,
@@ -193,7 +193,7 @@ function OpenmixApplication(settings) {
     /**
      * @param {!Object} data
      */
-    function parseFusionData(data) {
+    function parseSonarData(data) {
         var keys = Object.keys(data),
             i = keys.length,
             key;
