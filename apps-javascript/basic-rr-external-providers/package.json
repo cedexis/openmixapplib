@@ -1,0 +1,18 @@
+{
+    "devDependencies": {
+        "jshint": "^2.9.5",
+        "karma": "^2.0.0",
+        "karma-junit-reporter": "^1.2.0",
+        "karma-phantomjs-launcher": "^1.0.4",
+        "karma-qunit": "^2.0.1",
+        "karma-sinon": "^1.0.5"
+    },
+    "dependencies": {
+        "qunit": "^2.6.0",
+        "sinon": "^4.5.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://code.example.com/git/example.git"
+    }
+}
